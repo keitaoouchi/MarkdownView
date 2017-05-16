@@ -7,6 +7,8 @@
 
 > MarkdownView is a WKWebView based UI element, and internally use bootstrap, highlight.js, markdown-it.
 
+![GIF](https://github.com/keitaoouchi/MarkdownView/blob/master/sample.gif "GIF")
+
 ## How to use
 
 ```swift
