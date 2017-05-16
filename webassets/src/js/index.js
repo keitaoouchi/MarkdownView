@@ -1,7 +1,7 @@
-import $ from 'jquery'
 import hljs from 'highlight.js'
 import MarkdownIt from 'markdown-it'
-import 'bootstrap/dist/css/bootstrap.css'
+import emoji from 'markdown-it-emoji'
+import './../css/bootstrap.css'
 import './../css/gist.css'
 import './../css/github.css'
 import './../css/index.css'
@@ -21,9 +21,22 @@ window.showMarkdown = (markdownText) => {
     }
   })
 
+  markdown.use(emoji)
+
   let html = markdown.render(markdownText)
-  $('#contents').html(html)
-  $('table').addClass('table')
-  $('pre code').each((i, block) => hljs.highlightBlock(block))
+
+  document.getElementById('contents').innerHTML = html
+
+  let tables = document.querySelectorAll('table')
+
+  tables.forEach((table) => {
+    table.classList.add('table')
+  })
+
+  let codes = document.querySelectorAll('pre code')
+
+  codes.forEach((code) => {
+    hljs.highlightBlock(code)
+  })
 
 }

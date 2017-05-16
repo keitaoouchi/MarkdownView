@@ -16,6 +16,8 @@
 		FCB2E9471ECA8B7600285B87 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB2E9461ECA8B7600285B87 /* ViewController.swift */; };
 		FCB2E9491ECA929500285B87 /* Example2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB2E9481ECA929500285B87 /* Example2ViewController.swift */; };
 		FCB2E94B1ECA93CB00285B87 /* Example3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB2E94A1ECA93CB00285B87 /* Example3ViewController.swift */; };
+		FCB2E94F1ECADF3700285B87 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = FCB2E94E1ECADF3700285B87 /* README.md */; };
+		FCB2E9511ECAF36500285B87 /* sample.md in Resources */ = {isa = PBXBuildFile; fileRef = FCB2E9501ECAF36500285B87 /* sample.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		FCB2E9461ECA8B7600285B87 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		FCB2E9481ECA929500285B87 /* Example2ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Example2ViewController.swift; sourceTree = "<group>"; };
 		FCB2E94A1ECA93CB00285B87 /* Example3ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Example3ViewController.swift; sourceTree = "<group>"; };
+		FCB2E94E1ECADF3700285B87 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
+		FCB2E9501ECAF36500285B87 /* sample.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = sample.md; path = ../../sample.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +88,8 @@
 		DE524D631EC47CB100E8C2F9 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				FCB2E9501ECAF36500285B87 /* sample.md */,
+				FCB2E94E1ECADF3700285B87 /* README.md */,
 				DE524D641EC47CB100E8C2F9 /* AppDelegate.swift */,
 				DE524D661EC47CB100E8C2F9 /* Example1ViewController.swift */,
 				FCB2E9481ECA929500285B87 /* Example2ViewController.swift */,
@@ -159,6 +165,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCB2E94F1ECADF3700285B87 /* README.md in Resources */,
+				FCB2E9511ECAF36500285B87 /* sample.md in Resources */,
 				DE524D6F1EC47CB100E8C2F9 /* LaunchScreen.storyboard in Resources */,
 				DE524D6C1EC47CB100E8C2F9 /* Assets.xcassets in Resources */,
 				DE524D6A1EC47CB100E8C2F9 /* Main.storyboard in Resources */,

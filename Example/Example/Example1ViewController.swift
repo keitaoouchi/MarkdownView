@@ -9,20 +9,17 @@ class Example1ViewController: UIViewController {
     let mdView = MarkdownView()
     view.addSubview(mdView)
     mdView.translatesAutoresizingMaskIntoConstraints = false
-    mdView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+    mdView.topAnchor.constraint(equalTo: topLayoutGuide.topAnchor).isActive = true
     mdView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     mdView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-    mdView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    mdView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
 
-    let session = URLSession(configuration: .default)
-    let url = URL(string: "https://raw.githubusercontent.com/matteocrippa/awesome-swift/master/README.md")!
-    let task = session.dataTask(with: url) { data, res, error in
-      let str = String(data: data!, encoding: String.Encoding.utf8)
-      DispatchQueue.main.async {
-        mdView.load(markdown: str)
-      }
-    }
-    task.resume()
+    let path = Bundle.main.path(forResource: "sample", ofType: "md")!
+
+    let url = URL(fileURLWithPath: path)
+    let markdown = try! String(contentsOf: url, encoding: String.Encoding.utf8)
+    mdView.load(markdown: markdown)
+
   }
 
 }
