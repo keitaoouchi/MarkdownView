@@ -16,8 +16,6 @@
 		FC9CC4C61EC43FA90013238C /* main.css in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BE1EC43FA90013238C /* main.css */; };
 		FC9CC4C71EC43FA90013238C /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BF1EC43FA90013238C /* main.js */; };
 		FCA0501A1EC41211001DAD5F /* MarkdownView.h in Headers */ = {isa = PBXBuildFile; fileRef = FCA050181EC41211001DAD5F /* MarkdownView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FCFB6FD31EC4381600297562 /* Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFB6FD01EC4381600297562 /* Formatter.swift */; };
-		FCFB6FD41EC4381600297562 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFB6FD11EC4381600297562 /* String.swift */; };
 		FCFB6FD51EC4381600297562 /* MarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFB6FD21EC4381600297562 /* MarkdownView.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,8 +31,6 @@
 		FCA050151EC41211001DAD5F /* MarkdownView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MarkdownView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCA050181EC41211001DAD5F /* MarkdownView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MarkdownView.h; sourceTree = "<group>"; };
 		FCA050191EC41211001DAD5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FCFB6FD01EC4381600297562 /* Formatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Formatter.swift; sourceTree = "<group>"; };
-		FCFB6FD11EC4381600297562 /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		FCFB6FD21EC4381600297562 /* MarkdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkdownView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,12 +64,10 @@
 		FCA050171EC41211001DAD5F /* MarkdownView */ = {
 			isa = PBXGroup;
 			children = (
-				FCFB6FD01EC4381600297562 /* Formatter.swift */,
-				FCFB6FD11EC4381600297562 /* String.swift */,
 				FCFB6FD21EC4381600297562 /* MarkdownView.swift */,
-				FCA050201EC4123C001DAD5F /* Assets */,
 				FCA050181EC41211001DAD5F /* MarkdownView.h */,
 				FCA050191EC41211001DAD5F /* Info.plist */,
+				FCA050201EC4123C001DAD5F /* Assets */,
 			);
 			path = MarkdownView;
 			sourceTree = "<group>";
@@ -181,8 +175,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FCFB6FD41EC4381600297562 /* String.swift in Sources */,
-				FCFB6FD31EC4381600297562 /* Formatter.swift in Sources */,
 				FCFB6FD51EC4381600297562 /* MarkdownView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
