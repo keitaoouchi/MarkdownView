@@ -14,11 +14,9 @@ module.exports = {
                 test: /\.js$/,
                 loader: "babel-loader"
             }, {
-                // CSSファイル用の処理
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader"})
             }, {
-                // スタイルシート以外のファイルの処理
                 test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
                 loader: "file-loader",
                 options: {
