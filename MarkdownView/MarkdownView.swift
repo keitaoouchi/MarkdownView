@@ -97,11 +97,7 @@ extension MarkdownView: WKNavigationDelegate {
         decisionHandler(.cancel)
       }
     default:
-      if let url = navigationAction.request.url, UIApplication.shared.canOpenURL(url) {
-        decisionHandler(.allow)
-      } else {
-        decisionHandler(.cancel)
-      }
+      decisionHandler(.allow)
     }
 
   }
