@@ -24,13 +24,13 @@ md.load(markdown: "# Hello World!")
 md.isScrollEnabled = false
 
 // called when rendering finished
-mdView.onRendered = { [weak self] height in
+md.onRendered = { [weak self] height in
   self?.mdViewHeight.constant = height
   self?.view.setNeedsLayout()
 }
 
 // called when user touch link
-mdView.onTouchLink = { [weak self] request in
+md.onTouchLink = { [weak self] request in
   guard let url = request.url else { return false }
 
   if url.scheme == "file" {
