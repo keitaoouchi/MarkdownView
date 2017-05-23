@@ -1,7 +1,6 @@
 # MarkdownView
 
 [![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat)](https://swift.org/)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Version](https://img.shields.io/cocoapods/v/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
 [![License](https://img.shields.io/cocoapods/l/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
 
@@ -52,21 +51,13 @@ Swift3.0 or later.
 
 ## Installation
 
-MarkdownView is available through [CocoaPods](http://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage).
+MarkdownView is available through [CocoaPods](http://cocoapods.org).
 
 ### CocoaPods
 
 ```ruby
 pod "MarkdownView"
 ```
-
-### Carthage
-
-```
-github "keitaoouchi/MarkdownView"
-```
-
-for detail, please follow the [Carthage Instruction](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos)
 
 ## Author
 
