@@ -34,8 +34,18 @@ open class MarkdownView: UIView {
 
     let bundle = Bundle(for: MarkdownView.self)
 
-    if let path = bundle.path(forResource: "MarkdownView.bundle/index", ofType:"html") {
-      let templateRequest = URLRequest(url: URL(fileURLWithPath: path))
+    var htmlURL: URL?
+    if bundle.bundleIdentifier?.hasPrefix("org.cocoapods") == true {
+      htmlURL = bundle.url(forResource: "index",
+                           withExtension: "html",
+                           subdirectory: "MarkdownView.bundle")
+    } else {
+      htmlURL = bundle.url(forResource: "index",
+                           withExtension: "html")
+    }
+
+    if let url = htmlURL {
+      let templateRequest = URLRequest(url: url)
 
       let escapedMarkdown = self.escape(markdown: markdown)
       let script = "window.showMarkdown('\(escapedMarkdown)');"
