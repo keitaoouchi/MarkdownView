@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0zV-ZM-AeL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0zV-ZM-AeL">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -17,7 +17,7 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
@@ -49,10 +49,14 @@
         <scene sceneID="PuQ-IH-Yy3">
             <objects>
                 <navigationController id="0zV-ZM-AeL" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="YIJ-65-bX7">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="YIJ-65-bX7">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="ZuY-QC-Xpc">
+                        <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="rqT-ae-QLc"/>
                     </connections>
@@ -154,6 +158,75 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xrG-jQ-sWD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2463" y="36"/>
+        </scene>
+        <!--Example4 View Controller-->
+        <scene sceneID="7bC-E2-cjh">
+            <objects>
+                <viewController storyboardIdentifier="Example4" id="dyi-iO-giE" customClass="Example4ViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fZg-3P-ZYQ"/>
+                        <viewControllerLayoutGuide type="bottom" id="NbS-G2-zhP"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="XWG-QA-6Ev">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="izT-Tv-hzD">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DNa-7Z-b9M">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dG6-ar-pCb" customClass="MarkdownView" customModule="MarkdownView">
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" id="Gig-Pn-LYq"/>
+                                                </constraints>
+                                            </view>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstItem="dG6-ar-pCb" firstAttribute="top" secondItem="DNa-7Z-b9M" secondAttribute="top" id="6sZ-ek-nRn"/>
+                                            <constraint firstAttribute="trailing" secondItem="dG6-ar-pCb" secondAttribute="trailing" id="KJp-IY-wPa"/>
+                                            <constraint firstAttribute="bottom" secondItem="dG6-ar-pCb" secondAttribute="bottom" id="WzK-2G-UMd"/>
+                                            <constraint firstItem="dG6-ar-pCb" firstAttribute="leading" secondItem="DNa-7Z-b9M" secondAttribute="leading" id="Xw3-sU-h0F"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="DNa-7Z-b9M" firstAttribute="top" secondItem="izT-Tv-hzD" secondAttribute="top" id="04h-y5-aeN"/>
+                                    <constraint firstAttribute="bottom" secondItem="DNa-7Z-b9M" secondAttribute="bottom" id="8y1-X6-wpE"/>
+                                    <constraint firstItem="DNa-7Z-b9M" firstAttribute="leading" secondItem="izT-Tv-hzD" secondAttribute="leading" id="Fyf-P4-9zH"/>
+                                    <constraint firstAttribute="trailing" secondItem="DNa-7Z-b9M" secondAttribute="trailing" id="dBU-zI-Tin"/>
+                                    <constraint firstItem="DNa-7Z-b9M" firstAttribute="width" secondItem="izT-Tv-hzD" secondAttribute="width" id="nna-Pq-kLJ"/>
+                                </constraints>
+                            </scrollView>
+                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="TAa-ZV-mC7">
+                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="TAa-ZV-mC7" secondAttribute="trailing" id="2Oa-Vl-h5M"/>
+                            <constraint firstItem="izT-Tv-hzD" firstAttribute="leading" secondItem="XWG-QA-6Ev" secondAttribute="leading" id="6u4-9t-fAx"/>
+                            <constraint firstItem="izT-Tv-hzD" firstAttribute="top" secondItem="TAa-ZV-mC7" secondAttribute="bottom" id="77v-Rb-WRl"/>
+                            <constraint firstItem="TAa-ZV-mC7" firstAttribute="top" secondItem="fZg-3P-ZYQ" secondAttribute="bottom" id="Axv-Kv-cRO"/>
+                            <constraint firstAttribute="trailing" secondItem="izT-Tv-hzD" secondAttribute="trailing" id="K1G-ke-UjY"/>
+                            <constraint firstItem="TAa-ZV-mC7" firstAttribute="leading" secondItem="XWG-QA-6Ev" secondAttribute="leading" id="bNP-0T-Adp"/>
+                            <constraint firstItem="NbS-G2-zhP" firstAttribute="top" secondItem="izT-Tv-hzD" secondAttribute="bottom" id="dSg-UI-fSN"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="mdView" destination="dG6-ar-pCb" id="Ecq-Ev-0JV"/>
+                        <outlet property="mdViewHeight" destination="Gig-Pn-LYq" id="VCa-3U-1y9"/>
+                        <outlet property="searchBar" destination="TAa-ZV-mC7" id="rIr-Mc-iM0"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oQ2-kS-cnz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3232.8000000000002" y="35.532233883058474"/>
         </scene>
     </scenes>
 </document>
