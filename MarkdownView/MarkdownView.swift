@@ -47,7 +47,7 @@ open class MarkdownView: UIView {
     if let url = htmlURL {
       let templateRequest = URLRequest(url: url)
 
-      let escapedMarkdown = self.escape(markdown: markdown)
+      let escapedMarkdown = self.escape(markdown: markdown) ?? ""
       let script = "window.showMarkdown('\(escapedMarkdown)');"
       let userScript = WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
 
@@ -76,10 +76,8 @@ open class MarkdownView: UIView {
     }
   }
 
-  private func escape(markdown: String) -> String {
-    return markdown
-      .replacingOccurrences(of: "\n", with: "\\n")
-      .replacingOccurrences(of: "'", with: "\\'")
+  private func escape(markdown: String) -> String? {
+    return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
   }
 
 }
