@@ -6,11 +6,13 @@ import './../css/gist.css'
 import './../css/github.css'
 import './../css/index.css'
 
-window.showMarkdown = (markdownText) => {
+window.showMarkdown = (percentEncodedMarkdown) => {
 
-  if (!markdownText) {
+  if (!percentEncodedMarkdown) {
     return
   }
+
+  const markdownText = decodeURIComponent(percentEncodedMarkdown)
 
   let markdown = new MarkdownIt({
     html: true,
