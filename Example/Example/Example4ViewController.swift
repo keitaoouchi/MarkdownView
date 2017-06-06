@@ -27,14 +27,14 @@ class Example4ViewController: UIViewController {
         return true
       } else if url.scheme == "https" {
         let safari = SFSafariViewController(url: url)
-        self?.navigationController?.pushViewController(safari, animated: true)
+        self?.present(safari, animated: true, completion: nil)
         return false
       } else {
         return false
       }
     }
   }
-  
+
 }
 
 extension Example4ViewController: UISearchBarDelegate {
@@ -42,14 +42,14 @@ extension Example4ViewController: UISearchBarDelegate {
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     if let urlStr = searchBar.text, let url = URL(string: urlStr) {
       let session = URLSession(configuration: .default)
-      let task = session.dataTask(with: url) { [weak self] data, res, error in
+      let task = session.dataTask(with: url) { [weak self] data, _, _ in
         guard let data = data else { return }
 
         let str = String(data: data, encoding: String.Encoding.utf8)
         DispatchQueue.main.async {
           self?.mdView.load(markdown: str)
         }
-        
+
       }
       task.resume()
     } else {

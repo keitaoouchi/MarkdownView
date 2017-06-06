@@ -24,7 +24,7 @@ class Example3ViewController: UIViewController {
         return true
       } else if url.scheme == "https" {
         let safari = SFSafariViewController(url: url)
-        self?.navigationController?.pushViewController(safari, animated: true)
+        self?.present(safari, animated: true, completion: nil)
         return false
       } else {
         return false
@@ -33,7 +33,7 @@ class Example3ViewController: UIViewController {
 
     let session = URLSession(configuration: .default)
     let url = URL(string: "https://raw.githubusercontent.com/matteocrippa/awesome-swift/master/README.md")!
-    let task = session.dataTask(with: url) { [weak self] data, res, error in
+    let task = session.dataTask(with: url) { [weak self] data, _, _ in
       let str = String(data: data!, encoding: String.Encoding.utf8)
       DispatchQueue.main.async {
         self?.mdView.load(markdown: str)
@@ -41,5 +41,5 @@ class Example3ViewController: UIViewController {
     }
     task.resume()
   }
-  
+
 }
