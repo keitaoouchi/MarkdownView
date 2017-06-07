@@ -6,7 +6,7 @@ import './../css/gist.css'
 import './../css/github.css'
 import './../css/index.css'
 
-window.showMarkdown = (percentEncodedMarkdown) => {
+window.showMarkdown = (percentEncodedMarkdown, enableImage = true) => {
 
   if (!percentEncodedMarkdown) {
     return
@@ -22,6 +22,10 @@ window.showMarkdown = (percentEncodedMarkdown) => {
         return hljs.highlightAuto(code).value;
     }
   })
+
+  if (!enableImage) {
+    markdown = markdown.disable('image')
+  }
 
   markdown.use(emoji)
 

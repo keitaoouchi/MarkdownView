@@ -18,7 +18,7 @@ class Example1ViewController: UIViewController {
 
     let url = URL(fileURLWithPath: path)
     let markdown = try! String(contentsOf: url, encoding: String.Encoding.utf8)
-    mdView.load(markdown: markdown)
+    mdView.load(markdown: markdown, enableImage: true)
 
   }
 

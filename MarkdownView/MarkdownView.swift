@@ -29,7 +29,7 @@ open class MarkdownView: UIView {
     super.init(coder: aDecoder)
   }
 
-  public func load(markdown: String?) {
+  public func load(markdown: String?, enableImage: Bool = true) {
     guard let markdown = markdown else { return }
 
     let bundle = Bundle(for: MarkdownView.self)
@@ -48,7 +48,8 @@ open class MarkdownView: UIView {
       let templateRequest = URLRequest(url: url)
 
       let escapedMarkdown = self.escape(markdown: markdown) ?? ""
-      let script = "window.showMarkdown('\(escapedMarkdown)');"
+      let imageOption = enableImage ? "true" : "false"
+      let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
       let userScript = WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
 
       let controller = WKUserContentController()
