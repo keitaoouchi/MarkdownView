@@ -69,7 +69,6 @@ open class MarkdownView: UIView {
         wv.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
         wv.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
       } else {
-        // Fallback on earlier versions
         NSLayoutConstraint(item: wv,
                            attribute: .top,
                            relatedBy: .equal,
