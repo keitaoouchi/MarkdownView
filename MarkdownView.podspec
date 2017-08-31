@@ -11,8 +11,5 @@ Pod::Spec.new do |s|
     'MarkdownView' => ['webassets/dist/*']
   }
   s.frameworks    = "Foundation"
-  s.ios.deployment_target = "9.0"
-  s.pod_target_xcconfig = {
-    "SWIFT_VERSION": "3.0"
-  }
+  s.ios.deployment_target = "8.0"
 end

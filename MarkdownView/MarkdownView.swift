@@ -63,10 +63,41 @@ open class MarkdownView: UIView {
       wv.translatesAutoresizingMaskIntoConstraints = false
       wv.navigationDelegate = self
       addSubview(wv)
-      wv.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-      wv.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-      wv.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-      wv.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+      if #available(iOS 9.0, *) {
+        wv.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        wv.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        wv.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        wv.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+      } else {
+        NSLayoutConstraint(item: wv,
+                           attribute: .top,
+                           relatedBy: .equal,
+                           toItem: self,
+                           attribute: .topMargin,
+                           multiplier: 1.0,
+                           constant: 0.0).isActive = true
+        NSLayoutConstraint(item: wv,
+                           attribute: .bottom,
+                           relatedBy: .equal,
+                           toItem: self,
+                           attribute: .bottomMargin,
+                           multiplier: 1.0,
+                           constant: 0.0).isActive = true
+        NSLayoutConstraint(item: wv,
+                           attribute: .leading,
+                           relatedBy: .equal,
+                           toItem: self,
+                           attribute: .leadingMargin,
+                           multiplier: 1.0,
+                           constant: 0.0).isActive = true
+        NSLayoutConstraint(item: wv,
+                           attribute: .trailing,
+                           relatedBy: .equal,
+                           toItem: self,
+                           attribute: .trailingMargin,
+                           multiplier: 1.0,
+                           constant: 0.0).isActive = true
+      }
       wv.backgroundColor = self.backgroundColor
 
       self.webView = wv
