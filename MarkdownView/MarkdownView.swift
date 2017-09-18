@@ -17,7 +17,7 @@ open class MarkdownView: UIView {
     
     public var onRendered: ((CGFloat) -> Void)?
     
-    public var didRendered: (() -> Void)?
+    public var didRendered: ((WKWebView) -> Void)?
     
     public convenience init() {
         self.init(frame: CGRect.zero)
@@ -97,7 +97,7 @@ extension MarkdownView: WKNavigationDelegate {
             }
         }
         if let _ = didRendered {
-            didRendered!()
+            didRendered!(webView)
         }
     }
     
