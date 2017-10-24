@@ -1,6 +1,7 @@
 # MarkdownView
 
-[![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat)](https://swift.org/)
+[![CI Status](http://img.shields.io/travis/keitaoouchi/MArkdownView.svg?style=flat)](https://travis-ci.org/keitaoouchi/MarkdownView)
+[![Swift 4.0](https://img.shields.io/badge/Swift-4.0-orange.svg?style=flat)](https://swift.org/)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Version](https://img.shields.io/cocoapods/v/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
 [![License](https://img.shields.io/cocoapods/l/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
@@ -47,8 +48,10 @@ md.onTouchLink = { [weak self] request in
 
 ## Requirements
 
-iOS 9 or later.
-Swift3.0 or later.
+| Target            | Version |
+|-------------------|---------|
+| iOS               |  => 9.0 |
+| Swift             |  => 4.0 |
 
 ## Installation
 
