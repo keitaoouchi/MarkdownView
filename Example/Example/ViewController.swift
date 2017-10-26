@@ -44,25 +44,25 @@ final class ViewController: UIViewController {
     stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
   }
 
-  func openExample1(sender: Any) {
+  @objc func openExample1(sender: Any) {
     let example = storyboard?.instantiateViewController(
       withIdentifier: "Example1") as! Example1ViewController
     navigationController?.pushViewController(example, animated: true)
   }
 
-  func openExample2(sender: Any) {
+  @objc func openExample2(sender: Any) {
     let example = storyboard?.instantiateViewController(
       withIdentifier: "Example2") as! Example2ViewController
     navigationController?.pushViewController(example, animated: true)
   }
 
-  func openExample3(sender: Any) {
+  @objc func openExample3(sender: Any) {
     let example = storyboard?.instantiateViewController(
       withIdentifier: "Example3") as! Example3ViewController
     navigationController?.pushViewController(example, animated: true)
   }
 
-  func openExample4(sender: Any) {
+  @objc func openExample4(sender: Any) {
     let example = storyboard?.instantiateViewController(
       withIdentifier: "Example4") as! Example4ViewController
     navigationController?.pushViewController(example, animated: true)
