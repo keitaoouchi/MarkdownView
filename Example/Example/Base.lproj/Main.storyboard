@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0zV-ZM-AeL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0zV-ZM-AeL">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -17,7 +18,7 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
@@ -50,11 +51,10 @@
             <objects>
                 <navigationController id="0zV-ZM-AeL" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="YIJ-65-bX7">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="ZuY-QC-Xpc">
-                        <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
                     <connections>
@@ -120,7 +120,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" id="JQv-Ma-12I"/>
+                                                    <constraint firstAttribute="height" placeholder="YES" id="JQv-Ma-12I"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
@@ -152,7 +152,6 @@
                     </view>
                     <connections>
                         <outlet property="mdView" destination="7IU-tq-2e9" id="ppI-98-j5H"/>
-                        <outlet property="mdViewHeight" destination="JQv-Ma-12I" id="xAr-B7-CBd"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xrG-jQ-sWD" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -172,7 +171,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="izT-Tv-hzD">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="76" width="375" height="591"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DNa-7Z-b9M">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
@@ -181,7 +180,7 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="375" height="0.0"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" id="Gig-Pn-LYq"/>
+                                                    <constraint firstAttribute="height" placeholder="YES" id="Gig-Pn-LYq"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
@@ -203,7 +202,7 @@
                                 </constraints>
                             </scrollView>
                             <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="TAa-ZV-mC7">
-                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="20" width="375" height="56"/>
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
                         </subviews>
@@ -220,7 +219,6 @@
                     </view>
                     <connections>
                         <outlet property="mdView" destination="dG6-ar-pCb" id="Ecq-Ev-0JV"/>
-                        <outlet property="mdViewHeight" destination="Gig-Pn-LYq" id="VCa-3U-1y9"/>
                         <outlet property="searchBar" destination="TAa-ZV-mC7" id="rIr-Mc-iM0"/>
                     </connections>
                 </viewController>

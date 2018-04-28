@@ -6,7 +6,6 @@ class Example4ViewController: UIViewController {
 
   @IBOutlet weak var searchBar: UISearchBar!
   @IBOutlet weak var mdView: MarkdownView!
-  @IBOutlet weak var mdViewHeight: NSLayoutConstraint!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -15,9 +14,8 @@ class Example4ViewController: UIViewController {
 
     mdView.isScrollEnabled = false
 
-    mdView.onRendered = { [weak self] height in
-      self?.mdViewHeight.constant = height
-      self?.view.setNeedsLayout()
+    mdView.onRendered = { height in
+      print(height)
     }
 
     mdView.onTouchLink = { [weak self] request in
