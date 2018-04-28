@@ -10,7 +10,7 @@ open class MarkdownView: UIView {
 
   private var webView: WKWebView?
   
-  private var intrinsicContentHeight: CGFloat? {
+  fileprivate var intrinsicContentHeight: CGFloat? {
     didSet {
       self.invalidateIntrinsicContentSize()
     }
