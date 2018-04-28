@@ -5,16 +5,14 @@ import SafariServices
 class Example3ViewController: UIViewController {
 
   @IBOutlet weak var mdView: MarkdownView!
-  @IBOutlet weak var mdViewHeight: NSLayoutConstraint!
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
     mdView.isScrollEnabled = false
 
-    mdView.onRendered = { [weak self] height in
-      self?.mdViewHeight.constant = height
-      self?.view.setNeedsLayout()
+    mdView.onRendered = { height in
+      print(height)
     }
 
     mdView.onTouchLink = { [weak self] request in
