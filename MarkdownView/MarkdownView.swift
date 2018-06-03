@@ -34,10 +34,26 @@ open class MarkdownView: UIView {
 
   override init (frame: CGRect) {
     super.init(frame : frame)
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(contentSizeDidChange(_:)),
+                                           name: NSNotification.Name.UIContentSizeCategoryDidChange,
+                                           object: nil)
   }
 
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(contentSizeDidChange(_:)),
+                                           name: NSNotification.Name.UIContentSizeCategoryDidChange,
+                                           object: nil)
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+  @objc private func contentSizeDidChange(_ notification: Notification) {
+    webView?.reload()
   }
 
   open override var intrinsicContentSize: CGSize {
