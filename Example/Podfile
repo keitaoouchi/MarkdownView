@@ -2,7 +2,7 @@
 # platform :ios, '9.0'
 
 target 'Example' do
-  use_frameworks!
+  use_modular_headers!
 
   post_install do |installer|
   installer.pods_project.targets.each do |target|

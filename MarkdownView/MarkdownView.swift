@@ -53,15 +53,12 @@ open class MarkdownView: UIView {
 
     let bundle = Bundle(for: MarkdownView.self)
 
-    var htmlURL: URL?
-    if bundle.bundleIdentifier?.hasPrefix("org.cocoapods") == true {
-      htmlURL = bundle.url(forResource: "index",
-                           withExtension: "html",
-                           subdirectory: "MarkdownView.bundle")
-    } else {
-      htmlURL = bundle.url(forResource: "index",
-                           withExtension: "html")
-    }
+    let htmlURL: URL? =
+      bundle.url(forResource: "index",
+                 withExtension: "html") ??
+      bundle.url(forResource: "index",
+                 withExtension: "html",
+                 subdirectory: "MarkdownView.bundle")
 
     if let url = htmlURL {
       let templateRequest = URLRequest(url: url)
