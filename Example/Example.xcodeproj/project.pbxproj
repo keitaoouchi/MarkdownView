@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		672053A8E8D45EEE3739CB50 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2992D172711A655B6322F894 /* Pods_Example.framework */; };
 		DE524D651EC47CB100E8C2F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE524D641EC47CB100E8C2F9 /* AppDelegate.swift */; };
 		DE524D671EC47CB100E8C2F9 /* Example1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE524D661EC47CB100E8C2F9 /* Example1ViewController.swift */; };
 		DE524D6A1EC47CB100E8C2F9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DE524D681EC47CB100E8C2F9 /* Main.storyboard */; };
 		DE524D6C1EC47CB100E8C2F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE524D6B1EC47CB100E8C2F9 /* Assets.xcassets */; };
 		DE524D6F1EC47CB100E8C2F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DE524D6D1EC47CB100E8C2F9 /* LaunchScreen.storyboard */; };
+		DF85605DE14EAE2D14E58EB3 /* libPods-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EAEB7F4358B9EF21E9D96277 /* libPods-Example.a */; };
 		FC2C2EE21ED7B1D70065633B /* Example4ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2C2EE11ED7B1D70065633B /* Example4ViewController.swift */; };
 		FCB2E9471ECA8B7600285B87 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB2E9461ECA8B7600285B87 /* ViewController.swift */; };
 		FCB2E9491ECA929500285B87 /* Example2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB2E9481ECA929500285B87 /* Example2ViewController.swift */; };
@@ -22,7 +22,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2992D172711A655B6322F894 /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DB4CCAB27BE7F6CF35BA1E5 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		88E6DEC525FE3CD3BAB79EA8 /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
 		DE524D611EC47CB100E8C2F9 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -32,6 +31,7 @@
 		DE524D6B1EC47CB100E8C2F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE524D6E1EC47CB100E8C2F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DE524D701EC47CB100E8C2F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EAEB7F4358B9EF21E9D96277 /* libPods-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC2C2EE11ED7B1D70065633B /* Example4ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Example4ViewController.swift; sourceTree = "<group>"; };
 		FCB2E9461ECA8B7600285B87 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		FCB2E9481ECA929500285B87 /* Example2ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Example2ViewController.swift; sourceTree = "<group>"; };
@@ -45,7 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				672053A8E8D45EEE3739CB50 /* Pods_Example.framework in Frameworks */,
+				DF85605DE14EAE2D14E58EB3 /* libPods-Example.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,7 +55,7 @@
 		5120DE397F30974224FD684A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2992D172711A655B6322F894 /* Pods_Example.framework */,
+				EAEB7F4358B9EF21E9D96277 /* libPods-Example.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -117,7 +117,6 @@
 				DE524D5D1EC47CB100E8C2F9 /* Sources */,
 				DE524D5E1EC47CB100E8C2F9 /* Frameworks */,
 				DE524D5F1EC47CB100E8C2F9 /* Resources */,
-				EAE02CA1CF5EF2380CEFA2B6 /* [CP] Embed Pods Frameworks */,
 				A9591DA79983D9E13DB22B4B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -185,9 +184,12 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Example/Pods-Example-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/MarkdownView/MarkdownView.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MarkdownView.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -200,28 +202,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Example-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		EAE02CA1CF5EF2380CEFA2B6 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Example/Pods-Example-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
