@@ -36,7 +36,7 @@ open class MarkdownView: UIView {
     super.init(frame : frame)
     NotificationCenter.default.addObserver(self,
                                            selector: #selector(contentSizeDidChange(_:)),
-                                           name: NSNotification.Name.UIContentSizeCategoryDidChange,
+                                           name: UIContentSizeCategory.didChangeNotification,
                                            object: nil)
   }
 
@@ -44,7 +44,7 @@ open class MarkdownView: UIView {
     super.init(coder: aDecoder)
     NotificationCenter.default.addObserver(self,
                                            selector: #selector(contentSizeDidChange(_:)),
-                                           name: NSNotification.Name.UIContentSizeCategoryDidChange,
+                                           name: UIContentSizeCategory.didChangeNotification,
                                            object: nil)
   }
 
@@ -58,7 +58,7 @@ open class MarkdownView: UIView {
 
   open override var intrinsicContentSize: CGSize {
     if let height = self.intrinsicContentHeight {
-      return CGSize(width: UIViewNoIntrinsicMetric, height: height)
+        return CGSize(width: UIView.noIntrinsicMetric, height: height)
     } else {
       return CGSize.zero
     }
