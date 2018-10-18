@@ -42,7 +42,7 @@ open class MarkdownView: UIView {
 
   open override var intrinsicContentSize: CGSize {
     if let height = self.intrinsicContentHeight {
-      return CGSize(width: UIViewNoIntrinsicMetric, height: height)
+      return CGSize(width: UIView.noIntrinsicMetric, height: height)
     } else {
       return CGSize.zero
     }
