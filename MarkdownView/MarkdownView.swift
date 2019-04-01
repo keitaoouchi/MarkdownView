@@ -16,7 +16,7 @@ open class MarkdownView: UIView {
     }
   }
 
-  public var isScrollEnabled: Bool = true {
+  @objc public var isScrollEnabled: Bool = true {
 
     didSet {
       webView?.scrollView.isScrollEnabled = isScrollEnabled
@@ -24,9 +24,9 @@ open class MarkdownView: UIView {
 
   }
 
-  public var onTouchLink: ((URLRequest) -> Bool)?
+  @objc public var onTouchLink: ((URLRequest) -> Bool)?
 
-  public var onRendered: ((CGFloat) -> Void)?
+  @objc public var onRendered: ((CGFloat) -> Void)?
 
   public convenience init() {
     self.init(frame: CGRect.zero)
@@ -48,7 +48,7 @@ open class MarkdownView: UIView {
     }
   }
 
-  public func load(markdown: String?, enableImage: Bool = true) {
+  @objc public func load(markdown: String?, enableImage: Bool = true) {
     guard let markdown = markdown else { return }
 
     let bundle = Bundle(for: MarkdownView.self)
