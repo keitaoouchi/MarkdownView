@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = "MarkdownView"
-  s.version       = "1.5.0"
+  s.version       = "1.6.0"
   s.summary       = "Markdown View for iOS."
   s.homepage      = "https://github.com/keitaoouchi/MarkdownView"
   s.license       = { :type => "MIT", :file => "LICENSE" }
@@ -11,8 +11,8 @@ Pod::Spec.new do |s|
     'MarkdownView' => ['webassets/dist/*']
   }
   s.frameworks    = "Foundation"
-  s.ios.deployment_target = "9.0"
+  s.ios.deployment_target = "10.0"
   s.pod_target_xcconfig = {
-    "SWIFT_VERSION": "4.2"
+    "SWIFT_VERSION": "5.0"
   }
 end
