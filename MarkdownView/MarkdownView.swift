@@ -61,8 +61,6 @@ open class MarkdownView: UIView {
                  subdirectory: "MarkdownView.bundle")
 
     if let url = htmlURL {
-      let templateRequest = URLRequest(url: url)
-
       let escapedMarkdown = self.escape(markdown: markdown) ?? ""
       let imageOption = enableImage ? "true" : "false"
       let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
@@ -87,7 +85,7 @@ open class MarkdownView: UIView {
 
       self.webView = wv
 
-      wv.load(templateRequest)
+      wv.loadFileURL(url, allowingReadAccessTo: url)
     } else {
       // TODO: raise error
     }
