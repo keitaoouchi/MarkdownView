@@ -12,7 +12,7 @@ open class MarkdownView: UIView {
   private var webView: WKWebView?
 
 
-    var isDarkUIStyle = false
+    public var isDarkUIStyle = false
   
   fileprivate var intrinsicContentHeight: CGFloat? {
     didSet {
