@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D3D278923BC75DC0059D330 /* main_dark.css in Resources */ = {isa = PBXBuildFile; fileRef = 7D3D278823BC75DC0059D330 /* main_dark.css */; };
+		7D3D278B23BC763C0059D330 /* index_dark.html in Resources */ = {isa = PBXBuildFile; fileRef = 7D3D278A23BC763C0059D330 /* index_dark.html */; };
 		FC9CC4C51EC43FA90013238C /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BD1EC43FA90013238C /* index.html */; };
 		FC9CC4C61EC43FA90013238C /* main.css in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BE1EC43FA90013238C /* main.css */; };
 		FC9CC4C71EC43FA90013238C /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BF1EC43FA90013238C /* main.js */; };
@@ -15,6 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7D3D278823BC75DC0059D330 /* main_dark.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = main_dark.css; sourceTree = "<group>"; };
+		7D3D278A23BC763C0059D330 /* index_dark.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index_dark.html; sourceTree = "<group>"; };
 		FC9CC4BD1EC43FA90013238C /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = webassets/dist/index.html; sourceTree = SOURCE_ROOT; };
 		FC9CC4BE1EC43FA90013238C /* main.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = main.css; path = webassets/dist/main.css; sourceTree = SOURCE_ROOT; };
 		FC9CC4BF1EC43FA90013238C /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = webassets/dist/main.js; sourceTree = SOURCE_ROOT; };
@@ -67,6 +71,8 @@
 			children = (
 				FC9CC4BD1EC43FA90013238C /* index.html */,
 				FC9CC4BE1EC43FA90013238C /* main.css */,
+				7D3D278A23BC763C0059D330 /* index_dark.html */,
+				7D3D278823BC75DC0059D330 /* main_dark.css */,
 				FC9CC4BF1EC43FA90013238C /* main.js */,
 			);
 			name = Assets;
@@ -125,6 +131,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = FCA0500B1EC41211001DAD5F;
@@ -144,6 +151,8 @@
 			files = (
 				FC9CC4C61EC43FA90013238C /* main.css in Resources */,
 				FC9CC4C51EC43FA90013238C /* index.html in Resources */,
+				7D3D278B23BC763C0059D330 /* index_dark.html in Resources */,
+				7D3D278923BC75DC0059D330 /* main_dark.css in Resources */,
 				FC9CC4C71EC43FA90013238C /* main.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

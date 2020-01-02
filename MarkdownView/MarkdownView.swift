@@ -6,9 +6,13 @@ import WebKit
  
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
+
 open class MarkdownView: UIView {
 
   private var webView: WKWebView?
+
+
+    public var isDarkUIStyle = false
   
   fileprivate var intrinsicContentHeight: CGFloat? {
     didSet {
@@ -53,10 +57,16 @@ open class MarkdownView: UIView {
 
     let bundle = Bundle(for: MarkdownView.self)
 
+    var htmlName = "index"
+
+    if isDarkUIStyle {
+        htmlName = "index_dark"
+    }
+
     let htmlURL: URL? =
-      bundle.url(forResource: "index",
+      bundle.url(forResource: htmlName,
                  withExtension: "html") ??
-      bundle.url(forResource: "index",
+      bundle.url(forResource: htmlName,
                  withExtension: "html",
                  subdirectory: "MarkdownView.bundle")
 
