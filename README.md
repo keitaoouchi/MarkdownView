@@ -80,7 +80,7 @@ Originally by:
 keita.oouchi, keita.oouchi@gmail.com
 
 Catalyst & Swift Package Manager support by:
-[Dan Burkhard](https://github.com/danburkhardt), Founder and Lead Engineer @[GigabiteLabs](https://gigabitelabs.com)
+[Dan Burkhardt](https://github.com/danburkhardt), Founder and Lead Engineer @[GigabiteLabs](https://gigabitelabs.com)
 
 ## License
 
