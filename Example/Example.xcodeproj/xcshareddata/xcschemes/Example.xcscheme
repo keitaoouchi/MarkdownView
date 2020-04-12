@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0900"
+   LastUpgradeVersion = "1140"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FCA050141EC41211001DAD5F"
-               BuildableName = "MarkdownView.framework"
-               BlueprintName = "MarkdownView"
-               ReferencedContainer = "container:MarkdownView.xcodeproj">
+               BlueprintIdentifier = "DE524D601EC47CB100E8C2F9"
+               BuildableName = "Example.app"
+               BlueprintName = "Example"
+               ReferencedContainer = "container:Example.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,15 +40,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FCA050141EC41211001DAD5F"
-            BuildableName = "MarkdownView.framework"
-            BlueprintName = "MarkdownView"
-            ReferencedContainer = "container:MarkdownView.xcodeproj">
+            BlueprintIdentifier = "DE524D601EC47CB100E8C2F9"
+            BuildableName = "Example.app"
+            BlueprintName = "Example"
+            ReferencedContainer = "container:Example.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -56,21 +57,23 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FCA050141EC41211001DAD5F"
-            BuildableName = "MarkdownView.framework"
-            BlueprintName = "MarkdownView"
-            ReferencedContainer = "container:MarkdownView.xcodeproj">
+            BlueprintIdentifier = "DE524D601EC47CB100E8C2F9"
+            BuildableName = "Example.app"
+            BlueprintName = "Example"
+            ReferencedContainer = "container:Example.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "MarkdownView Example"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
