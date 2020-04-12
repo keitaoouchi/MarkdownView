@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/dan/SynologyDrive/SoftwareDevelopment/FrameworkRepositories/Cocoapods/OpenSource/MarkdownView/Example/Example.xcodeproj">
+      location = "group:MarkdownView Example.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">

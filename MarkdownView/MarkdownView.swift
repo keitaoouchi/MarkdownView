@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import Metal
 
 /**
  Markdown View for iOS.
@@ -49,48 +50,81 @@ open class MarkdownView: UIView {
   }
 
   @objc public func load(markdown: String?, enableImage: Bool = true) {
-    guard let markdown = markdown else { return }
-
-    let bundle = Bundle(for: MarkdownView.self)
-
-    let htmlURL: URL? =
-      bundle.url(forResource: "index",
-                 withExtension: "html") ??
-      bundle.url(forResource: "index",
-                 withExtension: "html",
-                 subdirectory: "MarkdownView.bundle")
-
-    if let url = htmlURL {
-      let templateRequest = URLRequest(url: url)
-
-      let escapedMarkdown = self.escape(markdown: markdown) ?? ""
-      let imageOption = enableImage ? "true" : "false"
-      let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
-      let userScript = WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-
-      let controller = WKUserContentController()
-      controller.addUserScript(userScript)
-
-      let configuration = WKWebViewConfiguration()
-      configuration.userContentController = controller
-
-      let wv = WKWebView(frame: self.bounds, configuration: configuration)
-      wv.scrollView.isScrollEnabled = self.isScrollEnabled
-      wv.translatesAutoresizingMaskIntoConstraints = false
-      wv.navigationDelegate = self
-      addSubview(wv)
-      wv.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-      wv.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-      wv.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-      wv.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-      wv.backgroundColor = self.backgroundColor
-
-      self.webView = wv
-
-      wv.load(templateRequest)
-    } else {
-      // TODO: raise error
+    guard let markdown = markdown else {
+        #if DEBUG
+        print("ERROR: markdown string not passed into load() function, returning")
+        #endif
+        return
     }
+
+    // setup bundle url and holder for optional htmlURL var
+    let bundle = Bundle(for: MarkdownView.self)
+    var htmlURL: URL? = nil
+    
+    // Enables handling different bundle URL formatting for catalyst environment
+    #if targetEnvironment(macCatalyst)
+        #if DEBUG
+        print("using htmlURL formatted for mac catalyst environment")
+        #endif
+        htmlURL = bundle.url(
+            forResource: "index",
+            withExtension: "html",
+            subdirectory: "MarkdownView.bundle/Contents/Resources")
+        
+        #if DEBUG
+        print("htmlURL: \(htmlURL?.absoluteString ?? "error, htmlURL was nil!")")
+        #endif
+    // handle bundle URL formatting for iOS envs
+    #else
+        #if DEBUG
+         print("using htmlURL formatted for iOS environment")
+        #endif
+         htmlURL =
+             bundle.url(forResource: "index",
+                       withExtension: "html") ??
+             bundle.url(forResource: "index",
+                       withExtension: "html",
+                           subdirectory: "MarkdownView.bundle")
+        #if DEBUG
+        print("htmlURL: \(htmlURL?.absoluteString ?? "error, htmlURL was nil!")")
+        #endif
+    #endif
+    
+    // ensure htmlURL is assigned & handle nil value
+    guard let url = htmlURL else {
+        #if DEBUG
+        print("\nWARNING: markdownView.swift: htmlurl could not be loaded: this is likely due to running this application in unsupported environment.\n")
+        #endif
+        return
+    }
+    
+    // format & setup markdownview
+    let escapedMarkdown = self.escape(markdown: markdown) ?? ""
+    let imageOption = enableImage ? "true" : "false"
+    let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
+    let userScript = WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+    
+    // setup wk config
+    let controller = WKUserContentController()
+    controller.addUserScript(userScript)
+    
+    let configuration = WKWebViewConfiguration()
+    configuration.userContentController = controller
+
+    let wv = WKWebView(frame: self.bounds, configuration: configuration)
+    wv.scrollView.isScrollEnabled = self.isScrollEnabled
+    wv.translatesAutoresizingMaskIntoConstraints = false
+    wv.navigationDelegate = self
+    addSubview(wv)
+    wv.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+    wv.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+    wv.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+    wv.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+    wv.backgroundColor = self.backgroundColor
+    self.webView = wv
+    
+    // use wk to load, but using catalyst && iOS compatible func
+    wv.loadFileURL(url, allowingReadAccessTo: url)
   }
 
   private func escape(markdown: String) -> String? {
