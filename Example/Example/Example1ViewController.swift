@@ -11,7 +11,7 @@ class Example1ViewController: UIViewController {
         mdView.translatesAutoresizingMaskIntoConstraints = false
         
         // Apply appropriate constraints
-        if #available(iOS 10.0, *) {
+        if #available(iOS 13.0, *) {
             mdView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
             mdView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         } else if #available(OSX 10.15, *) {
