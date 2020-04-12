@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = "MarkdownView"
-  s.version       = "2.0.0"
+  s.version       = "2.0.1"
   s.summary       = "Markdown View for iOS & macCatalyst applications."
   s.homepage      = "https://github.com/gigabitelabs/MarkdownView"
   s.license       = { :type => "MIT", :file => "LICENSE" }
