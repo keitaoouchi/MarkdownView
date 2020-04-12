@@ -7,7 +7,7 @@ generate_multiple_pod_projects: true,
 incremental_installation: true
 use_modular_headers!
 
-target 'MarkdownView Example' do
+target 'Example' do
   use_frameworks!
   inhibit_all_warnings!
 
