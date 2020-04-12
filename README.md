@@ -50,12 +50,23 @@ md.onTouchLink = { [weak self] request in
 
 | Target            | Version |
 |-------------------|---------|
-| iOS               |  => 10.0 |
-| Swift             |  => 5.0 |
+| iOS               |  => 13.0        |
+| macCatalyst       |  => macOS 10.15 |
+| Swift             |  => 5.0         |
 
 ## Installation
 
-MarkdownView is available through [CocoaPods](http://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage).
+MarkdownView for iOS and macCatalyst with SwiftPM support is only available through [GigabiteLabs](https://github.com/gigabitelabs/markdownview)
+
+### Swift Package Manager
+
+Incorporation via SPM will typically be the easiset and most performant way to use this framework (fastest time to compile, less re-compiling / fussing with cocoapods).
+
+1. Open your Xcode project / workspace
+2. Go to `file>Swift Packages>Add Package Dependency`
+3. Target the master branch of this repo [https://github.com/GigabiteLabs/MarkdownView]()
+4. Choose latest release by tag version, or just target master for the latest
+5. All set
 
 ### CocoaPods
 
@@ -63,18 +74,13 @@ MarkdownView is available through [CocoaPods](http://cocoapods.org) or [Carthage
 pod "MarkdownView"
 ```
 
-### Carthage
-
-```
-github "keitaoouchi/MarkdownView"
-```
-
-for detail, please follow the [Carthage Instruction](https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos)
-
-
 ## Author
 
+Originally by:
 keita.oouchi, keita.oouchi@gmail.com
+
+Catalyst & Swift Package Manager support by:
+[Dan Burkhard](https://github.com/danburkhardt), Founder and Lead Engineer @[GigabiteLabs](https://gigabitelabs.com)
 
 ## License
 
