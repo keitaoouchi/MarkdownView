@@ -10,8 +10,8 @@ Pod::Spec.new do |s|
   s.resource_bundles = {
     'MarkdownView' => ['webassets/dist/*']
   }
-  s.frameworks    = "Foundation"
+  s.ios.frameworks = "Foundation"
+  s.platform = :ios
   s.ios.deployment_target = "13.0"
-  s.osx.deployment_target = "10.15"
   s.swift_version = '5.0'
 end

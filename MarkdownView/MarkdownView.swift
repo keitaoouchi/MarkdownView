@@ -1,6 +1,5 @@
 import UIKit
 import WebKit
-import Metal
 
 /**
  Markdown View for iOS.

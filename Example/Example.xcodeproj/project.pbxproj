@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3708C8702442C93D0098AD1F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3708C86F2442C93D0098AD1F /* UIKit.framework */; };
 		3B609C9845BD2E3C69B20496 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADFBCF05DB1F1317E607E406 /* Pods_Example.framework */; };
 		DE524D651EC47CB100E8C2F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE524D641EC47CB100E8C2F9 /* AppDelegate.swift */; };
 		DE524D671EC47CB100E8C2F9 /* Example1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE524D661EC47CB100E8C2F9 /* Example1ViewController.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3708C86F2442C93D0098AD1F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		374A40C5244297BE00F839A6 /* Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example.entitlements; sourceTree = "<group>"; };
 		377721222442AC1900CEFA9D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		4A04D2F8D66FBC3E282BE792 /* Pods-MarkdownView Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MarkdownView Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-MarkdownView Example/Pods-MarkdownView Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -49,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3708C8702442C93D0098AD1F /* UIKit.framework in Frameworks */,
 				3B609C9845BD2E3C69B20496 /* Pods_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -59,6 +62,7 @@
 		5120DE397F30974224FD684A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3708C86F2442C93D0098AD1F /* UIKit.framework */,
 				377721222442AC1900CEFA9D /* Metal.framework */,
 				ADFBCF05DB1F1317E607E406 /* Pods_Example.framework */,
 			);
