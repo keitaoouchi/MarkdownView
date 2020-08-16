@@ -108,6 +108,11 @@ open class MarkdownView: UIView {
           wv.scrollView.isScrollEnabled = self.isScrollEnabled
           wv.translatesAutoresizingMaskIntoConstraints = false
           wv.navigationDelegate = self
+          wv.isOpaque = false
+          if #available(iOS 13.0, *) {
+            wv.backgroundColor = UIColor.systemBackground
+            wv.scrollView.backgroundColor = UIColor.systemBackground
+          }
           addSubview(wv)
           wv.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
           wv.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true

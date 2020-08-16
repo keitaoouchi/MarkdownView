@@ -1147,7 +1147,7 @@ table td[class*=col-], table th[class*=col-] {
 
 .diff .hljs-deletion {
     color: #bd2c00;
-    background-color: #ffecec
+    background-color: #36383a
 }
 
 .markdown .hljs-link_url {
@@ -1222,7 +1222,7 @@ table td[class*=col-], table th[class*=col-] {
 }
 
 .hljs-deletion {
-    background: #fdd
+    background: #36383a
 }
 
 .hljs-addition {
