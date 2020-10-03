@@ -1,5 +1,9 @@
 {
   "presets": [
-    "es2015"
+    ["env", {
+      "targets": {
+        "ios": 13
+      }
+    }]
   ]
 }

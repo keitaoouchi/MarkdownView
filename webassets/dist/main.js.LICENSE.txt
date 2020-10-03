@@ -1,0 +1,7150 @@
+/*
+      On any opening or closing tag of the original markup we first close
+      the entire highlighted node stack, then render the original tag along
+      with all the following original tags at the same offset and then
+      reopen all the tags on the highlighted stack.
+      */
+
+/*
+      The lookahead pattern (?=...) ensures that 'begin' only matches
+      '<style' as a single word, followed by a whitespace or an
+      ending braket. The '$' is needed for the lexeme to be recognized
+      by hljs.subMode() that tests lexemes outside the stream.
+      */
+
+/*
+      Why might be find ourselves here?  Only one occasion now.  An end match that was
+      triggered but could not be completed.  When might this happen?  When an `endSameasBegin`
+      rule sets the end rule to a specific match.  Since the overall mode termination rule that's
+      being used to scan the text isn't recompiled that means that any match that LOOKS like
+      the end (but is not, because it is not an exact match to the beginning) will
+      end up here.  A definite end match, but when `doEndMatch` tries to "reapply"
+      the end rule and fails to match, we wind up here, and just silently ignore the end.
+       This causes no real harm other than stopping a few times too many.
+      */
+
+/*
+    A double quote can start either a string or a line comment. Strings are
+    ended before the end of a line by another double quote and can contain
+    escaped double-quotes and post-escaped line breaks.
+     Also, any double quote at the beginning of a line is a comment but we
+    don't handle that properly at the moment: any double quote inside will
+    turn them into a string. Handling it properly will require a smarter
+    parser.
+    */
+
+/*
+    Created to solve the key deficiently with MultiRegex - there is no way to
+    test for multiple matches at a single location.  Why would we need to do
+    that?  In the future a more dynamic engine will allow certain matches to be
+    ignored.  An example: if we matched say the 3rd regex in a large group but
+    decided to ignore it - we'd need to started testing again at the 4th
+    regex... but MultiRegex itself gives us no real way to do that.
+     So what this class creates MultiRegexs on the fly for whatever search
+    position they are needed.
+     NOTE: These additional MultiRegex objects are created dynamically.  For most
+    grammars most of the time we will never actually need anything more than the
+    first MultiRegex - so this shouldn't have too much overhead.
+     Say this is our search group, and we match regex3, but wish to ignore it.
+       regex1 | regex2 | regex3 | regex4 | regex5    ' ie, startAt = 0
+     What we need is a new MultiRegex that only includes the remaining
+    possibilities:
+       regex4 | regex5                               ' ie, startAt = 3
+     This class wraps all that complexity up in a simple API... `startAt` decides
+    where in the array of expressions to start doing the matching. It
+    auto-increments, so if a match is found at position 2, then startAt will be
+    set to 3.  If the end is reached startAt will return to 0.
+     MOST of the time the parser will be setting startAt manually to 0.
+  */
+
+/*
+    To avoid starting the stream just before it should stop the order is
+    ensured that original always starts first and closes last:
+     if (event1 == 'start' && event2 == 'start')
+      return original;
+    if (event1 == 'start' && event2 == 'stop')
+      return highlighted;
+    if (event1 == 'stop' && event2 == 'start')
+      return original;
+    if (event1 == 'stop' && event2 == 'stop')
+      return highlighted;
+     ... which is collapsed to:
+    */
+
+/*
+  Formal syntax is not published, helpful link:
+  https://github.com/kornilova-l/matlab-IntelliJ-plugin/blob/master/src/main/grammar/Matlab.bnf
+*/
+
+/*
+  This is a fork and modification of Drew McDonald's file (https://github.com/drewmcdonald/stata-highlighting). I have also included a list of builtin commands from https://bugs.kde.org/show_bug.cgi?id=135646.
+*/
+
+/*
+ Language: Apache Access Log
+ Author: Oleg Efimov <efimovov@gmail.com>
+ Description: Apache/Nginx Access Logs
+ Website: https://httpd.apache.org/docs/2.4/logs.html#accesslog
+ */
+
+/*
+ Language: ArcGIS Arcade
+ Category: scripting
+ Author: John Foster <jfoster@esri.com>
+ Website: https://developers.arcgis.com/arcade/
+ Description: ArcGIS Arcade is an expression language used in many Esri ArcGIS products such as Pro, Online, Server, Runtime, JavaScript, and Python
+*/
+
+/*
+ Language: Flix
+ Category: functional
+ Author: Magnus Madsen <mmadsen@uwaterloo.ca>
+ Website: https://flix.dev/
+ */
+
+/*
+ Language: G-code (ISO 6983)
+ Contributors: Adam Joseph Cook <adam.joseph.cook@gmail.com>
+ Description: G-code syntax highlighter for Fanuc and other common CNC machine tool controls.
+ Website: https://www.sis.se/api/document/preview/911952/
+ */
+
+/*
+ Language: GAMS
+ Author: Stefan Bechert <stefan.bechert@gmx.net>
+ Contributors: Oleg Efimov <efimovov@gmail.com>, Mikko Kouhia <mikko.kouhia@iki.fi>
+ Description: The General Algebraic Modeling System language
+ Website: https://www.gams.com
+ Category: scientific
+ */
+
+/*
+ Language: Gherkin
+ Author: Sam Pikesley (@pikesley) <sam.pikesley@theodi.org>
+ Description: Gherkin is the format for cucumber specifications. It is a domain specific language which helps you to describe business behavior without the need to go into detail of implementation.
+ Website: https://cucumber.io/docs/gherkin/
+ */
+
+/*
+ Language: Groovy
+ Author: Guillaume Laforge <glaforge@gmail.com>
+ Description: Groovy programming language implementation inspired from Vsevolod's Java mode
+ Website: https://groovy-lang.org
+ */
+
+/*
+ Language: HTMLBars (legacy)
+ Requires: xml.js
+ Description: Matcher for Handlebars as well as EmberJS additions.
+ Website: https://github.com/tildeio/htmlbars
+ Category: template
+ */
+
+/*
+ Language: JBoss CLI
+ Author: Raphaël Parrëe <rparree@edc4it.com>
+ Description: language definition jboss cli
+ Website: https://docs.jboss.org/author/display/WFLY/Command+Line+Interface
+ Category: config
+ */
+
+/*
+ Language: Kotlin
+ Description: Kotlin is an OSS statically typed programming language that targets the JVM, Android, JavaScript and Native.
+ Author: Sergey Mashkov <cy6erGn0m@gmail.com>
+ Website: https://kotlinlang.org
+ Category: common
+ */
+
+/*
+ Language: N1QL
+ Author: Andres Täht <andres.taht@gmail.com>
+ Contributors: Rene Saarsoo <nene@triin.net>
+ Description: Couchbase query language
+ Website: https://www.couchbase.com/products/n1ql
+ */
+
+/*
+ Language: SQL
+ Contributors: Nikolay Lisienko <info@neor.ru>, Heiko August <post@auge8472.de>, Travis Odom <travis.a.odom@gmail.com>, Vadimtro <vadimtro@yahoo.com>, Benjamin Auder <benjamin.auder@gmail.com>
+ Website: https://en.wikipedia.org/wiki/SQL
+ Category: common
+ */
+
+/*
+ Language: Zephir
+ Description: Zephir, an open source, high-level language designed to ease the creation and maintainability of extensions for PHP with a focus on type and memory safety.
+ Author: Oleg Efimov <efimovov@gmail.com>
+ Website: https://zephir-lang.com/en
+ */
+
+/*
+ Language: dsconfig
+ Description: dsconfig batch configuration language for LDAP directory servers
+ Contributors: Jacob Childress <jacobc@gmail.com>
+ Category: enterprise, config
+ */
+
+/*
+Language: .properties
+Contributors: Valentin Aitken <valentin@nalisbg.com>, Egor Rogov <e.rogov@postgrespro.ru>
+Website: https://en.wikipedia.org/wiki/.properties
+Category: common, config
+*/
+
+/*
+Language: 1C:Enterprise
+Author: Stanislav Belov <stbelov@gmail.com>
+Description: built-in language 1C:Enterprise (v7, v8)
+Category: enterprise
+*/
+
+/*
+Language: ARM Assembly
+Author: Dan Panzarella <alsoelp@gmail.com>
+Description: ARM Assembly including Thumb and Thumb2 instructions
+Category: assembler
+*/
+
+/*
+Language: AVR Assembly
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Category: assembler
+Website: https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_instruction_list.html
+*/
+
+/*
+Language: ActionScript
+Author: Alexander Myadzel <myadzel@gmail.com>
+Category: scripting
+*/
+
+/*
+Language: Ada
+Author: Lars Schulna <kartoffelbrei.mit.muskatnuss@gmail.org>
+Description: Ada is a general-purpose programming language that has great support for saftey critical and real-time applications.
+             It has been developed by the DoD and thus has been used in military and safety-critical applications (like civil aviation).
+             The first version appeared in the 80s, but it's still actively developed today with
+             the newest standard being Ada2012.
+*/
+
+/*
+Language: AngelScript
+Author: Melissa Geels <melissa@nimble.tools>
+Category: scripting
+Website: https://www.angelcode.com/angelscript/
+*/
+
+/*
+Language: Apache config
+Author: Ruslan Keba <rukeba@gmail.com>
+Contributors: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Website: https://httpd.apache.org
+Description: language definition for Apache configuration files (httpd.conf & .htaccess)
+Category: common, config
+*/
+
+/*
+Language: AppleScript
+Authors: Nathan Grigg <nathan@nathanamy.org>, Dr. Drang <drdrang@gmail.com>
+Category: scripting
+Website: https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/introduction/ASLR_intro.html
+*/
+
+/*
+Language: Arduino
+Author: Stefania Mellai <s.mellai@arduino.cc>
+Description: The Arduino® Language is a superset of C++. This rules are designed to highlight the Arduino® source code. For info about language see http://www.arduino.cc.
+Requires: cpp.js
+Website: https://www.arduino.cc
+*/
+
+/*
+Language: AsciiDoc
+Requires: xml.js
+Author: Dan Allen <dan.j.allen@gmail.com>
+Website: http://asciidoc.org
+Description: A semantic, text-based document format that can be exported to HTML, DocBook and other backends.
+Category: markup
+*/
+
+/*
+Language: AspectJ
+Author: Hakan Ozler <ozler.hakan@gmail.com>
+Website: https://www.eclipse.org/aspectj/
+Description: Syntax Highlighting for the AspectJ Language which is a general-purpose aspect-oriented extension to the Java programming language.
+ */
+
+/*
+Language: Augmented Backus-Naur Form
+Author: Alex McKibben <alex@nullscope.net>
+Website: https://tools.ietf.org/html/rfc5234
+*/
+
+/*
+Language: AutoHotkey
+Author: Seongwon Lee <dlimpid@gmail.com>
+Description: AutoHotkey language definition
+Category: scripting
+*/
+
+/*
+Language: AutoIt
+Author: Manh Tuan <junookyo@gmail.com>
+Description: AutoIt language definition
+Category: scripting
+*/
+
+/*
+Language: Awk
+Author: Matthew Daly <matthewbdaly@gmail.com>
+Website: https://www.gnu.org/software/gawk/manual/gawk.html
+Description: language definition for Awk scripts
+*/
+
+/*
+Language: BASIC
+Author: Raphaël Assénat <raph@raphnet.net>
+Description: Based on the BASIC reference from the Tandy 1000 guide
+Website: https://en.wikipedia.org/wiki/Tandy_1000
+*/
+
+/*
+Language: Backus–Naur Form
+Website: https://en.wikipedia.org/wiki/Backus–Naur_form
+Author: Oleg Efimov <efimovov@gmail.com>
+*/
+
+/*
+Language: Bash
+Author: vah <vahtenberg@gmail.com>
+Contributrors: Benjamin Pannell <contact@sierrasoftworks.com>
+Website: https://www.gnu.org/software/bash/
+Category: common
+*/
+
+/*
+Language: Batch file (DOS)
+Author: Alexander Makarov <sam@rmcreative.ru>
+Contributors: Anton Kochkov <anton.kochkov@gmail.com>
+Website: https://en.wikipedia.org/wiki/Batch_file
+*/
+
+/*
+Language: Brainfuck
+Author: Evgeny Stepanischev <imbolk@gmail.com>
+Website: https://esolangs.org/wiki/Brainfuck
+*/
+
+/*
+Language: C
+Category: common, system
+Website: https://en.wikipedia.org/wiki/C_(programming_language)
+Requires: c-like.js
+*/
+
+/*
+Language: C#
+Author: Jason Diamond <jason@diamond.name>
+Contributor: Nicolas LLOBERA <nllobera@gmail.com>, Pieter Vantorre <pietervantorre@gmail.com>
+Website: https://docs.microsoft.com/en-us/dotnet/csharp/
+Category: common
+*/
+
+/*
+Language: C++
+Category: common, system
+Website: https://isocpp.org
+Requires: c-like.js
+*/
+
+/*
+Language: C-like foundation grammar for C/C++ grammars
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Contributors: Evgeny Stepanischev <imbolk@gmail.com>, Zaven Muradyan <megalivoithos@gmail.com>, Roel Deckers <admin@codingcat.nl>, Sam Wu <samsam2310@gmail.com>, Jordi Petit <jordi.petit@gmail.com>, Pieter Vantorre <pietervantorre@gmail.com>, Google Inc. (David Benjamin) <davidben@google.com>
+Category: common, system
+*/
+
+/*
+Language: C/AL
+Author: Kenneth Fuglsang Christensen <kfuglsang@gmail.com>
+Description: Provides highlighting of Microsoft Dynamics NAV C/AL code files
+Website: https://docs.microsoft.com/en-us/dynamics-nav/programming-in-c-al
+*/
+
+/*
+Language: CMake
+Description: CMake is an open-source cross-platform system for build automation.
+Author: Igor Kalnitsky <igor@kalnitsky.org>
+Website: https://cmake.org
+*/
+
+/*
+Language: CSP
+Description: Content Security Policy definition highlighting
+Author: Taras <oxdef@oxdef.info>
+Website: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
+vim: ts=2 sw=2 st=2
+*/
+
+/*
+Language: CSS
+Category: common, css
+Website: https://developer.mozilla.org/en-US/docs/Web/CSS
+*/
+
+/*
+Language: Caché Object Script
+Author: Nikita Savchenko <zitros.lab@gmail.com>
+Category: enterprise, scripting
+Website: https://cedocs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls
+*/
+
+/*
+Language: Cap’n Proto
+Author: Oleg Efimov <efimovov@gmail.com>
+Description: Cap’n Proto message definition format
+Website: https://capnproto.org/capnp-tool.html
+Category: protocols
+*/
+
+/*
+Language: Ceylon
+Author: Lucas Werkmeister <mail@lucaswerkmeister.de>
+Website: https://ceylon-lang.org
+*/
+
+/*
+Language: Clean
+Author: Camil Staps <info@camilstaps.nl>
+Category: functional
+Website: http://clean.cs.ru.nl
+*/
+
+/*
+Language: Clojure
+Description: Clojure syntax (based on lisp.js)
+Author: mfornos
+Website: https://clojure.org
+Category: lisp
+*/
+
+/*
+Language: Clojure REPL
+Description: Clojure REPL sessions
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Requires: clojure.js
+Website: https://clojure.org
+Category: lisp
+*/
+
+/*
+Language: CoffeeScript
+Author: Dmytrii Nagirniak <dnagir@gmail.com>
+Contributors: Oleg Efimov <efimovov@gmail.com>, Cédric Néhémie <cedric.nehemie@gmail.com>
+Description: CoffeeScript is a programming language that transcompiles to JavaScript. For info about language see http://coffeescript.org/
+Category: common, scripting
+Website: https://coffeescript.org
+*/
+
+/*
+Language: Coq
+Author: Stephan Boyer <stephan@stephanboyer.com>
+Category: functional
+Website: https://coq.inria.fr
+*/
+
+/*
+Language: Crystal
+Author: TSUYUSATO Kitsune <make.just.on@gmail.com>
+Website: https://crystal-lang.org
+*/
+
+/*
+Language: D
+Author: Aleksandar Ruzicic <aleksandar@ruzicic.info>
+Description: D is a language with C-like syntax and static typing. It pragmatically combines efficiency, control, and modeling power, with safety and programmer productivity.
+Version: 1.0a
+Website: https://dlang.org
+Date: 2012-04-08
+*/
+
+/*
+Language: DNS Zone
+Author: Tim Schumacher <tim@datenknoten.me>
+Category: config
+Website: https://en.wikipedia.org/wiki/Zone_file
+*/
+
+/*
+Language: Dart
+Requires: markdown.js
+Author: Maxim Dikun <dikmax@gmail.com>
+Description: Dart a modern, object-oriented language developed by Google. For more information see https://www.dartlang.org/
+Website: https://dart.dev
+Category: scripting
+*/
+
+/*
+Language: Delphi
+Website: https://www.embarcadero.com/products/delphi
+*/
+
+/*
+Language: Device Tree
+Description: *.dts files used in the Linux kernel
+Author: Martin Braun <martin.braun@ettus.com>, Moritz Fischer <moritz.fischer@ettus.com>
+Website: https://elinux.org/Device_Tree_Reference
+Category: config
+*/
+
+/*
+Language: Diff
+Description: Unified and context diff
+Author: Vasily Polovnyov <vast@whiteants.net>
+Website: https://www.gnu.org/software/diffutils/
+Category: common
+*/
+
+/*
+Language: Django
+Description: Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
+Requires: xml.js
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Contributors: Ilya Baryshev <baryshev@gmail.com>
+Website: https://www.djangoproject.com
+Category: template
+*/
+
+/*
+Language: Dockerfile
+Requires: bash.js
+Author: Alexis Hénaut <alexis@henaut.net>
+Description: language definition for Dockerfile files
+Website: https://docs.docker.com/engine/reference/builder/
+Category: config
+*/
+
+/*
+Language: Dust
+Requires: xml.js
+Author: Michael Allen <michael.allen@benefitfocus.com>
+Description: Matcher for dust.js templates.
+Website: https://www.dustjs.com
+Category: template
+*/
+
+/*
+Language: ERB (Embedded Ruby)
+Requires: xml.js, ruby.js
+Author: Lucas Mazza <lucastmazza@gmail.com>
+Contributors: Kassio Borges <kassioborgesm@gmail.com>
+Description: "Bridge" language defining fragments of Ruby in HTML within <% .. %>
+Website: https://ruby-doc.org/stdlib-2.6.5/libdoc/erb/rdoc/ERB.html
+Category: template
+*/
+
+/*
+Language: Elixir
+Author: Josh Adams <josh@isotope11.com>
+Description: language definition for Elixir source code files (.ex and .exs).  Based on ruby language support.
+Category: functional
+Website: https://elixir-lang.org
+*/
+
+/*
+Language: Elm
+Author: Janis Voigtlaender <janis.voigtlaender@gmail.com>
+Website: https://elm-lang.org
+Category: functional
+*/
+
+/*
+Language: Erlang
+Description: Erlang is a general-purpose functional language, with strict evaluation, single assignment, and dynamic typing.
+Author: Nikolay Zakharov <nikolay.desh@gmail.com>, Dmitry Kovega <arhibot@gmail.com>
+Website: https://www.erlang.org
+Category: functional
+*/
+
+/*
+Language: Erlang REPL
+Author: Sergey Ignatov <sergey@ignatov.spb.su>
+Website: https://www.erlang.org
+Category: functional
+*/
+
+/*
+Language: Excel formulae
+Author: Victor Zhou <OiCMudkips@users.noreply.github.com>
+Description: Excel formulae
+Website: https://products.office.com/en-us/excel/
+*/
+
+/*
+Language: Extended Backus-Naur Form
+Author: Alex McKibben <alex@nullscope.net>
+Website: https://en.wikipedia.org/wiki/Extended_Backus–Naur_form
+*/
+
+/*
+Language: F#
+Author: Jonas Follesø <jonas@follesoe.no>
+Contributors: Troy Kershaw <hello@troykershaw.com>, Henrik Feldt <henrik@haf.se>
+Website: https://docs.microsoft.com/en-us/dotnet/fsharp/
+Category: functional
+*/
+
+/*
+Language: FIX
+Author: Brent Bradbury <brent@brentium.com>
+*/
+
+/*
+Language: Fortran
+Author: Anthony Scemama <scemama@irsamc.ups-tlse.fr>
+Website: https://en.wikipedia.org/wiki/Fortran
+Category: scientific
+*/
+
+/*
+Language: GAUSS
+Author: Matt Evans <matt@aptech.com>
+Description: GAUSS Mathematical and Statistical language
+Website: https://www.aptech.com
+Category: scientific
+*/
+
+/*
+Language: GLSL
+Description: OpenGL Shading Language
+Author: Sergey Tikhomirov <sergey@tikhomirov.io>
+Website: https://en.wikipedia.org/wiki/OpenGL_Shading_Language
+Category: graphics
+*/
+
+/*
+Language: GML
+Author: Meseta <meseta@gmail.com>
+Description: Game Maker Language for GameMaker Studio 2
+Website: https://docs2.yoyogames.com
+Category: scripting
+*/
+
+/*
+Language: Go
+Author: Stephan Kountso aka StepLg <steplg@gmail.com>
+Contributors: Evgeny Stepanischev <imbolk@gmail.com>
+Description: Google go language (golang). For info about language
+Website: http://golang.org/
+Category: common, system
+*/
+
+/*
+Language: Golo
+Author: Philippe Charriere <ph.charriere@gmail.com>
+Description: a lightweight dynamic language for the JVM
+Website: http://golo-lang.org/
+*/
+
+/*
+Language: Gradle
+Description: Gradle is an open-source build automation tool focused on flexibility and performance.
+Website: https://gradle.org
+Author: Damian Mee <mee.damian@gmail.com>
+*/
+
+/*
+Language: HAML
+Requires: ruby.js
+Author: Dan Allen <dan.j.allen@gmail.com>
+Website: http://haml.info
+Category: template
+*/
+
+/*
+Language: HSP
+Author: prince <MC.prince.0203@gmail.com>
+Website: https://en.wikipedia.org/wiki/Hot_Soup_Processor
+Category: scripting
+*/
+
+/*
+Language: HTML, XML
+Website: https://www.w3.org/XML/
+Category: common
+*/
+
+/*
+Language: HTTP
+Description: HTTP request and response headers with automatic body highlighting
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Category: common, protocols
+Website: https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview
+*/
+
+/*
+Language: Handlebars
+Requires: xml.js
+Author: Robin Ward <robin.ward@gmail.com>
+Description: Matcher for Handlebars as well as EmberJS additions.
+Website: https://handlebarsjs.com
+Category: template
+*/
+
+/*
+Language: Haskell
+Author: Jeremy Hull <sourdrums@gmail.com>
+Contributors: Zena Treep <zena.treep@gmail.com>
+Website: https://www.haskell.org
+Category: functional
+*/
+
+/*
+Language: Haxe
+Description: Haxe is an open source toolkit based on a modern, high level, strictly typed programming language.
+Author: Christopher Kaster <ikasoki@gmail.com> (Based on the actionscript.js language file by Alexander Myadzel)
+Contributors: Kenton Hamaluik <kentonh@gmail.com>
+Website: https://haxe.org
+*/
+
+/*
+Language: Hy
+Description: Hy is a wonderful dialect of Lisp that’s embedded in Python.
+Author: Sergey Sobko <s.sobko@profitware.ru>
+Website: http://docs.hylang.org/en/stable/
+Category: lisp
+*/
+
+/*
+Language: IRPF90
+Author: Anthony Scemama <scemama@irsamc.ups-tlse.fr>
+Description: IRPF90 is an open-source Fortran code generator
+Website: http://irpf90.ups-tlse.fr
+Category: scientific
+*/
+
+/*
+Language: ISBL
+Author: Dmitriy Tarasov <dimatar@gmail.com>
+Description: built-in language DIRECTUM
+Category: enterprise
+*/
+
+/*
+Language: Inform 7
+Author: Bruno Dias <bruno.r.dias@gmail.com>
+Description: Language definition for Inform 7, a DSL for writing parser interactive fiction.
+Website: http://inform7.com
+*/
+
+/*
+Language: Intel x86 Assembly
+Author: innocenat <innocenat@gmail.com>
+Description: x86 assembly language using Intel's mnemonic and NASM syntax
+Website: https://en.wikipedia.org/wiki/X86_assembly_language
+Category: assembler
+*/
+
+/*
+Language: JSON
+Description: JSON (JavaScript Object Notation) is a lightweight data-interchange format.
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Website: http://www.json.org
+Category: common, protocols
+*/
+
+/*
+Language: Java
+Author: Vsevolod Solovyov <vsevolod.solovyov@gmail.com>
+Category: common, enterprise
+Website: https://www.java.com/
+*/
+
+/*
+Language: JavaScript
+Description: JavaScript (JS) is a lightweight, interpreted, or just-in-time compiled programming language with first-class functions.
+Category: common, scripting
+Website: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+*/
+
+/*
+Language: Julia
+Description: Julia is a high-level, high-performance, dynamic programming language.
+Author: Kenta Sato <bicycle1885@gmail.com>
+Contributors: Alex Arslan <ararslan@comcast.net>
+Website: https://julialang.org
+*/
+
+/*
+Language: Julia REPL
+Description: Julia REPL sessions
+Author: Morten Piibeleht <morten.piibeleht@gmail.com>
+Website: https://julialang.org
+Requires: julia.js
+
+The Julia REPL code blocks look something like the following:
+
+  julia> function foo(x)
+             x + 1
+         end
+  foo (generic function with 1 method)
+
+They start on a new line with "julia>". Usually there should also be a space after this, but
+we also allow the code to start right after the > character. The code may run over multiple
+lines, but the additional lines must start with six spaces (i.e. be indented to match
+"julia>"). The rest of the code is assumed to be output from the executed code and will be
+left un-highlighted.
+
+Using simply spaces to identify line continuations may get a false-positive if the output
+also prints out six spaces, but such cases should be rare.
+*/
+
+/*
+Language: LDIF
+Contributors: Jacob Childress <jacobc@gmail.com>
+Category: enterprise, config
+Website: https://en.wikipedia.org/wiki/LDAP_Data_Interchange_Format
+*/
+
+/*
+Language: LLVM IR
+Author: Michael Rodler <contact@f0rki.at>
+Description: language used as intermediate representation in the LLVM compiler framework
+Website: https://llvm.org/docs/LangRef.html
+Category: assembler
+*/
+
+/*
+Language: LSL (Linden Scripting Language)
+Description: The Linden Scripting Language is used in Second Life by Linden Labs.
+Author: Builder's Brewery <buildersbrewery@gmail.com>
+Website: http://wiki.secondlife.com/wiki/LSL_Portal
+Category: scripting
+*/
+
+/*
+Language: LaTeX
+Author: Vladimir Moskva <vladmos@gmail.com>
+Website: https://www.latex-project.org
+Category: markup
+*/
+
+/*
+Language: Lasso
+Author: Eric Knibbe <eric@lassosoft.com>
+Description: Lasso is a language and server platform for database-driven web applications. This definition handles Lasso 9 syntax and LassoScript for Lasso 8.6 and earlier.
+Website: http://www.lassosoft.com/What-Is-Lasso
+*/
+
+/*
+Language: Leaf
+Author: Hale Chan <halechan@qq.com>
+Description: Based on the Leaf reference from https://vapor.github.io/documentation/guide/leaf.html.
+*/
+
+/*
+Language: Less
+Description: It's CSS, with just a little more.
+Author:   Max Mikhailov <seven.phases.max@gmail.com>
+Website: http://lesscss.org
+Category: common, css
+*/
+
+/*
+Language: Lisp
+Description: Generic lisp syntax
+Author: Vasily Polovnyov <vast@whiteants.net>
+Category: lisp
+*/
+
+/*
+Language: LiveCode
+Author: Ralf Bitter <rabit@revigniter.com>
+Description: Language definition for LiveCode server accounting for revIgniter (a web application framework) characteristics.
+Version: 1.1
+Date: 2019-04-17
+Category: enterprise
+*/
+
+/*
+Language: LiveScript
+Author: Taneli Vatanen <taneli.vatanen@gmail.com>
+Contributors: Jen Evers-Corvina <jen@sevvie.net>
+Origin: coffeescript.js
+Description: LiveScript is a programming language that transcompiles to JavaScript. For info about language see http://livescript.net/
+Website: https://livescript.net
+Category: scripting
+*/
+
+/*
+Language: Lua
+Description: Lua is a powerful, efficient, lightweight, embeddable scripting language.
+Author: Andrew Fedorov <dmmdrs@mail.ru>
+Category: common, scripting
+Website: https://www.lua.org
+*/
+
+/*
+Language: MEL
+Description: Maya Embedded Language
+Author: Shuen-Huei Guan <drake.guan@gmail.com>
+Website: http://www.autodesk.com/products/autodesk-maya/overview
+Category: graphics
+*/
+
+/*
+Language: MIPS Assembly
+Author: Nebuleon Fumika <nebuleon.fumika@gmail.com>
+Description: MIPS Assembly (up to MIPS32R2)
+Website: https://en.wikipedia.org/wiki/MIPS_architecture
+Category: assembler
+*/
+
+/*
+Language: Makefile
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Contributors: Joël Porquet <joel@porquet.org>
+Website: https://www.gnu.org/software/make/manual/html_node/Introduction.html
+Category: common
+*/
+
+/*
+Language: Markdown
+Requires: xml.js
+Author: John Crepezzi <john.crepezzi@gmail.com>
+Website: https://daringfireball.net/projects/markdown/
+Category: common, markup
+*/
+
+/*
+Language: Mathematica
+Description: Wolfram Mathematica (usually termed Mathematica) is a modern technical computing system spanning most areas of technical computing.
+Authors: Daniel Kvasnicka <dkvasnicka@vendavo.com>, Jan Poeschko <jan@poeschko.com>
+Website: https://www.wolfram.com/mathematica/
+Category: scientific
+*/
+
+/*
+Language: Matlab
+Author: Denis Bardadym <bardadymchik@gmail.com>
+Contributors: Eugene Nizhibitsky <nizhibitsky@ya.ru>, Egor Rogov <e.rogov@postgrespro.ru>
+Website: https://www.mathworks.com/products/matlab.html
+Category: scientific
+*/
+
+/*
+Language: Maxima
+Author: Robert Dodier <robert.dodier@gmail.com>
+Website: http://maxima.sourceforge.net
+Category: scientific
+*/
+
+/*
+Language: Mercury
+Author: mucaho <mkucko@gmail.com>
+Description: Mercury is a logic/functional programming language which combines the clarity and expressiveness of declarative programming with advanced static analysis and error detection features.
+Website: https://www.mercurylang.org
+*/
+
+/*
+Language: Microsoft Axapta (now Dynamics 365)
+Author: Dmitri Roudakov <dmitri@roudakov.ru>
+Website: https://dynamics.microsoft.com/en-us/ax-overview/
+Category: enterprise
+*/
+
+/*
+Language: Microtik RouterOS script
+Author: Ivan Dementev <ivan_div@mail.ru>
+Description: Scripting host provides a way to automate some router maintenance tasks by means of executing user-defined scripts bounded to some event occurrence
+Website: https://wiki.mikrotik.com/wiki/Manual:Scripting
+*/
+
+/*
+Language: Mizar
+Description: The Mizar Language is a formal language derived from the mathematical vernacular.
+Author: Kelley van Evert <kelleyvanevert@gmail.com>
+Website: http://mizar.org/language/
+Category: scientific
+*/
+
+/*
+Language: Mojolicious
+Requires: xml.js, perl.js
+Author: Dotan Dimet <dotan@corky.net>
+Description: Mojolicious .ep (Embedded Perl) templates
+Website: https://mojolicious.org
+Category: template
+*/
+
+/*
+Language: Monkey
+Description: Monkey2 is an easy to use, cross platform, games oriented programming language from Blitz Research.
+Author: Arthur Bikmullin <devolonter@gmail.com>
+Website: https://blitzresearch.itch.io/monkey2
+*/
+
+/*
+Language: MoonScript
+Author: Billy Quith <chinbillybilbo@gmail.com>
+Description: MoonScript is a programming language that transcompiles to Lua.
+Origin: coffeescript.js
+Website: http://moonscript.org/
+Category: scripting
+*/
+
+/*
+Language: NSIS
+Description: Nullsoft Scriptable Install System
+Author: Jan T. Sott <jan.sott@gmail.com>
+Website: https://nsis.sourceforge.io/Main_Page
+*/
+
+/*
+Language: Nginx config
+Author: Peter Leonov <gojpeg@yandex.ru>
+Contributors: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Category: common, config
+Website: https://www.nginx.com
+*/
+
+/*
+Language: Nim
+Description: Nim is a statically typed compiled systems programming language.
+Website: https://nim-lang.org
+Category: system
+*/
+
+/*
+Language: Nix
+Author: Domen Kožar <domen@dev.si>
+Description: Nix functional language
+Website: http://nixos.org/nix
+*/
+
+/*
+Language: OCaml
+Author: Mehdi Dogguy <mehdi@dogguy.org>
+Contributors: Nicolas Braud-Santoni <nicolas.braud-santoni@ens-cachan.fr>, Mickael Delahaye <mickael.delahaye@gmail.com>
+Description: OCaml language definition.
+Website: https://ocaml.org
+Category: functional
+*/
+
+/*
+Language: Objective-C
+Author: Valerii Hiora <valerii.hiora@gmail.com>
+Contributors: Angel G. Olloqui <angelgarcia.mail@gmail.com>, Matt Diephouse <matt@diephouse.com>, Andrew Farmer <ahfarmer@gmail.com>, Minh Nguyễn <mxn@1ec5.org>
+Website: https://developer.apple.com/documentation/objectivec
+Category: common
+*/
+
+/*
+Language: OpenSCAD
+Author: Dan Panzarella <alsoelp@gmail.com>
+Description: OpenSCAD is a language for the 3D CAD modeling software of the same name.
+Website: https://www.openscad.org
+Category: scientific
+*/
+
+/*
+Language: Oracle Rules Language
+Author: Jason Jacobson <jason.a.jacobson@gmail.com>
+Description: The Oracle Utilities Rules Language is used to program the Oracle Utilities Applications acquired from LODESTAR Corporation.  The products include Billing Component, LPSS, Pricing Component etc. through version 1.6.1.
+Website: https://docs.oracle.com/cd/E17904_01/dev.1111/e10227/rlref.htm
+Category: enterprise
+*/
+
+/*
+Language: Oxygene
+Author: Carlo Kok <ck@remobjects.com>
+Description: Oxygene is built on the foundation of Object Pascal, revamped and extended to be a modern language for the twenty-first century.
+Website: https://www.elementscompiler.com/elements/default.aspx
+*/
+
+/*
+Language: PHP
+Author: Victor Karamzin <Victor.Karamzin@enterra-inc.com>
+Contributors: Evgeny Stepanischev <imbolk@gmail.com>, Ivan Sagalaev <maniac@softwaremaniacs.org>
+Website: https://www.php.net
+Category: common
+*/
+
+/*
+Language: PHP Template
+Requires: xml.js, php.js
+Author: Josh Goebel <hello@joshgoebel.com>
+Website: https://www.php.net
+Category: common
+*/
+
+/*
+Language: Packet Filter config
+Description: pf.conf — packet filter configuration file (OpenBSD)
+Author: Peter Piwowarski <oldlaptop654@aol.com>
+Website: http://man.openbsd.org/pf.conf
+Category: config
+*/
+
+/*
+Language: Parser3
+Requires: xml.js
+Author: Oleg Volchkov <oleg@volchkov.net>
+Website: https://www.parser.ru/en/
+Category: template
+*/
+
+/*
+Language: Perl
+Author: Peter Leonov <gojpeg@yandex.ru>
+Website: https://www.perl.org
+Category: common
+*/
+
+/*
+Language: Plain text
+Author: Egor Rogov (e.rogov@postgrespro.ru)
+Description: Plain text without any highlighting.
+Category: common
+*/
+
+/*
+Language: Pony
+Author: Joe Eli McIlvain <joe.eli.mac@gmail.com>
+Description: Pony is an open-source, object-oriented, actor-model,
+             capabilities-secure, high performance programming language.
+Website: https://www.ponylang.io
+*/
+
+/*
+Language: PostgreSQL and PL/pgSQL
+Author: Egor Rogov (e.rogov@postgrespro.ru)
+Website: https://www.postgresql.org/docs/11/sql.html
+Description:
+    This language incorporates both PostgreSQL SQL dialect and PL/pgSQL language.
+    It is based on PostgreSQL version 11. Some notes:
+    - Text in double-dollar-strings is _always_ interpreted as some programming code. Text
+      in ordinary quotes is _never_ interpreted that way and highlighted just as a string.
+    - There are quite a bit "special cases". That's because many keywords are not strictly
+      they are keywords in some contexts and ordinary identifiers in others. Only some
+      of such cases are handled; you still can get some of your identifiers highlighted
+      wrong way.
+    - Function names deliberately are not highlighted. There is no way to tell function
+      call from other constructs, hence we can't highlight _all_ function names. And
+      some names highlighted while others not looks ugly.
+*/
+
+/*
+Language: PowerShell
+Description: PowerShell is a task-based command-line shell and scripting language built on .NET.
+Author: David Mohundro <david@mohundro.com>
+Contributors: Nicholas Blumhardt <nblumhardt@nblumhardt.com>, Victor Zhou <OiCMudkips@users.noreply.github.com>, Nicolas Le Gall <contact@nlegall.fr>
+Website: https://docs.microsoft.com/en-us/powershell/
+*/
+
+/*
+Language: Processing
+Description: Processing is a flexible software sketchbook and a language for learning how to code within the context of the visual arts.
+Author: Erik Paluka <erik.paluka@gmail.com>
+Website: https://processing.org
+Category: graphics
+*/
+
+/*
+Language: Prolog
+Description: Prolog is a general purpose logic programming language associated with artificial intelligence and computational linguistics.
+Author: Raivo Laanemets <raivo@infdot.com>
+Website: https://en.wikipedia.org/wiki/Prolog
+*/
+
+/*
+Language: Protocol Buffers
+Author: Dan Tao <daniel.tao@gmail.com>
+Description: Protocol buffer message definition format
+Website: https://developers.google.com/protocol-buffers/docs/proto3
+Category: protocols
+*/
+
+/*
+Language: Puppet
+Author: Jose Molina Colmenero <gaudy41@gmail.com>
+Website: https://puppet.com/docs
+Category: config
+*/
+
+/*
+Language: PureBASIC
+Author: Tristano Ajmone <tajmone@gmail.com>
+Description: Syntax highlighting for PureBASIC (v.5.00-5.60). No inline ASM highlighting. (v.1.2, May 2017)
+Credits: I've taken inspiration from the PureBasic language file for GeSHi, created by Gustavo Julio Fiorenza (GuShH).
+Website: https://www.purebasic.com
+*/
+
+/*
+Language: Python
+Description: Python is an interpreted, object-oriented, high-level programming language with dynamic semantics.
+Website: https://www.python.org
+Category: common
+*/
+
+/*
+Language: Python REPL
+Requires: python.js
+Author: Josh Goebel <hello@joshgoebel.com>
+Category: common
+*/
+
+/*
+Language: Python profiler
+Description: Python profiler results
+Author: Brian Beck <exogen@gmail.com>
+*/
+
+/*
+Language: Q
+Description: Q is a vector-based functional paradigm programming language built into the kdb+ database.
+             (K/Q/Kdb+ from Kx Systems)
+Author: Sergey Vidyuk <svidyuk@gmail.com>
+Website: https://kx.com/connect-with-us/developers/
+*/
+
+/*
+Language: QML
+Requires: javascript.js, xml.js
+Author: John Foster <jfoster@esri.com>
+Description: Syntax highlighting for the Qt Quick QML scripting language, based mostly off
+             the JavaScript parser.
+Website: https://doc.qt.io/qt-5/qmlapplications.html
+Category: scripting
+*/
+
+/*
+Language: R
+Description: R is a free software environment for statistical computing and graphics.
+Author: Joe Cheng <joe@rstudio.org>
+Website: https://www.r-project.org
+Category: scientific
+*/
+
+/*
+Language: ReasonML
+Description: Reason lets you write simple, fast and quality type safe code while leveraging both the JavaScript & OCaml ecosystems.
+Website: https://reasonml.github.io
+Author: Gidi Meir Morris <oss@gidi.io>
+Category: functional
+*/
+
+/*
+Language: RenderMan RIB
+Author: Konstantin Evdokimenko <qewerty@gmail.com>
+Contributors: Shuen-Huei Guan <drake.guan@gmail.com>
+Website: https://renderman.pixar.com/resources/RenderMan_20/ribBinding.html
+Category: graphics
+*/
+
+/*
+Language: RenderMan RSL
+Author: Konstantin Evdokimenko <qewerty@gmail.com>
+Contributors: Shuen-Huei Guan <drake.guan@gmail.com>
+Website: https://renderman.pixar.com/resources/RenderMan_20/shadingLanguage.html
+Category: graphics
+*/
+
+/*
+Language: Roboconf
+Author: Vincent Zurczak <vzurczak@linagora.com>
+Description: Syntax highlighting for Roboconf's DSL
+Website: http://roboconf.net
+Category: config
+*/
+
+/*
+Language: Ruby
+Description: Ruby is a dynamic, open source programming language with a focus on simplicity and productivity.
+Website: https://www.ruby-lang.org/
+Author: Anton Kovalyov <anton@kovalyov.net>
+Contributors: Peter Leonov <gojpeg@yandex.ru>, Vasily Polovnyov <vast@whiteants.net>, Loren Segal <lsegal@soen.ca>, Pascal Hurni <phi@ruby-reactive.org>, Cedric Sohrauer <sohrauer@googlemail.com>
+Category: common
+*/
+
+/*
+Language: Rust
+Author: Andrey Vlasovskikh <andrey.vlasovskikh@gmail.com>
+Contributors: Roman Shmatov <romanshmatov@gmail.com>, Kasper Andersen <kma_untrusted@protonmail.com>
+Website: https://www.rust-lang.org
+Category: common, system
+*/
+
+/*
+Language: SAS
+Author: Mauricio Caceres <mauricio.caceres.bravo@gmail.com>
+Description: Syntax Highlighting for SAS
+*/
+
+/*
+Language: SCSS
+Description: Scss is an extension of the syntax of CSS.
+Author: Kurt Emch <kurt@kurtemch.com>
+Website: https://sass-lang.com
+Category: common, css
+*/
+
+/*
+Language: SML (Standard ML)
+Author: Edwin Dalorzo <edwin@dalorzo.org>
+Description: SML language definition.
+Website: https://www.smlnj.org
+Origin: ocaml.js
+Category: functional
+*/
+
+/*
+Language: SQF
+Author: Søren Enevoldsen <senevoldsen90@gmail.com>
+Contributors: Marvin Saignat <contact@zgmrvn.com>, Dedmen Miller <dedmen@dedmen.de>
+Description: Scripting language for the Arma game series
+Website: https://community.bistudio.com/wiki/SQF_syntax
+Category: scripting
+*/
+
+/*
+Language: STEP Part 21
+Contributors: Adam Joseph Cook <adam.joseph.cook@gmail.com>
+Description: Syntax highlighter for STEP Part 21 files (ISO 10303-21).
+Website: https://en.wikipedia.org/wiki/ISO_10303-21
+*/
+
+/*
+Language: Scala
+Category: functional
+Author: Jan Berkel <jan.berkel@gmail.com>
+Contributors: Erik Osheim <d_m@plastic-idolatry.com>
+Website: https://www.scala-lang.org
+*/
+
+/*
+Language: Scheme
+Description: Scheme is a programming language in the Lisp family.
+             (keywords based on http://community.schemewiki.org/?scheme-keywords)
+Author: JP Verkamp <me@jverkamp.com>
+Contributors: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Origin: clojure.js
+Website: http://community.schemewiki.org/?what-is-scheme
+Category: lisp
+*/
+
+/*
+Language: Scilab
+Author: Sylvestre Ledru <sylvestre.ledru@scilab-enterprises.com>
+Origin: matlab.js
+Description: Scilab is a port from Matlab
+Website: https://www.scilab.org
+Category: scientific
+*/
+
+/*
+Language: Shell Session
+Requires: bash.js
+Author: TSUYUSATO Kitsune <make.just.on@gmail.com>
+Category: common
+*/
+
+/*
+Language: Smali
+Author: Dennis Titze <dennis.titze@gmail.com>
+Description: Basic Smali highlighting
+Website: https://github.com/JesusFreke/smali
+*/
+
+/*
+Language: Smalltalk
+Description: Smalltalk is an object-oriented, dynamically typed reflective programming language.
+Author: Vladimir Gubarkov <xonixx@gmail.com>
+Website: https://en.wikipedia.org/wiki/Smalltalk
+*/
+
+/*
+Language: Stan
+Description: The Stan probabilistic programming language
+Author: Jeffrey B. Arnold <jeffrey.arnold@gmail.com>
+Website: http://mc-stan.org/
+Category: scientific
+*/
+
+/*
+Language: Stata
+Author: Brian Quistorff <bquistorff@gmail.com>
+Contributors: Drew McDonald <drewmcdo@gmail.com>
+Description: Stata is a general-purpose statistical software package created in 1985 by StataCorp.
+Website: https://en.wikipedia.org/wiki/Stata
+Category: scientific
+*/
+
+/*
+Language: Stylus
+Author: Bryant Williams <b.n.williams@gmail.com>
+Description: Stylus is an expressive, robust, feature-rich CSS language built for nodejs.
+Website: https://github.com/stylus/stylus
+Category: css
+*/
+
+/*
+Language: SubUnit
+Author: Sergey Bronnikov <sergeyb@bronevichok.ru>
+Website: https://pypi.org/project/python-subunit/
+*/
+
+/*
+Language: Swift
+Description: Swift is a general-purpose programming language built using a modern approach to safety, performance, and software design patterns.
+Author: Chris Eidhof <chris@eidhof.nl>
+Contributors: Nate Cook <natecook@gmail.com>, Alexander Lichter <manniL@gmx.net>
+Website: https://swift.org
+Category: common, system
+*/
+
+/*
+Language: TOML, also INI
+Description: TOML aims to be a minimal configuration file format that's easy to read due to obvious semantics.
+Contributors: Guillaume Gomez <guillaume1.gomez@gmail.com>
+Category: common, config
+Website: https://github.com/toml-lang/toml
+*/
+
+/*
+Language: TP
+Author: Jay Strybis <jay.strybis@gmail.com>
+Description: FANUC TP programming language (TPP).
+*/
+
+/*
+Language: Tagger Script
+Author: Philipp Wolfer <ph.wolfer@gmail.com>
+Description: Syntax Highlighting for the Tagger Script as used by MusicBrainz Picard.
+Website: https://picard.musicbrainz.org
+ */
+
+/*
+Language: Tcl
+Description: Tcl is a very simple programming language.
+Author: Radek Liska <radekliska@gmail.com>
+Website: https://www.tcl.tk/about/language.html
+*/
+
+/*
+Language: Test Anything Protocol
+Description: TAP, the Test Anything Protocol, is a simple text-based interface between testing modules in a test harness.
+Requires: yaml.js
+Author: Sergey Bronnikov <sergeyb@bronevichok.ru>
+Website: https://testanything.org
+*/
+
+/*
+Language: Thrift
+Author: Oleg Efimov <efimovov@gmail.com>
+Description: Thrift message definition format
+Website: https://thrift.apache.org
+Category: protocols
+*/
+
+/*
+Language: Twig
+Requires: xml.js
+Author: Luke Holder <lukemh@gmail.com>
+Description: Twig is a templating language for PHP
+Website: https://twig.symfony.com
+Category: template
+*/
+
+/*
+Language: TypeScript
+Author: Panu Horsmalahti <panu.horsmalahti@iki.fi>
+Contributors: Ike Ku <dempfi@yahoo.com>
+Description: TypeScript is a strict superset of JavaScript
+Website: https://www.typescriptlang.org
+Category: common, scripting
+*/
+
+/*
+Language: VBScript
+Description: VBScript ("Microsoft Visual Basic Scripting Edition") is an Active Scripting language developed by Microsoft that is modeled on Visual Basic.
+Author: Nikita Ledyaev <lenikita@yandex.ru>
+Contributors: Michal Gabrukiewicz <mgabru@gmail.com>
+Website: https://en.wikipedia.org/wiki/VBScript
+Category: scripting
+*/
+
+/*
+Language: VBScript in HTML
+Requires: xml.js, vbscript.js
+Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
+Description: "Bridge" language defining fragments of VBScript in HTML within <% .. %>
+Website: https://en.wikipedia.org/wiki/VBScript
+Category: scripting
+*/
+
+/*
+Language: VHDL
+Author: Igor Kalnitsky <igor@kalnitsky.org>
+Contributors: Daniel C.K. Kho <daniel.kho@tauhop.com>, Guillaume Savaton <guillaume.savaton@eseo.fr>
+Description: VHDL is a hardware description language used in electronic design automation to describe digital and mixed-signal systems.
+Website: https://en.wikipedia.org/wiki/VHDL
+*/
+
+/*
+Language: Vala
+Author: Antono Vasiljev <antono.vasiljev@gmail.com>
+Description: Vala is a new programming language that aims to bring modern programming language features to GNOME developers without imposing any additional runtime requirements and without using a different ABI compared to applications and libraries written in C.
+Website: https://wiki.gnome.org/Projects/Vala
+*/
+
+/*
+Language: Verilog
+Author: Jon Evans <jon@craftyjon.com>
+Contributors: Boone Severson <boone.severson@gmail.com>
+Description: Verilog is a hardware description language used in electronic design automation to describe digital and mixed-signal systems. This highlighter supports Verilog and SystemVerilog through IEEE 1800-2012.
+Website: http://www.verilog.com
+*/
+
+/*
+Language: Vim Script
+Author: Jun Yang <yangjvn@126.com>
+Description: full keyword and built-in from http://vimdoc.sourceforge.net/htmldoc/
+Website: https://www.vim.org
+Category: scripting
+*/
+
+/*
+Language: Visual Basic .NET
+Description: Visual Basic .NET (VB.NET) is a multi-paradigm, object-oriented programming language, implemented on the .NET Framework.
+Author: Poren Chiang <ren.chiang@gmail.com>
+Website: https://docs.microsoft.com/en-us/dotnet/visual-basic/getting-started/
+*/
+
+/*
+Language: XL
+Author: Christophe de Dinechin <christophe@taodyne.com>
+Description: An extensible programming language, based on parse tree rewriting
+Website: http://xlr.sf.net
+*/
+
+/*
+Language: XQuery
+Author: Dirk Kirsten <dk@basex.org>
+Contributor: Duncan Paterson
+Description: Supports XQuery 3.1 including XQuery Update 3, so also XPath (as it is a superset)
+Refactored to process xml constructor syntax and function-bodies. Added missing data-types, xpath operands, inbuilt functions, and query prologs
+Website: https://www.w3.org/XML/Query/
+Category: functional
+*/
+
+/*
+Language: YAML
+Description: Yet Another Markdown Language
+Author: Stefan Wienert <stwienert@gmail.com>
+Contributors: Carl Baxter <carl@cbax.tech>
+Requires: ruby.js
+Website: https://yaml.org
+Category: common, config
+*/
+
+/*
+Language: crmsh
+Author: Kristoffer Gronlund <kgronlund@suse.com>
+Website: http://crmsh.github.io
+Description: Syntax Highlighting for the crmsh DSL
+Category: config
+*/
+
+/*  ==============================================================================
+                                      CHANGELOG
+    ==============================================================================
+    - v.1.2 (2017-05-12)
+        -- BUG-FIX: Some keywords were accidentally joyned together. Now fixed.
+    - v.1.1 (2017-04-30)
+        -- Updated to PureBASIC 5.60.
+        -- Keywords list now built by extracting them from the PureBASIC SDK's
+           "SyntaxHilighting.dll" (from each PureBASIC version). Tokens from each
+           version are added to the list, and renamed or removed tokens are kept
+           for the sake of covering all versions of the language from PureBASIC
+           v5.00 upward. (NOTE: currently, there are no renamed or deprecated
+           tokens in the keywords list). For more info, see:
+           -- http://www.purebasic.fr/english/viewtopic.php?&p=506269
+           -- https://github.com/tajmone/purebasic-archives/tree/master/syntax-highlighting/guidelines
+    - v.1.0 (April 2016)
+        -- First release
+        -- Keywords list taken and adapted from GuShH's (Gustavo Julio Fiorenza)
+           PureBasic language file for GeSHi:
+           -- https://github.com/easybook/geshi/blob/master/geshi/purebasic.php
+*/
+
+/* ! */
+
+/* " */
+
+/* # */
+
+/* $ */
+
+/* % */
+
+/* & */
+
+/* ' */
+
+/* ( */
+
+/* ) */
+
+/* * */
+
+/* + */
+
+/* , */
+
+/* - */
+
+/* . */
+
+/* / */
+
+/* 0 */
+
+/* 1 */
+
+/* 10 */
+
+/* 100 */
+
+/* 101 */
+
+/* 102 */
+
+/* 103 */
+
+/* 104 */
+
+/* 105 */
+
+/* 106 */
+
+/* 107 */
+
+/* 108 */
+
+/* 109 */
+
+/* 11 */
+
+/* 110 */
+
+/* 111 */
+
+/* 112 */
+
+/* 113 */
+
+/* 114 */
+
+/* 115 */
+
+/* 116 */
+
+/* 117 */
+
+/* 118 */
+
+/* 119 */
+
+/* 12 */
+
+/* 120 */
+
+/* 121 */
+
+/* 122 */
+
+/* 123 */
+
+/* 124 */
+
+/* 125 */
+
+/* 126 */
+
+/* 127 */
+
+/* 128 */
+
+/* 129 */
+
+/* 13 */
+
+/* 130 */
+
+/* 131 */
+
+/* 132 */
+
+/* 133 */
+
+/* 134 */
+
+/* 135 */
+
+/* 136 */
+
+/* 137 */
+
+/* 138 */
+
+/* 139 */
+
+/* 14 */
+
+/* 140 */
+
+/* 141 */
+
+/* 142 */
+
+/* 143 */
+
+/* 144 */
+
+/* 145 */
+
+/* 146 */
+
+/* 147 */
+
+/* 148 */
+
+/* 149 */
+
+/* 15 */
+
+/* 150 */
+
+/* 151 */
+
+/* 152 */
+
+/* 153 */
+
+/* 154 */
+
+/* 155 */
+
+/* 156 */
+
+/* 157 */
+
+/* 158 */
+
+/* 159 */
+
+/* 16 */
+
+/* 160 */
+
+/* 161 */
+
+/* 162 */
+
+/* 163 */
+
+/* 164 */
+
+/* 165 */
+
+/* 166 */
+
+/* 167 */
+
+/* 168 */
+
+/* 169 */
+
+/* 17 */
+
+/* 170 */
+
+/* 171 */
+
+/* 172 */
+
+/* 173 */
+
+/* 174 */
+
+/* 175 */
+
+/* 176 */
+
+/* 177 */
+
+/* 178 */
+
+/* 179 */
+
+/* 18 */
+
+/* 180 */
+
+/* 181 */
+
+/* 182 */
+
+/* 183 */
+
+/* 184 */
+
+/* 185 */
+
+/* 186 */
+
+/* 187 */
+
+/* 188 */
+
+/* 189 */
+
+/* 19 */
+
+/* 190 */
+
+/* 191 */
+
+/* 192 */
+
+/* 193 */
+
+/* 194 */
+
+/* 195 */
+
+/* 196 */
+
+/* 197 */
+
+/* 198 */
+
+/* 199 */
+
+/* 2 */
+
+/* 20 */
+
+/* 200 */
+
+/* 201 */
+
+/* 202 */
+
+/* 203 */
+
+/* 204 */
+
+/* 205 */
+
+/* 206 */
+
+/* 207 */
+
+/* 208 */
+
+/* 209 */
+
+/* 21 */
+
+/* 210 */
+
+/* 211 */
+
+/* 212 */
+
+/* 213 */
+
+/* 214 */
+
+/* 215 */
+
+/* 216 */
+
+/* 217 */
+
+/* 218 */
+
+/* 219 */
+
+/* 22 */
+
+/* 220 */
+
+/* 221 */
+
+/* 222 */
+
+/* 223 */
+
+/* 224 */
+
+/* 225 */
+
+/* 226 */
+
+/* 227 */
+
+/* 228 */
+
+/* 229 */
+
+/* 23 */
+
+/* 230 */
+
+/* 231 */
+
+/* 232 */
+
+/* 233 */
+
+/* 234 */
+
+/* 235 */
+
+/* 236 */
+
+/* 237 */
+
+/* 238 */
+
+/* 239 */
+
+/* 24 */
+
+/* 240 */
+
+/* 241 */
+
+/* 242 */
+
+/* 243 */
+
+/* 244 */
+
+/* 245 */
+
+/* 246 */
+
+/* 247 */
+
+/* 248 */
+
+/* 249 */
+
+/* 25 */
+
+/* 250 */
+
+/* 251 */
+
+/* 252 */
+
+/* 253 */
+
+/* 254 */
+
+/* 255 */
+
+/* 256 */
+
+/* 257 */
+
+/* 258 */
+
+/* 259 */
+
+/* 26 */
+
+/* 260 */
+
+/* 261 */
+
+/* 262 */
+
+/* 263 */
+
+/* 264 */
+
+/* 265 */
+
+/* 266 */
+
+/* 267 */
+
+/* 268 */
+
+/* 269 */
+
+/* 27 */
+
+/* 270 */
+
+/* 271 */
+
+/* 28 */
+
+/* 29 */
+
+/* 3 */
+
+/* 30 */
+
+/* 31 */
+
+/* 32 */
+
+/* 33 */
+
+/* 34 */
+
+/* 35 */
+
+/* 36 */
+
+/* 37 */
+
+/* 38 */
+
+/* 39 */
+
+/* 4 */
+
+/* 40 */
+
+/* 41 */
+
+/* 42 */
+
+/* 43 */
+
+/* 44 */
+
+/* 45 */
+
+/* 46 */
+
+/* 47 */
+
+/* 48 */
+
+/* 49 */
+
+/* 5 */
+
+/* 50 */
+
+/* 51 */
+
+/* 52 */
+
+/* 53 */
+
+/* 54 */
+
+/* 55 */
+
+/* 56 */
+
+/* 57 */
+
+/* 58 */
+
+/* 59 */
+
+/* 6 */
+
+/* 60 */
+
+/* 61 */
+
+/* 62 */
+
+/* 63 */
+
+/* 64 */
+
+/* 65 */
+
+/* 66 */
+
+/* 67 */
+
+/* 68 */
+
+/* 69 */
+
+/* 7 */
+
+/* 70 */
+
+/* 71 */
+
+/* 72 */
+
+/* 73 */
+
+/* 74 */
+
+/* 75 */
+
+/* 76 */
+
+/* 77 */
+
+/* 78 */
+
+/* 79 */
+
+/* 8 */
+
+/* 80 */
+
+/* 81 */
+
+/* 82 */
+
+/* 83 */
+
+/* 84 */
+
+/* 85 */
+
+/* 86 */
+
+/* 87 */
+
+/* 88 */
+
+/* 89 */
+
+/* 9 */
+
+/* 90 */
+
+/* 91 */
+
+/* 92 */
+
+/* 93 */
+
+/* 94 */
+
+/* 95 */
+
+/* 96 */
+
+/* 97 */
+
+/* 98 */
+
+/* 99 */
+
+/* : */
+
+/* ; */
+
+/* < */
+
+/* = */
+
+/* > */
+
+/* ? */
+
+/* @ */
+
+/* Excel formula comments are done by putting the comment in a function call to N() */
+
+/* In the future the intention is to split out the C/C++ grammars distinctly
+since they are separate languages.  They will likely share a common foundation
+though, and this file sets the groundwork for that - so that we get the breaking
+change in v10 and don't have to change the requirements again later.
+
+See: https://github.com/highlightjs/highlight.js/issues/2146
+*/
+
+/* Interface definition */
+
+/* Quoted string with variables inside */
+
+/* Stream merging */
+
+/* Utility functions */
+
+/* Variables: simple (eg $(var)) and special (eg $@) */
+
+/* WEBPACK VAR INJECTION */
+
+/* We need another contained nameless mode to not have every nested
+    pair of parens to be called "params" */
+
+/* [ */
+
+/* \ */
+
+/* \n */
+
+/* ] */
+
+/* ^ */
+
+/* _ */
+
+/* ` */
+
+/* a */
+
+/* according to Definition of Standard ML 97  */
+
+/* block match pass are "actions" in pf.conf(5), the rest are
+       * lexically similar top-level commands.
+       */
+
+/* built-in types */
+
+/* built-in types according to basis library */
+
+/* core facts */
+
+/* don't color identifiers, but safely catch all identifiers with '*/
+
+/* eslint-disable no-bitwise */
+
+/* eslint-disable no-script-url */
+
+/* eslint-disable no-unreachable */
+
+/* eslint-enable no-script-url */
+
+/* fixMarkup is deprecated and will be removed entirely in v11 */
+
+/* for pos section at bottom */
+
+/* general purpose registers */
+
+/* language keywords */
+
+/* matches a beginning equal sign found in Excel formula examples */
+
+/* matches a reference to a range of cells */
+
+/* matches a reference to a single cell */
+
+/* metaparameters */
+
+/* missing support for heredoc-like string (OCaml 4.0.2+) */
+
+/* mnemonic */
+
+/* module or constructor */
+
+/* multi-line comment */
+
+/* no condition */
+
+/* no final expression */
+
+/* no initialization */
+
+/* no leading zeros */
+
+/* no paramater help tags */
+
+/* one parameter help tags */
+
+/* only allow single equal sign at front of line */
+
+/* parameters to instances */
+
+/* polymorphic variant */
+
+/* reserved deprecated keywords */
+
+/* s-u */
+
+/* single-line comment */
+
+/* space */
+
+/* t-y */
+
+/* tab */
+
+/* technically, there can be more than 2 letters in column names, but this prevents conflict with some keywords */
+
+/* the grammar is ambiguous on how 'a'b should be interpreted but not the compiler */
+
+/* this is for cases like ,CALL */
+
+/* this is for cases like CNT100 where the default lexemes do not
+       * separate the keyword and the number */
+
+/* to catch numbers that do not have a word boundary on the left */
+
+/* type variable */
+
+/* z */
+
+/* { */
+
+/* | */
+
+/* } */
+
+/* ~ */
+
+/* ’ */
+
+/* “”‘’ */
+
+/*! https://mths.be/punycode v1.4.1 by @mathias */
+
+/*#__PURE__*/
+
+/**
+     *  Process an individual match
+     *
+     * @param {string} textBeforeMatch - text preceeding the match (since the last match)
+     * @param {EnhancedMatch} [match] - the match itself
+     */
+
+/**
+     * @param {CompiledMode } mode - the mode to potentially end
+     * @param {RegExpMatchArray} match - the latest match
+     * @param {string} matchPlusRemainder - match plus remainder of content
+     * @returns {CompiledMode | void} - the next mode, or if void continue on in current mode
+     */
+
+/**
+     * @param {Mode} mode - new mode to start
+     */
+
+/**
+     * A string representing the current Punycode.js version number.
+     * @memberOf punycode
+     * @type String
+     */
+
+/**
+     * An object of methods to convert from JavaScript's internal character
+     * representation (UCS-2) to Unicode code points, and back.
+     * @see <https://mathiasbynens.be/notes/javascript-encoding>
+     * @memberOf punycode
+     * @type Object
+     */
+
+/**
+     * Handle matching but then ignoring a sequence of text
+     *
+     * @param {string} lexeme - string containing full match text
+     */
+
+/**
+     * Handle the potential end of mode
+     *
+     * @param {RegExpMatchArray} match - the current match
+     */
+
+/**
+     * Handle the start of a new potential mode match
+     *
+     * @param {EnhancedMatch} match - the current match
+     * @returns {number} how far to advance the parse cursor
+     */
+
+/**
+     * Return keyword data if a match is a keyword
+     * @param {CompiledMode} mode - current mode
+     * @param {RegExpMatchArray} match - regexp match data
+     * @returns {KeywordData | false}
+     */
+
+/**
+    Stores multiple regular expressions and allows you to quickly search for
+    them all in a string simultaneously - returning the first match.  It does
+    this by creating a huge (a|b|c) regex - each individual item wrapped with ()
+    and joined by `|` - using match groups to track position.  When a match is
+    found checking which position in the array has content allows us to figure
+    out which of the original regexes / match groups triggered the match.
+     The match object itself (the result of `Regex.exec`) is returned but also
+    enhanced by merging in any meta-data that was registered with the regex.
+    This is how we keep track of which mode matched, and what type of rule
+    (`illegal`, `begin`, end, etc).
+  */
+
+/**
+    intended usage: When one language truly requires another
+     Unlike `getLanguage`, this will throw when the requested language
+    is not available.
+     @param {string} name - name of the language to fetch/require
+    @returns {Language | never}
+  */
+
+/**
+   *
+   * @param {PluginEvent} event
+   * @param {any} args
+   */
+
+/**
+   *
+   * @param {string|string[]} aliasList - single alias or list of aliases
+   * @param {{languageName: string}} opts
+   */
+
+/**
+   * @param {*} options
+   */
+
+/**
+   * @param {CompiledMode} mode
+   */
+
+/**
+   * @param {Emitter & {root: DataNode}} emitter
+   * @param {string} name
+   */
+
+/**
+   * @param {Event} event
+   */
+
+/**
+   * @param {HLJSPlugin} plugin
+   */
+
+/**
+   * @param {HighlightedHTMLElement} block - the HTML element to determine language for
+   */
+
+/**
+   * @param {Node} node
+   */
+
+/**
+   * @param {Renderer} builder
+   * @param {Node} node
+   */
+
+/**
+   * @param {string} name - name of the language to retrieve
+   * @returns {Language | undefined}
+   */
+
+/**
+   * @param {string} text
+   * @param {string} kind
+   */
+
+/**
+   * @param {string} text
+   */
+
+/**
+   * @returns {string[]} List of language internal names
+   */
+
+/**
+   * @typedef { import("./html_renderer").Renderer } Renderer
+   * @param {Renderer} builder
+   */
+
+/**
+   * A generic `Array#map` utility function.
+   * @private
+   * @param {Array} array The array to iterate over.
+   * @param {Function} callback The function that gets called for every array
+   * item.
+   * @returns {Array} A new array of values returned by the callback function.
+   */
+
+/**
+   * A generic error utility function.
+   * @private
+   * @param {String} type The error type.
+   * @returns {Error} Throws a `RangeError` with the applicable error message.
+   */
+
+/**
+   * A simple `Array#map`-like wrapper to work with domain name strings or email
+   * addresses.
+   * @private
+   * @param {String} domain The domain name or email address.
+   * @param {Function} callback The function that gets called for every
+   * character.
+   * @returns {Array} A new string of characters returned by the callback
+   * function.
+   */
+
+/**
+   * Adds a node close to the output stream (if needed)
+   *
+   * @param {Node} node */
+
+/**
+   * Adds a node open to the output stream (if needed)
+   *
+   * @param {Node} node */
+
+/**
+   * Adds texts to the output stream
+   *
+   * @param {string} text */
+
+/**
+   * Applies highlighting to a DOM node containing code. Accepts a DOM node and
+   * two optional parameters for fixMarkup.
+   *
+   * @param {HighlightedHTMLElement} element - the HTML element to highlight
+  */
+
+/**
+   * Bias adaptation function as per section 3.4 of RFC 3492.
+   * https://tools.ietf.org/html/rfc3492#section-3.4
+   * @private
+   */
+
+/**
+   * Builds a regex with the case sensativility of the current language
+   *
+   * @param {RegExp | string} value
+   * @param {boolean} [global]
+   */
+
+/**
+   * Builds a span element
+   *
+   * @param {string} className */
+
+/**
+   * Builds new class name for block given the language name
+   *
+   * @param {string} prevClassName
+   * @param {string} [currentLang]
+   * @param {string} [resultLang]
+   */
+
+/**
+   * Compiles an individual list of keywords
+   *
+   * Ex: "for if when while|5"
+   *
+   * @param {string} className
+   * @param {string} keywordList
+   */
+
+/**
+   * Compiles an individual mode
+   *
+   * This can raise an error if the mode contains certain detectable known logic
+   * issues.
+   * @param {Mode} mode
+   * @param {CompiledMode | null} [parent]
+   * @returns {CompiledMode | never}
+   */
+
+/**
+   * Converts a Punycode string of ASCII-only symbols to a string of Unicode
+   * symbols.
+   * @memberOf punycode
+   * @param {String} input The Punycode string of ASCII-only symbols.
+   * @returns {String} The resulting string of Unicode symbols.
+   */
+
+/**
+   * Converts a Punycode string representing a domain name or an email address
+   * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
+   * it doesn't matter if you call it on a string that has already been
+   * converted to Unicode.
+   * @memberOf punycode
+   * @param {String} input The Punycoded domain name or email address to
+   * convert to Unicode.
+   * @returns {String} The Unicode representation of the given Punycode
+   * string.
+   */
+
+/**
+   * Converts a Unicode string representing a domain name or an email address to
+   * Punycode. Only the non-ASCII parts of the domain name will be converted,
+   * i.e. it doesn't matter if you call it with a domain that's already in
+   * ASCII.
+   * @memberOf punycode
+   * @param {String} input The domain name or email address to convert, as a
+   * Unicode string.
+   * @returns {String} The Punycode representation of the given domain name or
+   * email address.
+   */
+
+/**
+   * Converts a basic code point into a digit/integer.
+   * @see `digitToBasic()`
+   * @private
+   * @param {Number} codePoint The basic numeric code point value.
+   * @returns {Number} The numeric value of a basic code point (for use in
+   * representing integers) in the range `0` to `base - 1`, or `base` if
+   * the code point does not represent a value.
+   */
+
+/**
+   * Converts a digit/integer into a basic code point.
+   * @see `basicToDigit()`
+   * @private
+   * @param {Number} digit The numeric value of a basic code point.
+   * @returns {Number} The basic code point whose value (when used for
+   * representing integers) is `digit`, which needs to be in the range
+   * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+   * used; else, the lowercase form is used. The behavior is undefined
+   * if `flag` is non-zero and `digit` has no uppercase form.
+   */
+
+/**
+   * Converts a string of Unicode symbols (e.g. a domain name label) to a
+   * Punycode string of ASCII-only symbols.
+   * @memberOf punycode
+   * @param {String} input The string of Unicode symbols.
+   * @returns {String} The resulting Punycode string of ASCII-only symbols.
+   */
+
+/**
+   * Core highlighting function.
+   *
+   * @param {string} languageName - the language to use for highlighting
+   * @param {string} code - the code to highlight
+   * @param {boolean} [ignoreIllegals] - whether to ignore illegal matches, default is to bail
+   * @param {Mode} [continuation] - current continuation mode, if any
+   *
+   * @returns {HighlightResult} Result - an object that represents the result
+   * @property {string} language - the language name
+   * @property {number} relevance - the relevance score
+   * @property {string} value - the highlighted HTML code
+   * @property {string} code - the original raw code
+   * @property {Mode} top - top of the current mode stack
+   * @property {boolean} illegal - indicates whether any illegal matches were found
+  */
+
+/**
+   * Core#ruler -> Ruler
+   *
+   * [[Ruler]] instance. Keep configuration of core rules.
+   **/
+
+/**
+   * Creates a new HTMLRenderer
+   *
+   * @param {Tree} parseTree - the parse tree (must support `walk` API)
+   * @param {{classPrefix: string}} options
+   */
+
+/**
+   * Creates a string based on an array of numeric code points.
+   * @see `punycode.ucs2.decode`
+   * @memberOf punycode.ucs2
+   * @name encode
+   * @param {Array} codePoints The array of numeric code points.
+   * @returns {String} The new Unicode string (UCS-2).
+   */
+
+/**
+   * Creates an array containing the numeric code points of each Unicode
+   * character in the string. While JavaScript uses UCS-2 internally,
+   * this function will convert a pair of surrogate halves (each of which
+   * UCS-2 exposes as separate characters) into a single code point,
+   * matching UTF-16.
+   * @see `punycode.ucs2.encode`
+   * @see <https://mathiasbynens.be/notes/javascript-encoding>
+   * @memberOf punycode.ucs2
+   * @name decode
+   * @param {String} string The Unicode input string (UCS-2).
+   * @returns {Array} The new array of code points.
+   */
+
+/**
+   * Determines if a given language has auto-detection enabled
+   * @param {string} name - name of the language
+   */
+
+/**
+   * Given a mode, builds a huge ResumableMultiRegex that can be used to walk
+   * the content and find matches.
+   *
+   * @param {CompiledMode} mode
+   * @returns {ResumableMultiRegex}
+   */
+
+/**
+   * Highlights to all <pre><code> blocks on a page
+   *
+   * @type {Function & {called?: boolean}}
+   */
+
+/**
+   * Language keywords
+   *
+   * @type {Object}
+   */
+
+/**
+   * MarkdownIt#block -> ParserBlock
+   *
+   * Instance of [[ParserBlock]]. You may need it to add new rules when
+   * writing plugins. For simple rules control use [[MarkdownIt.disable]] and
+   * [[MarkdownIt.enable]].
+   **/
+
+/**
+   * MarkdownIt#core -> Core
+   *
+   * Instance of [[Core]] chain executor. You may need it to add new rules when
+   * writing plugins. For simple rules control use [[MarkdownIt.disable]] and
+   * [[MarkdownIt.enable]].
+   **/
+
+/**
+   * MarkdownIt#helpers -> helpers
+   *
+   * Link components parser functions, useful to write plugins. See details
+   * [here](https://github.com/markdown-it/markdown-it/blob/master/lib/helpers).
+   **/
+
+/**
+   * MarkdownIt#inline -> ParserInline
+   *
+   * Instance of [[ParserInline]]. You may need it to add new rules when
+   * writing plugins. For simple rules control use [[MarkdownIt.disable]] and
+   * [[MarkdownIt.enable]].
+   **/
+
+/**
+   * MarkdownIt#linkify -> LinkifyIt
+   *
+   * [linkify-it](https://github.com/markdown-it/linkify-it) instance.
+   * Used by [linkify](https://github.com/markdown-it/markdown-it/blob/master/lib/rules_core/linkify.js)
+   * rule.
+   **/
+
+/**
+   * MarkdownIt#normalizeLink(url) -> String
+   *
+   * Function used to encode link url to a machine-readable format,
+   * which includes url-encoding, punycode, etc.
+   **/
+
+/**
+   * MarkdownIt#normalizeLinkText(url) -> String
+   *
+   * Function used to decode link url to a human-readable format`
+   **/
+
+/**
+   * MarkdownIt#renderer -> Renderer
+   *
+   * Instance of [[Renderer]]. Use it to modify output look. Or to add rendering
+   * rules for new token types, generated by plugins.
+   *
+   * ##### Example
+   *
+   * ```javascript
+   * var md = require('markdown-it')();
+   *
+   * function myToken(tokens, idx, options, env, self) {
+   *   //...
+   *   return result;
+   * };
+   *
+   * md.renderer.rules['my_token'] = myToken
+   * ```
+   *
+   * See [[Renderer]] docs and [source code](https://github.com/markdown-it/markdown-it/blob/master/lib/renderer.js).
+   **/
+
+/**
+   * MarkdownIt#utils -> utils
+   *
+   * Assorted utility functions, useful to write plugins. See details
+   * [here](https://github.com/markdown-it/markdown-it/blob/master/lib/common/utils.js).
+   **/
+
+/**
+   * MarkdownIt#validateLink(url) -> Boolean
+   *
+   * Link validation function. CommonMark allows too much in links. By default
+   * we disable `javascript:`, `vbscript:`, `file:` schemas, and almost all `data:...` schemas
+   * except some embedded image types.
+   *
+   * You can change this behaviour:
+   *
+   * ```javascript
+   * var md = require('markdown-it')();
+   * // enable everything
+   * md.validateLink = function () { return true; }
+   * ```
+   **/
+
+/**
+   * Match#index -> Number
+   *
+   * First position of matched string.
+   **/
+
+/**
+   * Match#lastIndex -> Number
+   *
+   * Next position after matched string.
+   **/
+
+/**
+   * Match#raw -> String
+   *
+   * Matched string.
+   **/
+
+/**
+   * Match#schema -> String
+   *
+   * Prefix (protocol) for matched string.
+   **/
+
+/**
+   * Match#text -> String
+   *
+   * Notmalized text of matched string.
+   **/
+
+/**
+   * Match#url -> String
+   *
+   * Normalized url of matched string.
+   **/
+
+/**
+   * Number literal regexps
+   *
+   * @type {String}
+   */
+
+/**
+   * ParserBlock#ruler -> Ruler
+   *
+   * [[Ruler]] instance. Keep configuration of block rules.
+   **/
+
+/**
+   * ParserInline#ruler -> Ruler
+   *
+   * [[Ruler]] instance. Keep configuration of inline rules.
+   **/
+
+/**
+   * ParserInline#ruler2 -> Ruler
+   *
+   * [[Ruler]] instance. Second ruler used for post-processing
+   * (e.g. in emphasis-like rules).
+   **/
+
+/**
+   * Register a language grammar module
+   *
+   * @param {string} languageName
+   * @param {LanguageFn} languageDefinition
+   */
+
+/**
+   * Renderer#rules -> Object
+   *
+   * Contains render rules for tokens. Can be updated and extended.
+   *
+   * ##### Example
+   *
+   * ```javascript
+   * var md = require('markdown-it')();
+   *
+   * md.renderer.rules.strong_open  = function () { return '<b>'; };
+   * md.renderer.rules.strong_close = function () { return '</b>'; };
+   *
+   * var result = md.renderInline(...);
+   * ```
+   *
+   * Each rule is called as independent static function with fixed signature:
+   *
+   * ```javascript
+   * function my_token_render(tokens, idx, options, env, renderer) {
+   *   // ...
+   *   return renderedHTML;
+   * }
+   * ```
+   *
+   * See [source code](https://github.com/markdown-it/markdown-it/blob/master/lib/renderer.js)
+   * for more details and examples.
+   **/
+
+/**
+   * Skip a match if it has a preceding or trailing dot
+   *
+   * This is used for `beginKeywords` to prevent matching expressions such as
+   * `bob.keyword.do()`. The mode compiler automatically wires this up as a
+   * special _internal_ 'on:begin' callback for modes with `beginKeywords`
+   * @param {RegExpMatchArray} match
+   * @param {CallbackResponse} response
+   */
+
+/**
+   * Tests a language name to see if highlighting should be skipped
+   * @param {string} languageName
+   */
+
+/**
+   * The `FUNCTION` and `CLASS` modes were intentionally removed to simplify
+   * highlighting and fix cases like
+   * ```
+   * interface Iterator[A: A]
+   *   fun has_next(): Bool
+   *   fun next(): A?
+   * ```
+   * where it is valid to have a function head without a body
+   */
+
+/**
+   * The `punycode` object.
+   * @name punycode
+   * @type Object
+   */
+
+/**
+   * Token#attrs -> Array
+   *
+   * Html attributes. Format: `[ [ name1, value1 ], [ name2, value2 ] ]`
+   **/
+
+/**
+   * Token#block -> Boolean
+   *
+   * True for block-level tokens, false for inline tokens.
+   * Used in renderer to calculate line breaks
+   **/
+
+/**
+   * Token#children -> Array
+   *
+   * An array of child nodes (inline and img tokens)
+   **/
+
+/**
+   * Token#content -> String
+   *
+   * In a case of self-closing tag (code, html, fence, etc.),
+   * it has contents of this tag.
+   **/
+
+/**
+   * Token#hidden -> Boolean
+   *
+   * If it's true, ignore this element when rendering. Used for tight lists
+   * to hide paragraphs.
+   **/
+
+/**
+   * Token#info -> String
+   *
+   * fence infostring
+   **/
+
+/**
+   * Token#level -> Number
+   *
+   * nesting level, the same as `state.level`
+   **/
+
+/**
+   * Token#map -> Array
+   *
+   * Source map info. Format: `[ line_begin, line_end ]`
+   **/
+
+/**
+   * Token#markup -> String
+   *
+   * '*' or '_' for emphasis, fence string for fence, etc.
+   **/
+
+/**
+   * Token#meta -> Object
+   *
+   * A place for plugins to store an arbitrary data
+   **/
+
+/**
+   * Token#nesting -> Number
+   *
+   * Level change (number in {-1, 0, 1} set), where:
+   *
+   * -  `1` means the tag is opening
+   * -  `0` means the tag is self-closing
+   * - `-1` means the tag is closing
+   **/
+
+/**
+   * Token#tag -> String
+   *
+   * html tag name, e.g. "p"
+   **/
+
+/**
+   * Token#type -> String
+   *
+   * Type of the token (string, e.g. "paragraph_open")
+   **/
+
+/**
+   * Updates highlight.js global options with the passed options
+   *
+   * @param {{}} userOptions
+   */
+
+/**
+   * private highlight that's used internally and does not fire callbacks
+   *
+   * @param {string} languageName - the language to use for highlighting
+   * @param {string} code - the code to highlight
+   * @param {boolean} [ignoreIllegals] - whether to ignore illegal matches, default is to bail
+   * @param {Mode} [continuation] - current continuation mode, if any
+  */
+
+/**
+   * returns a valid highlight result, without actually doing any actual work,
+   * auto highlight starts with this and it's possible for small snippets that
+   * auto-detection may not find a better match
+   * @param {string} code
+   * @returns {HighlightResult}
+   */
+
+/**
+   * returns the accumulated buffer
+  */
+
+/**
+  Currently this is all private API, but this is the minimal API necessary
+  that an Emitter must implement to fully support the parser.
+
+  Minimal interface:
+
+  - addKeyword(text, kind)
+  - addText(text)
+  - addSublanguage(emitter, subLanguageName)
+  - finalize()
+  - openNode(kind)
+  - closeNode()
+  - closeAllNodes()
+  - toHTML()
+
+*/
+
+/**
+  Highlighting with language detection. Accepts a string with the code to
+  highlight. Returns an object with the following properties:
+   - language (detected language)
+  - relevance (int)
+  - value (an HTML string with highlighting markup)
+  - second_best (object with the same structure for second-best heuristically
+    detected language, may be absent)
+     @param {string} code
+    @param {Array<string>} [languageSubset]
+    @returns {AutoHighlightResult}
+  */
+
+/**
+  Post-processing of the highlighted markup:
+   - replace TABs with something more useful
+  - replace real line-breaks with '<br>' for non-pre containers
+     @param {string} html
+    @returns {string}
+  */
+
+/**
+ * @implements {Emitter}
+ */
+
+/**
+ * @param {(string | RegExp)[]} regexps
+ * @param {string} separator
+ * @returns {string}
+ */
+
+/**
+ * @param {...(RegExp | string) } args
+ * @returns {string}
+ */
+
+/**
+ * @param {HLJSApi} hljs
+ * @returns {LanguageDetail}
+ * */
+
+/**
+ * @param {Node} node
+ */
+
+/**
+ * @param {RegExp | string } re
+ * @returns {string}
+ */
+
+/**
+ * @param {RegExp} re
+ * @returns {number}
+ */
+
+/**
+ * @param {any} original - the original stream
+ * @param {any} highlighted - stream of the highlighted source
+ * @param {string} value - the original source itself
+ */
+
+/**
+ * @param {string} value
+ * @returns {RegExp}
+ * */
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+
+/**
+ * @typedef Event
+ * @property {'start'|'stop'} event
+ * @property {number} offset
+ * @property {Node} node
+ */
+
+/**
+ * @typedef {object} Renderer
+ * @property {(text: string) => void} addText
+ * @property {(node: Node) => void} openNode
+ * @property {(node: Node) => void} closeNode
+ * @property {() => string} value
+ */
+
+/**
+ * Any of the passed expresssions may match
+ *
+ * Creates a huge this | this | that | that match
+ * @param {(RegExp | string)[] } args
+ * @returns {string}
+ */
+
+/**
+ * Compiles a language definition result
+ *
+ * Given the raw result of a language definition (Language), compiles this so
+ * that it is ready for highlighting code.
+ * @param {Language} language
+ * @returns {CompiledLanguage}
+ */
+
+/**
+ * Core.process(state)
+ *
+ * Executes core chain rules.
+ **/
+
+/**
+ * Determines if a given keyword is common or not
+ *
+ * @param {string} keyword */
+
+/**
+ * Determines if a mode has a dependency on it's parent or not
+ *
+ * If a mode does have a parent dependency then often we need to clone it if
+ * it's used in multiple places so that each copy points to the correct parent,
+ * where-as modes without a parent can often safely be re-used at the bottom of
+ * a mode chain.
+ *
+ * @param {Mode | null} mode
+ * @returns {boolean} - is there a dependency on the parent?
+ * */
+
+/**
+ * Determines if a node needs to be wrapped in <span>
+ *
+ * @param {Node} node */
+
+/**
+ * Does lexeme start with a regular expression match at the beginning
+ * @param {RegExp} re
+ * @param {string} lexeme
+ */
+
+/**
+ * Expands a mode or clones it if necessary
+ *
+ * This is necessary for modes with parental dependenceis (see notes on
+ * `dependencyOnParent`) and for nodes that have `variants` - which must then be
+ * exploded into their own individual modes at compile time.
+ *
+ * @param {Mode} mode
+ * @returns {Mode | Mode[]}
+ * */
+
+/**
+ * Given raw keywords from a language definition, compile them.
+ *
+ * @param {string | Record<string,string>} rawKeywords
+ * @param {boolean} case_insensitive
+ */
+
+/**
+ * Known issues:
+ *
+ * - invalid hex string literals will be recognized as a double quoted strings
+ *   but 'x' at the beginning of string will not be matched
+ *
+ * - delimited string literals are not checked for matching end delimiter
+ *   (not possible to do with js regexp)
+ *
+ * - content of token string is colored as a string (i.e. no keyword coloring inside a token string)
+ *   also, content of token string is not validated to contain only valid D tokens
+ *
+ * - special token sequence rule is not strictly following D grammar (anything following #line
+ *   up to the end of line is matched as special token sequence)
+ */
+
+/**
+ * LinkifyIt#match(text) -> Array|null
+ *
+ * Returns array of found link descriptions or `null` on fail. We strongly
+ * recommend to use [[LinkifyIt#test]] first, for best speed.
+ *
+ * ##### Result match description
+ *
+ * - __schema__ - link schema, can be empty for fuzzy links, or `//` for
+ *   protocol-neutral  links.
+ * - __index__ - offset of matched text
+ * - __lastIndex__ - index of next char after mathch end
+ * - __raw__ - matched text
+ * - __text__ - normalized text
+ * - __url__ - link, generated from matched text
+ **/
+
+/**
+ * LinkifyIt#normalize(match)
+ *
+ * Default normalizer (if schema does not define it's own).
+ **/
+
+/**
+ * LinkifyIt#onCompile()
+ *
+ * Override to modify basic RegExp-s.
+ **/
+
+/**
+ * LinkifyIt#pretest(text) -> Boolean
+ *
+ * Very quick check, that can give false positives. Returns true if link MAY BE
+ * can exists. Can be used for speed optimization, when you need to check that
+ * link NOT exists.
+ **/
+
+/**
+ * LinkifyIt#test(text) -> Boolean
+ *
+ * Searches linkifiable pattern and returns `true` on success or `false` on fail.
+ **/
+
+/**
+ * LinkifyIt#testSchemaAt(text, name, position) -> Number
+ * - text (String): text to scan
+ * - name (String): rule (schema) name
+ * - position (Number): text offset to check from
+ *
+ * Similar to [[LinkifyIt#test]] but checks only specific protocol tail exactly
+ * at given position. Returns length of found pattern (0 on fail).
+ **/
+
+/**
+ * MarkdownIt.render(src [, env]) -> String
+ * - src (String): source string
+ * - env (Object): environment sandbox
+ *
+ * Render markdown string into html. It does all magic for you :).
+ *
+ * `env` can be used to inject additional metadata (`{}` by default).
+ * But you will not need it with high probability. See also comment
+ * in [[MarkdownIt.parse]].
+ **/
+
+/**
+ * MarkdownIt.renderInline(src [, env]) -> String
+ * - src (String): source string
+ * - env (Object): environment sandbox
+ *
+ * Similar to [[MarkdownIt.render]] but for single paragraph content. Result
+ * will NOT be wrapped into `<p>` tags.
+ **/
+
+/**
+ * ParserBlock.parse(str, md, env, outTokens)
+ *
+ * Process input string and push block tokens into `outTokens`
+ **/
+
+/**
+ * ParserInline.parse(str, md, env, outTokens)
+ *
+ * Process input string and push inline tokens into `outTokens`
+ **/
+
+/**
+ * Renderer.render(tokens, options, env) -> String
+ * - tokens (Array): list on block tokens to renter
+ * - options (Object): params of parser instance
+ * - env (Object): additional data from parsed input (references, for example)
+ *
+ * Takes token stream and generates HTML. Probably, you will never need to call
+ * this method directly.
+ **/
+
+/**
+ * Renderer.renderAttrs(token) -> String
+ *
+ * Render token attributes to string.
+ **/
+
+/**
+ * Renderer.renderInline(tokens, options, env) -> String
+ * - tokens (Array): list on block tokens to renter
+ * - options (Object): params of parser instance
+ * - env (Object): additional data from parsed input (references, for example)
+ *
+ * The same as [[Renderer.render]], but for single token of `inline` type.
+ **/
+
+/**
+ * Renderer.renderToken(tokens, idx, options) -> String
+ * - tokens (Array): list of tokens
+ * - idx (Numbed): token index to render
+ * - options (Object): params of parser instance
+ *
+ * Default token renderer. Can be overriden by custom function
+ * in [[Renderer#rules]].
+ **/
+
+/**
+ * Returns the proper score for a given keyword
+ *
+ * Also takes into account comment keywords, which will be scored 0 UNLESS
+ * another score has been manually assigned.
+ * @param {string} keyword
+ * @param {string} [providedScore]
+ */
+
+/**
+ * Ruler.after(afterName, ruleName, fn [, options])
+ * - afterName (String): new rule will be added after this one.
+ * - ruleName (String): name of added rule.
+ * - fn (Function): rule function.
+ * - options (Object): rule options (not mandatory).
+ *
+ * Add new rule to chain after one with given name. See also
+ * [[Ruler.before]], [[Ruler.push]].
+ *
+ * ##### Options:
+ *
+ * - __alt__ - array with names of "alternate" chains.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * var md = require('markdown-it')();
+ *
+ * md.inline.ruler.after('text', 'my_rule', function replace(state) {
+ *   //...
+ * });
+ * ```
+ **/
+
+/**
+ * Ruler.at(name, fn [, options])
+ * - name (String): rule name to replace.
+ * - fn (Function): new rule function.
+ * - options (Object): new rule options (not mandatory).
+ *
+ * Replace rule by name with new function & options. Throws error if name not
+ * found.
+ *
+ * ##### Options:
+ *
+ * - __alt__ - array with names of "alternate" chains.
+ *
+ * ##### Example
+ *
+ * Replace existing typographer replacement rule with new one:
+ *
+ * ```javascript
+ * var md = require('markdown-it')();
+ *
+ * md.core.ruler.at('replacements', function replace(state) {
+ *   //...
+ * });
+ * ```
+ **/
+
+/**
+ * Ruler.before(beforeName, ruleName, fn [, options])
+ * - beforeName (String): new rule will be added before this one.
+ * - ruleName (String): name of added rule.
+ * - fn (Function): rule function.
+ * - options (Object): rule options (not mandatory).
+ *
+ * Add new rule to chain before one with given name. See also
+ * [[Ruler.after]], [[Ruler.push]].
+ *
+ * ##### Options:
+ *
+ * - __alt__ - array with names of "alternate" chains.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * var md = require('markdown-it')();
+ *
+ * md.block.ruler.before('paragraph', 'my_rule', function replace(state) {
+ *   //...
+ * });
+ * ```
+ **/
+
+/**
+ * Ruler.disable(list [, ignoreInvalid]) -> Array
+ * - list (String|Array): list of rule names to disable.
+ * - ignoreInvalid (Boolean): set `true` to ignore errors when rule not found.
+ *
+ * Disable rules with given names. If any rule name not found - throw Error.
+ * Errors can be disabled by second param.
+ *
+ * Returns list of found rule names (if no exception happened).
+ *
+ * See also [[Ruler.enable]], [[Ruler.enableOnly]].
+ **/
+
+/**
+ * Ruler.enable(list [, ignoreInvalid]) -> Array
+ * - list (String|Array): list of rule names to enable.
+ * - ignoreInvalid (Boolean): set `true` to ignore errors when rule not found.
+ *
+ * Enable rules with given names. If any rule name not found - throw Error.
+ * Errors can be disabled by second param.
+ *
+ * Returns list of found rule names (if no exception happened).
+ *
+ * See also [[Ruler.disable]], [[Ruler.enableOnly]].
+ **/
+
+/**
+ * Ruler.enableOnly(list [, ignoreInvalid])
+ * - list (String|Array): list of rule names to enable (whitelist).
+ * - ignoreInvalid (Boolean): set `true` to ignore errors when rule not found.
+ *
+ * Enable rules with given names, and disable everything else. If any rule name
+ * not found - throw Error. Errors can be disabled by second param.
+ *
+ * See also [[Ruler.disable]], [[Ruler.enable]].
+ **/
+
+/**
+ * Ruler.getRules(chainName) -> Array
+ *
+ * Return array of active functions (rules) for given chain name. It analyzes
+ * rules configuration, compiles caches if not exists and returns result.
+ *
+ * Default chain name is `''` (empty string). It can't be skipped. That's
+ * done intentionally, to keep signature monomorphic for high speed.
+ **/
+
+/**
+ * Ruler.push(ruleName, fn [, options])
+ * - ruleName (String): name of added rule.
+ * - fn (Function): rule function.
+ * - options (Object): rule options (not mandatory).
+ *
+ * Push new rule to the end of chain. See also
+ * [[Ruler.before]], [[Ruler.after]].
+ *
+ * ##### Options:
+ *
+ * - __alt__ - array with names of "alternate" chains.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * var md = require('markdown-it')();
+ *
+ * md.core.ruler.push('my_rule', function replace(state) {
+ *   //...
+ * });
+ * ```
+ **/
+
+/**
+ * Token.attrGet(name)
+ *
+ * Get the value of attribute `name`, or null if it does not exist.
+ **/
+
+/**
+ * Token.attrIndex(name) -> Number
+ *
+ * Search attribute index by name.
+ **/
+
+/**
+ * Token.attrJoin(name, value)
+ *
+ * Join value to existing attribute via space. Or create new attribute if not
+ * exists. Useful to operate with token classes.
+ **/
+
+/**
+ * Token.attrPush(attrData)
+ *
+ * Add `[ name, value ]` attribute to list. Init attrs if necessary
+ **/
+
+/**
+ * Token.attrSet(name, value)
+ *
+ * Set `name` attribute to `value`. Override old value if exists.
+ **/
+
+/**
+ * class LinkifyIt
+ **/
+
+/**
+ * class MarkdownIt
+ *
+ * Main parser/renderer class.
+ *
+ * ##### Usage
+ *
+ * ```javascript
+ * // node.js, "classic" way:
+ * var MarkdownIt = require('markdown-it'),
+ *     md = new MarkdownIt();
+ * var result = md.render('# markdown-it rulezz!');
+ *
+ * // node.js, the same, but with sugar:
+ * var md = require('markdown-it')();
+ * var result = md.render('# markdown-it rulezz!');
+ *
+ * // browser without AMD, added to "window" on script load
+ * // Note, there are no dash.
+ * var md = window.markdownit();
+ * var result = md.render('# markdown-it rulezz!');
+ * ```
+ *
+ * Single line rendering, without paragraph wrap:
+ *
+ * ```javascript
+ * var md = require('markdown-it')();
+ * var result = md.renderInline('__markdown-it__ rulezz!');
+ * ```
+ **/
+
+/**
+ * class Match
+ *
+ * Match result. Single element of array, returned by [[LinkifyIt#match]]
+ **/
+
+/**
+ * class Renderer
+ *
+ * Generates HTML from parsed token stream. Each instance has independent
+ * copy of rules. Those can be rewritten with ease. Also, you can add new
+ * rules if you create plugin and adds new token types.
+ **/
+
+/**
+ * class Ruler
+ *
+ * Helper class, used by [[MarkdownIt#core]], [[MarkdownIt#block]] and
+ * [[MarkdownIt#inline]] to manage sequences of functions (rules):
+ *
+ * - keep rules in defined order
+ * - assign the name to each rule
+ * - enable/disable rules
+ * - add/replace rules
+ * - allow assign rules to additional named chains (in the same)
+ * - cacheing lists of active rules
+ *
+ * You will not need use this class directly until write plugins. For simple
+ * rules control use [[MarkdownIt.disable]], [[MarkdownIt.enable]] and
+ * [[MarkdownIt.use]].
+ **/
+
+/**
+ * class Token
+ **/
+
+/**
+ * new Core()
+ **/
+
+/**
+ * new LinkifyIt(schemas, options)
+ * - schemas (Object): Optional. Additional schemas to validate (prefix/validator)
+ * - options (Object): { fuzzyLink|fuzzyEmail|fuzzyIP: true|false }
+ *
+ * Creates new linkifier instance with optional additional schemas.
+ * Can be called without `new` keyword for convenience.
+ *
+ * By default understands:
+ *
+ * - `http(s)://...` , `ftp://...`, `mailto:...` & `//...` links
+ * - "fuzzy" links and emails (example.com, foo@bar.com).
+ *
+ * `schemas` is an object, where each key/value describes protocol/rule:
+ *
+ * - __key__ - link prefix (usually, protocol name with `:` at the end, `skype:`
+ *   for example). `linkify-it` makes shure that prefix is not preceeded with
+ *   alphanumeric char and symbols. Only whitespaces and punctuation allowed.
+ * - __value__ - rule to check tail after link prefix
+ *   - _String_ - just alias to existing rule
+ *   - _Object_
+ *     - _validate_ - validator function (should return matched length on success),
+ *       or `RegExp`.
+ *     - _normalize_ - optional function to normalize text & url of matched result
+ *       (for example, for @twitter mentions).
+ *
+ * `options`:
+ *
+ * - __fuzzyLink__ - recognige URL-s without `http(s):` prefix. Default `true`.
+ * - __fuzzyIP__ - allow IPs in fuzzy links above. Can conflict with some texts
+ *   like version numbers. Default `false`.
+ * - __fuzzyEmail__ - recognize emails without `mailto:` prefix.
+ *
+ **/
+
+/**
+ * new MarkdownIt([presetName, options])
+ * - presetName (String): optional, `commonmark` / `zero`
+ * - options (Object)
+ *
+ * Creates parser instanse with given config. Can be called without `new`.
+ *
+ * ##### presetName
+ *
+ * MarkdownIt provides named presets as a convenience to quickly
+ * enable/disable active syntax rules and options for common use cases.
+ *
+ * - ["commonmark"](https://github.com/markdown-it/markdown-it/blob/master/lib/presets/commonmark.js) -
+ *   configures parser to strict [CommonMark](http://commonmark.org/) mode.
+ * - [default](https://github.com/markdown-it/markdown-it/blob/master/lib/presets/default.js) -
+ *   similar to GFM, used when no preset name given. Enables all available rules,
+ *   but still without html, typographer & autolinker.
+ * - ["zero"](https://github.com/markdown-it/markdown-it/blob/master/lib/presets/zero.js) -
+ *   all rules disabled. Useful to quickly setup your config via `.enable()`.
+ *   For example, when you need only `bold` and `italic` markup and nothing else.
+ *
+ * ##### options:
+ *
+ * - __html__ - `false`. Set `true` to enable HTML tags in source. Be careful!
+ *   That's not safe! You may need external sanitizer to protect output from XSS.
+ *   It's better to extend features via plugins, instead of enabling HTML.
+ * - __xhtmlOut__ - `false`. Set `true` to add '/' when closing single tags
+ *   (`<br />`). This is needed only for full CommonMark compatibility. In real
+ *   world you will need HTML output.
+ * - __breaks__ - `false`. Set `true` to convert `\n` in paragraphs into `<br>`.
+ * - __langPrefix__ - `language-`. CSS language class prefix for fenced blocks.
+ *   Can be useful for external highlighters.
+ * - __linkify__ - `false`. Set `true` to autoconvert URL-like text to links.
+ * - __typographer__  - `false`. Set `true` to enable [some language-neutral
+ *   replacement](https://github.com/markdown-it/markdown-it/blob/master/lib/rules_core/replacements.js) +
+ *   quotes beautification (smartquotes).
+ * - __quotes__ - `“”‘’`, String or Array. Double + single quotes replacement
+ *   pairs, when typographer enabled and smartquotes on. For example, you can
+ *   use `'«»„“'` for Russian, `'„“‚‘'` for German, and
+ *   `['«\xA0', '\xA0»', '‹\xA0', '\xA0›']` for French (including nbsp).
+ * - __highlight__ - `null`. Highlighter function for fenced code blocks.
+ *   Highlighter `function (str, lang)` should return escaped HTML. It can also
+ *   return empty string if the source was not changed and should be escaped
+ *   externaly. If result starts with <pre... internal wrapper is skipped.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * // commonmark mode
+ * var md = require('markdown-it')('commonmark');
+ *
+ * // default mode
+ * var md = require('markdown-it')();
+ *
+ * // enable everything
+ * var md = require('markdown-it')({
+ *   html: true,
+ *   linkify: true,
+ *   typographer: true
+ * });
+ * ```
+ *
+ * ##### Syntax highlighting
+ *
+ * ```js
+ * var hljs = require('highlight.js') // https://highlightjs.org/
+ *
+ * var md = require('markdown-it')({
+ *   highlight: function (str, lang) {
+ *     if (lang && hljs.getLanguage(lang)) {
+ *       try {
+ *         return hljs.highlight(lang, str, true).value;
+ *       } catch (__) {}
+ *     }
+ *
+ *     return ''; // use external default escaping
+ *   }
+ * });
+ * ```
+ *
+ * Or with full wrapper override (if you need assign class to `<pre>`):
+ *
+ * ```javascript
+ * var hljs = require('highlight.js') // https://highlightjs.org/
+ *
+ * // Actual default values
+ * var md = require('markdown-it')({
+ *   highlight: function (str, lang) {
+ *     if (lang && hljs.getLanguage(lang)) {
+ *       try {
+ *         return '<pre class="hljs"><code>' +
+ *                hljs.highlight(lang, str, true).value +
+ *                '</code></pre>';
+ *       } catch (__) {}
+ *     }
+ *
+ *     return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+ *   }
+ * });
+ * ```
+ *
+ **/
+
+/**
+ * new ParserBlock()
+ **/
+
+/**
+ * new ParserInline()
+ **/
+
+/**
+ * new Renderer()
+ *
+ * Creates new [[Renderer]] instance and fill [[Renderer#rules]] with defaults.
+ **/
+
+/**
+ * new Ruler()
+ **/
+
+/**
+ * new Token(type, tag, nesting)
+ *
+ * Create new token and fill passed properties.
+ **/
+
+/**
+ * performs a shallow merge of multiple objects into one
+ *
+ * @template T
+ * @param {T} original
+ * @param {Record<string,any>[]} objects
+ * @returns {T} a single new object
+ */
+
+/**  */
+
+/** */
+
+/** @param {Attr} attr */
+
+/** @param {Node} node */
+
+/** @param {any} obj */
+
+/** @param {string} kind */
+
+/** @param {string} s */
+
+/** @type CompiledMode */
+
+/** @type DataNode */
+
+/** @type Event[] */
+
+/** @type HLJSOptions */
+
+/** @type HTMLElement */
+
+/** @type HighlightResult */
+
+/** @type KeywordDict */
+
+/** @type LanguageFn */
+
+/** @type Mode */
+
+/** @type Node */
+
+/** @type Record<string,any> */
+
+/** @type {AnnotatedError} */
+
+/** @type {Language} */
+
+/** @type {ModeCallback} */
+
+/** @type {Record<string, Language>} */
+
+/** @type {Renderer} */
+
+/** @type {T} */
+
+/** @type {unknown[]} */
+
+/** @type {{ code: string, language: string, result?: any }} */
+
+/** @type {{type?: MatchType, index?: number, rule?: Mode}}} */
+
+/** @typedef {{kind?: string, sublanguage?: boolean, children: Node[]} | string} Node */
+
+/** @typedef {{kind?: string, sublanguage?: boolean, children: Node[]} } DataNode */
+
+/** @typedef {{kind?: string, sublanguage?: boolean}} Node */
+
+/** @typedef {{walk: (r: Renderer) => void}} Tree */
+
+/** Bootstring parameters */
+
+/** Cached calculation results */
+
+/** Define the public API */
+
+/** Detect free variables */
+
+/** Error messages */
+
+/** Highest positive signed 32-bit float value */
+
+/** Regular expressions */
+
+/** `inputLength` will hold the number of code points in `input`. */
+
+/** chainable
+ * LinkifyIt#add(schema, definition)
+ * - schema (String): rule name (fixed pattern prefix)
+ * - definition (String|RegExp|Object): schema definition
+ *
+ * Add new rule definition. See constructor description for details.
+ **/
+
+/** chainable
+ * LinkifyIt#set(options)
+ * - options (Object): { fuzzyLink|fuzzyEmail|fuzzyIP: true|false }
+ *
+ * Set recognition options for links without schema.
+ **/
+
+/** chainable
+ * LinkifyIt#tlds(list [, keepOld]) -> this
+ * - list (Array): list of tlds
+ * - keepOld (Boolean): merge with current list if `true` (`false` by default)
+ *
+ * Load (or merge) new tlds list. Those are user for fuzzy links (without prefix)
+ * to avoid false positives. By default this algorythm used:
+ *
+ * - hostname with any 2-letter root zones are ok.
+ * - biz|com|edu|gov|net|org|pro|web|xxx|aero|asia|coop|info|museum|name|shop|рф
+ *   are ok.
+ * - encoded (`xn--...`) root zones are ok.
+ *
+ * If list is replaced, then exact match for 2-chars root zones will be checked.
+ **/
+
+/** chainable
+ * MarkdownIt.disable(list, ignoreInvalid)
+ * - list (String|Array): rule name or list of rule names to disable.
+ * - ignoreInvalid (Boolean): set `true` to ignore errors when rule not found.
+ *
+ * The same as [[MarkdownIt.enable]], but turn specified rules off.
+ **/
+
+/** chainable
+ * MarkdownIt.enable(list, ignoreInvalid)
+ * - list (String|Array): rule name or list of rule names to enable
+ * - ignoreInvalid (Boolean): set `true` to ignore errors when rule not found.
+ *
+ * Enable list or rules. It will automatically find appropriate components,
+ * containing rules with given names. If rule not found, and `ignoreInvalid`
+ * not set - throws exception.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * var md = require('markdown-it')()
+ *             .enable(['sub', 'sup'])
+ *             .disable('smartquotes');
+ * ```
+ **/
+
+/** chainable
+ * MarkdownIt.set(options)
+ *
+ * Set parser options (in the same format as in constructor). Probably, you
+ * will never need it, but you can change options after constructor call.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * var md = require('markdown-it')()
+ *             .set({ html: true, breaks: true })
+ *             .set({ typographer, true });
+ * ```
+ *
+ * __Note:__ To achieve the best possible performance, don't modify a
+ * `markdown-it` instance options on the fly. If you need multiple configurations
+ * it's best to create multiple instances and initialize each with separate
+ * config.
+ **/
+
+/** chainable
+ * MarkdownIt.use(plugin, params)
+ *
+ * Load specified plugin with given params into current parser instance.
+ * It's just a sugar to call `plugin(md, params)` with curring.
+ *
+ * ##### Example
+ *
+ * ```javascript
+ * var iterator = require('markdown-it-for-inline');
+ * var md = require('markdown-it')()
+ *             .use(iterator, 'foo_replace', 'text', function (tokens, idx) {
+ *               tokens[idx].content = tokens[idx].content.replace(/foo/g, 'bar');
+ *             });
+ * ```
+ **/
+
+/** chainable, internal
+ * MarkdownIt.configure(presets)
+ *
+ * Batch load of all options and compenent settings. This is internal method,
+ * and you probably will not need it. But if you will - see available presets
+ * and data structure [here](https://github.com/markdown-it/markdown-it/tree/master/lib/presets)
+ *
+ * We strongly recommend to use presets instead of direct config loads. That
+ * will give better compatibility with next versions.
+ **/
+
+/** internal
+ * MarkdownIt.parse(src, env) -> Array
+ * - src (String): source string
+ * - env (Object): environment sandbox
+ *
+ * Parse input string and return list of block tokens (special token type
+ * "inline" will contain list of inline tokens). You should not call this
+ * method directly, until you write custom renderer (for example, to produce
+ * AST).
+ *
+ * `env` is used to pass data between "distributed" rules and return additional
+ * metadata like reference info, needed for the renderer. It also can be used to
+ * inject data in specific cases. Usually, you will be ok to pass `{}`,
+ * and then pass updated object to renderer.
+ **/
+
+/** internal
+ * MarkdownIt.parseInline(src, env) -> Array
+ * - src (String): source string
+ * - env (Object): environment sandbox
+ *
+ * The same as [[MarkdownIt.parse]] but skip all block rules. It returns the
+ * block tokens list with the single `inline` element, containing parsed inline
+ * tokens in `children` property. Also updates `env` object.
+ **/
+
+/** internal
+ * Renderer.renderInlineAsText(tokens, options, env) -> String
+ * - tokens (Array): list on block tokens to renter
+ * - options (Object): params of parser instance
+ * - env (Object): additional data from parsed input (references, for example)
+ *
+ * Special kludge for image `alt` attributes to conform CommonMark spec.
+ * Don't try to use it! Spec requires to show `alt` content with stripped markup,
+ * instead of simple escaping.
+ **/
+
+/** internal
+ * class Core
+ *
+ * Top-level rules executor. Glues block/inline parsers and does intermediate
+ * transformations.
+ **/
+
+/** internal
+ * class ParserBlock
+ *
+ * Block-level tokenizer.
+ **/
+
+/** internal
+ * class ParserInline
+ *
+ * Tokenizes paragraph content.
+ **/
+
+/** skip vs abort vs ignore
+   *
+   * @skip   - The mode is still entered and exited normally (and contains rules apply),
+   *           but all content is held and added to the parent buffer rather than being
+   *           output when the mode ends.  Mostly used with `sublanguage` to build up
+   *           a single large buffer than can be parsed by sublanguage.
+   *
+   *             - The mode begin ands ends normally.
+   *             - Content matched is added to the parent mode buffer.
+   *             - The parser cursor is moved forward normally.
+   *
+   * @abort  - A hack placeholder until we have ignore.  Aborts the mode (as if it
+   *           never matched) but DOES NOT continue to match subsequent `contains`
+   *           modes.  Abort is bad/suboptimal because it can result in modes
+   *           farther down not getting applied because an earlier rule eats the
+   *           content but then aborts.
+   *
+   *             - The mode does not begin.
+   *             - Content matched by `begin` is added to the mode buffer.
+   *             - The parser cursor is moved forward accordingly.
+   *
+   * @ignore - Ignores the mode (as if it never matched) and continues to match any
+   *           subsequent `contains` modes.  Ignore isn't technically possible with
+   *           the current parser implementation.
+   *
+   *             - The mode does not begin.
+   *             - Content matched by `begin` is ignored.
+   *             - The parser cursor is not moved forward.
+   */
+
+/***********************************************
+  Keywords
+***********************************************/
+
+/************************************************************************/
+
+/******/
+
+/***/
+
+/**/
+
+/*, endLine*/
+
+/*, env */
+
+/*, options, env */
+
+/*, params, ... */
+
+/*, silent*/
+
+/*--------------------------------------------------------------------------*/
+
+/*_root*/
+
+/*eslint max-depth:0*/
+
+/*eslint max-len:0*/
+
+/*eslint no-bitwise:0*/
+
+/*eslint no-labels:0,block-scoped-var:0*/
+
+/*eslint quotes:0*/
+
+/*eslint-disable max-len*/
+
+/*eslint-enable max-len*/
+
+/*from1, from2, from3, ...*/
+
+/*function replaceEntities(str) {
+  if (str.indexOf('&') < 0) { return str; }
+
+  return str.replace(ENTITY_RE, replaceEntityPattern);
+}*/
+
+/*istanbul ignore if*/
+
+/*{
+          // IPv4 addresses and subnets
+          className: 'number',
+          variants: [
+            {begin: IPADDR_wBITMASK+'(,'+IPADDR_wBITMASK+')*'}, //192.168.0.0/24,1.2.3.0/24
+            {begin: IPADDR+'-'+IPADDR},       // 192.168.0.1-192.168.0.3
+            {begin: IPADDR+'(,'+IPADDR+')*'}, // 192.168.0.1,192.168.0.34,192.168.24.1,192.168.0.1
+          ]
+        }, // */
+
+/*{
+          // MAC addresses and DHCP Client IDs
+          className: 'number',
+          begin: /\b(1:)?([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]){1,2}\b/,
+        }, //*/
+
+//
+
+//                          ^^^^^^^ parse this
+
+//                         ^^ skipping these spaces
+
+//                       ^^^ skipping those spaces
+
+//                  ^^^^^^^ parsing link title
+
+//                ^^ skipping these spaces
+
+//             println(name)
+
+//            ^^^^^^^^^^^ parse this
+
+//          ^^^^^^ parsing link destination
+
+//         ^^^ skip optional whitespace here
+
+//         end
+
+//         if !(v isa Function || v isa Type || v isa TypeVar || v isa Module || v isa Colon)
+
+//         if v isa Type || v isa TypeVar
+
+//         println(kw)
+
+//         to make extra space appear
+
+//         v = eval(Symbol(name))
+
+//        ^^ skipping these spaces
+
+//       (we can replace it by preventing links from being parsed in
+
+//       First[Characters[#]] &]], " +\n"]
+
+//       Select[Names["System`*"],
+
+//       StringStartsQ[#, CharacterRange["A", "Z"] | "$"] &],
+
+//       [[[[[[[[[[[[[[[[[[[[[foo]()
+
+//       ^ -- position start of line here (tab has width===1)
+
+//       validation mode)
+
+//       when an amount of `[` is exactly equal to `maxNesting + 1`:
+
+//      - - -
+
+//      - this one is a paragraph continuation
+
+//     - item 4
+
+//     /--- resume first regex match here (for [number])
+
+//     3 / something
+
+//     >
+
+//     > test
+
+//     Values[GroupBy[
+
+//     ^ -- position start of line here:
+
+//     ```
+
+//     end
+
+//     foo
+
+//     if !(contains(kw, " ") || kw == "struct")
+
+//     test
+
+//     try
+
+//     vv
+
+//     |/---- full match here for [string, "booger", number]
+
+//    (in joyent/node some chars in auth and paths are encoded)
+
+//    - item 3
+
+//    >
+
+//    > current blockquote
+
+//    ^ -- position start of line here + shift bsCount slightly
+
+//    e.g. in `url.parse('http://foo?bar')` pathname is ``, not `/`
+
+//    i.e. in `http://example.org:foo` pathname is `:foo`
+
+//    so `http:\\example.org\` is treated like a relative path
+
+//    which can be constructed using other parts of the url.
+
+//   "'" <> StringRiffle[#, " "] <> "'" & /@
+
+//   -
+
+//   - item 2
+
+//   ^ blkIndent position will be here
+
+//   alt: [ name2, name3 ]
+
+//   enabled: Boolean,
+
+//   fn: Function(),
+
+//   follow the '(' with a '?'.
+
+//   green        - #0E9A00
+
+//   interesting elements
+
+//   let resp = new Response(mode);
+
+//   light-brown  - #9A9900
+
+//   mode["after:begin"](match, resp);
+
+//   name: XXX,
+
+//   purple       - #99069A
+
+//   teal         - #0C9A9A
+
+//  "#" + a letter or underscore + letters, digits or underscores + (optional) "$"
+
+//  * binary literal (e.g. 0x10)
+
+//  * decimal literal (e.g. 9876543210, 100_000_000)
+
+//  * floating pointe literal (e.g. 1.2, 1.2f, .2, 1., 1.2e10, 1.2e-10)
+
+//  * hexadecimal floating point literal (e.g. 0x1p0, 0x1.2p2)
+
+//  * hexadecimal literal (e.g. 0xfedcba876543210)
+
+//  * octal literal (e.g. 0o76543210)
+
+//  - a
+
+//  - canSplitWord - determine if these markers can be found inside a word
+
+//  - example list
+
+//  - exclude      - list of characters to ignore (in addition to a-zA-Z0-9)
+
+//  - item 1
+
+//  - keepEscaped  - don't encode '%' in a correct escape sequence (default: true)
+
+//  - must have whitespace after it
+
+//  - only from beginning of line + whitespace
+
+//  - start - position to scan from (it should point at a valid marker);
+
+//  - string       - string to encode
+
+//  0..25 map to ASCII a..z or A..Z
+
+//  1. an empty line outside:
+
+//  2. an empty line inside:
+
+//  3. another tag:
+
+//  ^^^^^ - calculating total length of this thing
+
+// !!!! Don't confuse with "Markdown ASCII Punctuation" chars
+
+// !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, :, ;, <, =, >, ?, @, [, \, ], ^, _, `, {, |, }, or ~
+
+// !compiler_flags
+
+// "  -  test"
+
+// """heredoc strings"""
+
+// "Software"), to deal in the Software without restriction, including
+
+// "Whitespaces".
+
+// "Zero" preset, with nothing enabled. Useful for manual configuring of simple
+
+// "[a-z]:" is legal (as part of array slice), but improbabal.
+
+// "alt" attr MUST be set, even if empty. Because it's mandatory and
+
+// "echo" relevance has been set to 0 to avoid auto-detect conflicts with shell transcripts
+
+// "get",
+
+// "plaintext" stand-in so that the code blocks will still get normal
+
+// "set",
+
+// "strings"
+
+// "value" container
+
+// #
+
+// # built_in generator:
+
+// # keyword generator, multi-word keywords handled manually below
+
+// # literal generator
+
+// $(language_strings)
+
+// $\n, $\r, $\t, $$
+
+// $n
+
+// $variables
+
+// ${defines}
+
+// %ROWTYPE, %TYPE, $n
+
+// %TYPE, %ROWTYPE
+
+// '  >\t  test '
+
+// '  \n' -> hardbreak
+
+// ' >   test '
+
+// ' >\t  test '
+
+// '%' for more consistent coloring of @keyframes "tags"
+
+// '\u0398\u03f4\u03b8\u03d1'.toLowerCase().toUpperCase() === '\u0398\u0398\u0398\u0398'
+
+// '\x2D'
+
+// 'self'
+
+// 'strings'
+
+// '{}$%@~+=:' reserved for extentions
+
+// (!) Some patterns skipped, to avoid collisions
+
+// (?!_) cause 1.5x slowdown
+
+// (c) (C) → ©
+
+// (collapsed reference link and shortcut reference link respectively)
+
+// (list item is empty, list terminates before "foo"):
+
+// (p) (P) -> §
+
+// (prevents integer overflow in browsers)
+
+// (r) (R) → ®
+
+// (remove this when node v10 is no longer supported).
+
+// (the rest is just indented code block)
+
+// (this avoid a conflict with Object.prototype members,
+
+// (tm) (TM) → ™
+
+// (we’ll still often loose to the css-parser unless there's '//' comment,
+
+// (which will then blow up when regex's `illegal` sees the newline)
+
+// *.example.com
+
+// +- → ±
+
+// - [...] elements, where the meaning of parentheses and escapes change
+
+// - fractionals 1/2, 1/4, 3/4 -> ½, ¼, ¾
+
+// - http://en.wikipedia.org/wiki/List_of_emoticons#Western
+
+// - http://factoryjoe.com/projects/emoticons/
+
+// - https://github.com/wooorm/emoticon/blob/master/Support.md
+
+// - miltiplication 2 x 4 -> 2 × 4
+
+// - non-matching or lookahead parentheses, which do not capture. These
+
+// - other escape sequences, so we do not misparse escape sequences as
+
+// - return true
+
+// - update `state.line`
+
+// - update `state.pos`
+
+// - update `state.tokens`
+
+// -- comment
+
+// -- → &ndash;, --- → &mdash;
+
+// ---
+
+// ... → … (also ?.... → ?.., !.... → !..)
+
+// ....booger....
+
+// .3, 3.3, 3.3_3
+
+// .toLowerCase().toUpperCase() should get rid of all differences
+
+// // parameter types
+
+// /:
+
+// 0'a etc.
+
+// 0398;GREEK CAPITAL LETTER THETA;Lu;0;L;;;;;N;;;;03B8;
+
+// 03B8;GREEK SMALL LETTER THETA;Ll;0;L;;;;;N;;;0398;;0398
+
+// 03D1;GREEK THETA SYMBOL;Ll;0;L;<compat> 03B8;;;;N;GREEK SMALL LETTER SCRIPT THETA;;0398;;0398
+
+// 03F4;GREEK CAPITAL THETA SYMBOL;Lu;0;L;<compat> 0398;;;;N;;;;03B8;
+
+// 0b...
+
+// 0x..., decimal, float
+
+// 1. Match "booger" first, ignore. Also proves that [string] does non match.
+
+// 1. No leading slash in paths,
+
+// 1. anything
+
+// 1. foo " bar " baz - not replaced
+
+// 110xxxxx 10xxxxxx
+
+// 1110xxxx 10xxxxxx 10xxxxxx
+
+// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx
+
+// 2. Backslashes are not replaced with slashes,
+
+// 2. Resume matching for [number]
+
+// 2. checking this line
+
+// 2. foo-"-bar-"-baz - replaced
+
+// 2.3. Identifiers and keywords
+
+// 26..35 map to ASCII 0..9
+
+// 3. Match at index + 1 for [string, "booger", number]
+
+// 3. Trailing colon is treated like a part of the path,
+
+// 3. foo"bar"baz     - not replaced
+
+// 4. If #2 and #3 result in matches, which came first?
+
+// 4. Nothing is URL-encoded in the resulting object,
+
+// 5. `url.parse()` does not have `parseQueryString` argument
+
+// 6. Removed extraneous result properties: `host`, `path`, `query`, etc.,
+
+// 7.4.1 Declaration Modifiers
+
+// :\ and :-\ not used because of conflict with markdown escaping
+
+// <<labeles>>
+
+// <comments up next>` and then immediately end after the , because it
+
+// <https://www.php.net/manual/en/book.spl.php>
+
+// <https://www.php.net/manual/en/language.constants.predefined.php>
+
+// <lower = ..., upper = ...> or <upper = ...>
+
+// ???????? → ???, !!!!! → !!!, `,,` → `,`
+
+// @ keywords
+
+// @attributes
+
+// @font-face
+
+// @media features (it’s here to not duplicate things in AT_RULE_MODE with extra PARENS_MODE overriding):
+
+// @ts-ignore
+
+// @ts-nocheck
+
+// A negative indentation means that this is a paragraph continuation
+
+// A position of the token this delimiter corresponds to.
+
+// Actually pragma
+
+// Add a slash for self-closing tags, e.g. `<img src="foo" /`
+
+// Add new tokens to pending list
+
+// Add token name, e.g. `<img`
+
+// Adjust the backreference.
+
+// All non-basic code points < n have been handled already. Find the next
+
+// All possible word characters (everything without punctuation, spaces & controls)
+
+// Allow anything in markdown spec, forbid quote (") at the first position
+
+// Allow letters & digits (http://test1)
+
+// Allowed by RFCs, but cause of XSS attacks.  Always escape these.
+
+// An amount of characters before this one that's equivalent to
+
+// An amount of virtual spaces (tabs expanded) between beginning
+
+// Applying first lower then upper case normalizes any character:
+
+// AspectJ Constructs
+
+// Attribute
+
+// Attributes
+
+// Avoid `split(regex)` for IE8 compatibility. See #17.
+
+// Backquoted string
+
+// Base deafult colors in PB IDE: background: #FFFFDF; foreground: #000000;
+
+// Binary notation, e.g., %1010.
+
+// Block ends with either:
+
+// Block quotes
+
+// Block-level tag containing an inline tag.
+
+// Blocks start with a | or > followed by a newline
+
+// Boolean flags that determine if this delimiter could open or close
+
+// Build rules lookup cache
+
+// Build schema condition
+
+// Built-in macro variables take precedence
+
+// But .toLowerCase() doesn't change ϑ (it's already lowercase),
+
+// CLONE
+
+// COMMENTS | PB IDE color: #00AAAA (Persian Green)
+
+// CSS classes are set accordingly
+
+// CSS language prefix for fenced blocks
+
+// Cache last tested result. Used to skip repeating steps on next `match` call.
+
+// Cache the length
+
+// Cached rule chains.
+
+// Can be useful on practice: https://github.com/markdown-it/markdown-it/issues/54
+
+// Can't use built-in modes easily, as we want to use STRING in the meta
+
+// Case 2: line is not inside the blockquote, and the last line was empty.
+
+// Case 3: another tag found.
+
+// Case-insensitive comparison should treat all of them as equivalent.
+
+// Chain can be empty, if rules disabled. But we still have to return Array.
+
+// Changes from joyent/node:
+
+// Char code of the starting marker (number).
+
+// Characters that are never ever allowed in a hostname.
+
+// Check bullet
+
+// Check for underline in setext header
+
+// Check hr marker
+
+// Check if module is in cache
+
+// Check if we need to add a newline after this tag
+
+// Check start
+
+// Clean up tokens after emphasis and strikethrough postprocessing:
+
+// Cleanup
+
+// Clojure keywords
+
+// Code block (4 spaces padded)
+
+// Colors from RouterOS terminal:
+
+// Comments
+
+// Common
+
+// Common regexps
+
+// Commonmark default options
+
+// Compile each schema
+
+// Compile postponed aliases
+
+// Compile regexp
+
+// Component sections
+
+// Constants
+
+// Convenience variables for build-in objects
+
+// Convert '\n' in paragraphs into <br>
+
+// Convert input options to more useable format
+
+// Convert straight quotation marks to typographic ones
+
+// Convert the input in UCS-2 to Unicode
+
+// Copyright Joyent, Inc. and other Node contributors.
+
+// Core state object
+
+// Count matching parentheses.
+
+// Counting embedded language score towards the host language may be disabled
+
+// Create a lookup array where anything but characters in `chars` string
+
+// Create a new module (and put it into the cache)
+
+// Create caches
+
+// Currently restricted by `md.validateLink()` to http/https/ftp
+
+// Currently without astral characters support.
+
+// Cut head if cache was used
+
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+
+// Dates
+
+// Decimal literal:
+
+// Declarations
+
+// Decode a generalized variable-length integer into `delta`,
+
+// Decode percent-encoded string.
+
+// Define dynamic patterns
+
+// Defined via punctuation & spaces to save space
+
+// Detect list type and position after marker
+
+// Distinct highlight for proc <proc>, data, run, quit
+
+// Do minimal possible changes by default. Need to collect feedback prior
+
+// Doesn't seem to recognize floats which start with '.'
+
+// Doesn't seem to recognize integers which end with '.'
+
+// Don't allow letters after any shortcut
+
+// Don't allow letters before any shortcut (as in no ":/" in http://)
+
+// Don't allow single-level domains, because of false positives like '//test'
+
+// Don't confuse with unicode punctuation !!! It lacks some chars in ascii range.
+
+// Don't use UCS-2
+
+// Double + single quotes replacement pairs, when typographer enabled,
+
+// Double quote string
+
+// Double-quoted string
+
+// E4X / JSX
+
+// EOL -> fail
+
+// ES6 class
+
+// EXPAND
+
+// Emojies & shortcuts replacement logic.
+
+// Emoticons -> Emoji mapping.
+
+// Enable HTML tags in source
+
+// Enable some language-neutral replacements + quotes beautification
+
+// Encode attributes, e.g. `<img src="foo"`
+
+// Encode unsafe characters with percent-encoding, skipping already
+
+// Exclude params at functions without params
+
+// Execute the module function
+
+// Expose utils & helpers for easy acces from plugins
+
+// Expression keywords prevent 'keyword Name(...)' from being
+
+// F# class declaration?
+
+// FIXME these comments should be allowed to span indented lines
+
+// Facet sections
+
+// Fake record for guessed links
+
+// Fake token just to render attributes
+
+// Filter disabled & fake schemas
+
+// Filter emojies by whitelist, if needed
+
+// Final result should be uppercased, because it's later stored in an object
+
+// Finalize list
+
+// Find next character,
+
+// Find previous character,
+
+// Find rule index by name
+
+// Finish the basic string - if it is not empty - with a delimiter
+
+// First 2 params - rule name & source. Secondary array - list of rules,
+
+// First level - chain name, '' for default.
+
+// Flag the module as loaded
+
+// Flatten shortcuts to simple object: { alias: emoji_name }
+
+// Float number and x87 BCD
+
+// Flush pending text
+
+// For each opening emphasis-like marker find a matching closing one
+
+// For example, here we should insert a newline before blockquote:
+
+// For example, you can use '«»„“' for Russian, '„“‚‘' for German,
+
+// For validation mode we can terminate immediately
+
+// Forbid some cunstructs from other languages to improve autodetect. In fact
+
+// Function definitions
+
+// Function title
+
+// Functions and user-defined functions: write $ztime(60*60*3), $$myFunc(10), $$^Val(1)
+
+// Fuzzy link can't be prepended with .:/\- and non punctuation.
+
+// GFM table, non-standard
+
+// Generate markers.
+
+// Generate tokens for input range
+
+// Global commands: Every global command should start with ":" token, otherwise it will be treated as variable.
+
+// Global internal variables used within the highlight.js library.
+
+// Global label and local label
+
+// Global options used when within external APIs. This is modified when
+
+// Global variable: set ^globalName = 12 write ^globalName
+
+// HACK: This lets handlebars do the auto-detection if it's been loaded (by
+
+// HEX values
+
+// HTML block
+
+// HTML tags
+
+// HTML5 entities map: { name -> utf16string }
+
+// Handle the basic code points
+
+// Handle the basic code points: let `basic` be the number of input code
+
+// Helper methods, should not be used directly
+
+// Helpers
+
+// Hepler to unify [reference labels].
+
+// Here's an example showing how it happens. Lets take greek letter omega:
+
+// Hex number in $
+
+// Hexadecimal notation, e.g., $7F.
+
+// Highlighter function. Should return escaped HTML,
+
+// Higlights all when DOMContentLoaded fires
+
+// Horizontal rule
+
+// However, most prefer all uppercase and uppercase is customary.
+
+// I don't consider this a breaking change
+
+// INCLUDE ( ... ) in index_parameters in CREATE TABLE
+
+// INTERVAL optional fields
+
+// IP
+
+// IPv4
+
+// IPv6
+
+// If a fence has heading spaces, they should be removed from its inner block
+
+// If a marker sequence has an odd number of characters, it's splitted
+
+// If any of list item is tight, mark list as tight
+
+// If language exists, inject class gently, without modifying original token.
+
+// If match for this delimiter run failed, we want to set lower bound for
+
+// If nesting level exceeded - skip tail to the end. That's not ordinary
+
+// If not supported schema check requested - terminate
+
+// If one of the delimiters can both open and close emphasis, then the
+
+// If pending text exists - flush it as text token
+
+// If previous delimiter cannot be an opener, we can safely skip
+
+// If result starts with <pre... internal wrapper is skipped.
+
+// If the previous delimiter has the same marker and is adjacent to this one,
+
+// If there is an @ in the hostname, then non-host chars *are* allowed
+
+// If there was an un-closed backtick, go back to just after
+
+// If this delimiter is matched as a valid opener, `end` will be
+
+// If we are here - we detected HTML block.
+
+// If we have more than 4 spaces, the indent is 1
+
+// If we're starting a new ordered list right after
+
+// If we're starting a new unordered list right after
+
+// In SQF, a function should fit myTag_fnc_myFunction pattern
+
+// In SQF, a variable start with _
+
+// In email addresses, only the domain name should be punycoded. Leave
+
+// In node v10 'ẞ'.toLowerCase() === 'Ṿ', which is presumed to be a bug
+
+// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+
+// Increment state.level and decrement it later to limit recursion.
+
+// Indentation of subsequent lines must be the same to
+
+// Initialize the state
+
+// Inline link
+
+// Inline parser state
+
+// Insert `n` at position `i` of the output
+
+// Insert a newline between hidden paragraph and subsequent opening
+
+// Insert each marker as a separate text token, and add it to delimiter list
+
+// Instance sections
+
+// Instruction pointer
+
+// Internal state vartiables
+
+// It exists only as a hack because blockquotes override bMarks
+
+// It's harmless to do here, because no tokens are created. But ideally,
+
+// It's used only when expanding tabs, you can think about it as
+
+// Item become loose if finish with empty line,
+
+// Iterate list items
+
+// JS handles these with a special rule
+
+// JSX
+
+// Just a shortcut for bulk export
+
+// Keywords from all version of PureBASIC 5.00 upward ...
+
+// Known functions - only when followed by '('
+
+// Languages causing problems for language detection:
+
+// Length is only used for emphasis-specific "rule of 3",
+
+// Less strings are not multiline (also include '~' for more consistent coloring of "escaped" strings)
+
+// Let's cut tails like '    ###  ' from the end of string
+
+// Let's roll down till block end.
+
+// Link reference
+
+// Linkifier might send raw hostnames like "example.com", where url
+
+// List marker should have at least 2 chars (digit + dot)
+
+// List marker should have no more than 9 digits
+
+// List of added rules. Each element is:
+
+// List of emphasis-like delimiters for current tag
+
+// List of valid html blocks names, accorting to commonmark spec
+
+// Lists
+
+// Literals and names.
+
+// Load & clone RE patterns.
+
+// Load entry module and return exports
+
+// Lookup in pending chars is bad practice! Don't copy to other rules!
+
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+
+// Macro command: quit $$$OK
+
+// Macro parameter
+
+// Macro variables
+
+// Macro-local label
+
+// Magic constants:
+
+// Main decoding loop: start just after the last delimiter if any basic code
+
+// Main encoding loop:
+
+// Main parser class
+
+// Main rules
+
+// Markdown ASCII punctuation characters.
+
+// Match hexadecimal numbers (&Hxxxx)
+
+// Match line numbers
+
+// Match octal numbers (&Oxxxxxx)
+
+// Match typed numeric constants (1000, 12.34!, 1.2e5, 1.5#, 1.2D2)
+
+// May be, one day we will add .clone() for token and simplify this part, but
+
+// Merge objects
+
+// Monkey one line comment
+
+// Moonscript keywords
+
+// More to read about domain names
+
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+// NOTE: this might not work how you think.  We don't actually always
+
+// NOTE: this will cause links to behave incorrectly in the following case,
+
+// Next scan position
+
+// No need for bounds check because we have fake entry on tail.
+
+// Normal keywords.
+
+// Normalize input string
+
+// Normalize newlines
+
+// Note that any invalid chars are also handled, but these
+
+// Note: In theory, it could be faster to parse :smile: in inline chain and
+
+// Note: this is equivalent to unicode case folding; unicode normalization
+
+// Now split string to nodes
+
+// Now we have a portion which is definitely the auth.
+
+// Number in H,D,T,Q,O,B,Y suffix
+
+// Number in X,D,T,Q,O,B,Y prefix
+
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+
+// Object.prototype.hasOwnProperty.call
+
+// Octal notation, e.g., &42.
+
+// On success, rule should:
+
+// One-line quoted comment string
+
+// Other numbers
+
+// PB IDE color: #006666 (Blue Stone) + Bold
+
+// PB IDE color: #0080FF (Azure Radiance)
+
+// PB IDE color: #924B72 (Cannon Pink)
+
+// PG_smth; HAS_some_PRIVILEGE
+
+// PL/pgSQL staff
+
+// PROCEDURE KEYWORDS | PB IDE color: #006666 (Blue Stone) + Bold
+
+// PROCEDURE RETURN TYPE SETTING | PB IDE color: #000000 (Black)
+
+// PROCEDURES DEFINITIONS
+
+// PS literals are pretty verbose so it's a good idea to accent them a bit.
+
+// PS_NEW_OBJECT_TYPE,
+
+// Paragraph
+
+// Parameter/set/variable description text
+
+// Parse backticks
+
+// Parse inlines
+
+// Parse link destination
+
+// Parse link label
+
+// Parse link title
+
+// Parser rules
+
+// Parser state class
+
+// Pending string is stored in concat mode, indexed lookups will cause
+
+// Permission is hereby granted, free of charge, to any person obtaining a
+
+// Places to look for more emoticons info:
+
+// Prevent void elements from having an end tag that would actually
+
+// Previously calculated lower bounds (previous fails)
+
+// Proceess '\n'
+
+// Process ![image](<src> "title")
+
+// Process *this* and _that_
+
+// Process [link](<to> "stuff")
+
+// Process autolinks '<protocol:...>'
+
+// Process escaped chars and hardbreaks
+
+// Process html entity - &#123;, &#xAF;, &quot;, ...
+
+// Process html tags
+
+// Process only opening markers
+
+// Prohibit any of "@/[]()" in user/pass to avoid wrong domain fetch.
+
+// Pseudo-types which allowed only as return type
+
+// Pull that off.
+
+// Push fake entry to simplify cache bounds checks
+
+// Push new token to "stream".
+
+// Quick fail on second char
+
+// Quirk to enforce "hard termination mode" for paragraphs;
+
+// RE pattern for 2-character tlds (autogenerated by ./support/tlds_2char_gen.js)
+
+// RFC 2396: characters not allowed for various reasons.
+
+// RFC 3490 separators
+
+// Re-export libraries commonly used in both markdown-it and its plugins,
+
+// Ref: https://github.com/highlightjs/highlight.js/issues/2140
+
+// Reference can not terminate anything. This check is for safety only.
+
+// Reference: RFC 3986, RFC 1808, RFC 2396
+
+// Regexps to match html elements
+
+// Regular expression for Ada numeric literals.
+
+// Remove element from array and put another array at those position.
+
+// Replace NULL characters
+
+// Replace content with actual value
+
+// Replace link-like texts with link nodes.
+
+// Replace quotes in the middle of punctuation sequence, but not
+
+// Represent delta as a generalized variable-length integer
+
+// Requests
+
+// Reset compiled data
+
+// Reset scan cache
+
+// Restore original tShift; this might not be necessary since the parser
+
+// Return the exports of the module
+
+// Review our test case against browsers more comprehensively.
+
+// Ruby/Rails erb
+
+// Rude test fuzzy links by host, for quick deny
+
+// Rule definition
+
+// Rule to skip pure text
+
+// Run subparser & write tokens
+
+// SAME position for only: [string, number] but ignoring "booger" (if it
+
+// SAS is case-insensitive
+
+// STATIC_MEMBER,
+
+// STEP 21 is case insensitive in theory, in practice all non-comments are capitalized.
+
+// Scan a sequence of emphasis-like markers, and determine whether
+
+// Scan string until end reached
+
+// Schemas compiler. Build regexps.
+
+// Scilab has more than 2000 functions. Just list the most commons
+
+// Search `[-+*][\n ]`, returns next pos after marker on success
+
+// Search `\d+[.)][\n ]`, returns next pos after marker on success
+
+// Search by name and disable
+
+// Search by name and enable
+
+// Search the end of the block
+
+// Second level - diginal anchor for fast filtering by charcodes.
+
+// See details here:
+
+// See further comments in c-like.js.
+
+// See the comment in the <style tag about the lookahead pattern
+
+// Sequences. We actually skip everything between CACHE|INCREMENT|MAXVALUE|MINVALUE and
+
+// Shell built-ins
+
+// Should be something like \p{\L\N\S\M} (\w but without `_`)
+
+// Simple .toLowerCase() doesn't normalize 125 code points correctly,
+
+// Simple check to quickly interrupt scan on [link](url) at the start of line.
+
+// Simple typographic replacements
+
+// Since start is found, we can report success here in validation mode
+
+// Since there are numerous special names in Julia, it is too much trouble
+
+// Single-quoted string
+
+// Skip aliases for filtered emojies, to reduce regexp
+
+// Skip char codes from given position
+
+// Skip char codes reverse from given position - 1
+
+// Skip content of html tag links
+
+// Skip content of markdown links
+
+// Skip single token by running all rules in validation mode;
+
+// Skip spaces from given position in reverse.
+
+// Skip spaces from given position.
+
+// Skip text characters for text token, place those to pending buffer
+
+// So treat this one as a special case
+
+// So what we do: We execute two matchers, one resuming at the same
+
+// So, we have to move all those markers after subsequent s_close tags.
+
+// Some control constructions: do ##class(Package.ClassName).Method(), ##super()
+
+// Some implementations (CNC controls) of G-code are interoperable with uppercase and lowercase letters seamlessly.
+
+// Some keywords more or less unique to I7, for relevance.
+
+// Some tags can terminate paragraph without empty line.
+
+// Source: https://www.freepascal.org/docs-html/ref/refse6.html
+
+// Special (global) variables: write %request.Content; Built-in classes: %Library.Integer
+
+// Special case for a simple path URL
+
+// Special case:
+
+// Special emphasis for datalines|cards
+
+// Specific
+
+// Stack of delimiter lists for upper level tags
+
+// Stan comment
+
+// Standard PHP library:
+
+// Start list
+
+// Statements
+
+// Stores { start: end } pairs. Useful for backtrack
+
+// StringRiffle[
+
+// Strings
+
+// Strings, see https://www.postgresql.org/docs/11/static/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS
+
+// Support explicitly typed variables that end with $%! or #.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+
+// TODO support filter tags like :javascript, support inline HTML
+
+// TODO:
+
+// TODO: These spaces are not required by the Ada syntax
+
+// TODO: We need negative look-behind support to do this properly
+
+// TODO: characters.
+
+// TODO: fix to allow these to work with sublanguage also
+
+// TODO: other constructors (build-in, infix).
+
+// TODO: other constructors (built-in, infix).
+
+// TODO: remove this workaround when CM standard will allow nested links
+
+// TODO: remove with version 11.0
+
+// TODO: remove |$ hack when we have proper look-ahead support
+
+// Taken from http://developer.couchbase.com/documentation/server/4.5/n1ql/n1ql-language-reference/functions.html
+
+// Taken from http://developer.couchbase.com/documentation/server/4.5/n1ql/n1ql-language-reference/literals.html
+
+// Taken from http://developer.couchbase.com/documentation/server/current/n1ql/n1ql-language-reference/reservedwords.html
+
+// The above copyright notice and this permission notice shall be included
+
+// The following is because we have no easy way to say "resume scanning at the
+
+// The list of "keywords" (System` symbols) was determined by evaluating the following Wolfram Language code in Mathematica 12.0:
+
+// The module cache
+
+// The require function
+
+// The same as abothe but without [0-9]
+
+// This is here for relevance.
+
+// This is necessary because initially emphasis delimiter markers (*, _, ~)
+
+// This is to support parse stuff like "  http://foo.com  \n"
+
+// This line is inside the blockquote.
+
+// This looks more complicated than needed to avoid combinatorial
+
+// This mode covers expression context where we can't expect a function
+
+// This works if eval is allowed (see CSP)
+
+// This works if the window reference is available
+
+// This works in non-strict mode
+
+// Tight list paragraphs
+
+// Token class
+
+// Too much nesting, just skip until the end of the paragraph.
+
+// Top-level constructions.
+
+// Total length of these series of delimiters.
+
+// Trim and collapse whitespace
+
+// Try all possible rules.
+
+// Try fast path regexp
+
+// Try to check if list is terminated or continued.
+
+// Try to take previous element from cache, if .test() called before
+
+// Types
+
+// URLs are obnoxious.
+
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// Unicode entries:
+
+// Until C is actually different than C++ there is no reason to auto-detect C
+
+// Use '/' to close single tags (<br />)
+
+// Use direct extract instead of `regenerate` to reduse browserified size
+
+// Use reversed logic in links start/end match
+
+// Used to skip sequences like "*****" in one step, for 1st asterisk
+
+// Useful for some operations with tokens
+
+// User agent / relevance boost
+
+// User-defined macro functions highlighted after
+
+// Utilities
+
+// VHDL-2008 block commenting.
+
+// Validate emoji name
+
+// Value types
+
+// WITH|WITHOUT TIME ZONE as part of datatype
+
+// Walk through delimiter list and replace text tokens with tags
+
+// We don't want the php closing tag ?> to close the PHP block when
+
+// We found the end of the link, and know for a fact it's a valid link;
+
+// We highlight all appearances of types, keywords, literals (string, char, number, bool)
+
+// We return undefined, instead of nothing here, so it's
+
+// We scan from the end, to keep position when new tags added.
+
+// We should terminate list on style change. Remember first one to compare.
+
+// We try to support full Ada2012
+
+// Which ever results in a match first is then used. So this 3-4 step
+
+// Workaround for phantomjs - need regex without /g flag,
+
+// YAML block
+
+// YAML spec allows non-reserved URI characters in tags.
+
+// Zs (unicode class) || [\t\f\v\r\n]
+
+// [Attributes("")]
+
+// [label]:   destination   'title'
+
+// [link](  <href>  "title"  )
+
+// \B in the beginning suppresses recognition of ?-sequences where ?
+
+// \f
+
+// \n
+
+// \p{\Z\Cc} (white spaces + control)
+
+// \p{\Z\P\Cc\CF} (white spaces + control + format + punctuation)
+
+// \r
+
+// \t
+
+// \v
+
+// ^ listIndent position will be here
+
+// __beforeBegin is considered private API, internal use only
+
+// __webpack_public_path__
+
+// `<em><em>whatever</em></em>` -> `<strong>whatever</strong>`
+
+// ```
+
+// `basicLength` is the number of basic code points.
+
+// `class` as a keyword
+
+// `handledCPCount` is the number of code points that have been handled;
+
+// `i` was supposed to wrap around from `out` to `0`,
+
+// `index` is the index of the next character to be consumed.
+
+// `mode.lexemes` was the old standard before we added and now recommend
+
+// `return some()`, `else if()`, `(x*sum(1, 2))`
+
+// a 0 width match but not a begin/end match so it's not caught by the
+
+// a before plugin can usurp the result completely by providing it's own
+
+// a number tries to eat the following slash to prevent treating it as a regexp
+
+// a paragraph (validation mode only)
+
+// a paragraph, first line should not be empty.
+
+// a paragraph, it should start with 1.
+
+// a prior rule that was ignored".
+
+// a rule set but instead drops parser into
+
+// a space separates the REPL prefix from the actual code
+
+// a whole lot of languages
+
+// a word boundary is not sufficient, so instead we check for a word boundary
+
+// abstracts
+
+// actually we want them all except SQL; listed are those with known implementations
+
+// add non-matched text to the current mode buffer
+
+// admonition
+
+// advance so we aren't stuck in an infinite loop
+
+// aka. 0x7FFFFFFF or 2^31-1
+
+// all prior rules are also skipped which can result in matching the wrong
+
+// allow Fortran 77 style comments
+
+// allow HTMLBars to participate in the auto-detection
+
+// allow `C = value` for assignments so they aren't misdetected
+
+// allow empty columns before and after table, but not in between columns;
+
+// allow escaped asterisk followed by word char
+
+// allow escaped single quote followed by word char
+
+// allows XML everywhere and makes every XML snippet to have a much larger Markdown
+
+// always allow unencoded alphanumeric characters
+
+// ambiguously named function calls get a relevance of 0
+
+// an emphasis, neither do previous `jump` characters.
+
+// an emphasis.
+
+// an expression such as:
+
+// an incorrect parse, it additionally matches the following:
+
+// an initial tab length, e.g. bsCount=21 applied to string `\t123`
+
+// an install is only using `htmlbars`, not `handlebars`) then this will still
+
+// and .toUpperCase doesn't normalize 6 of them (list of exceptions:
+
+// and .toUpperCase() doesn't change ϴ (already uppercase).
+
+// and XML + JSON just in case
+
+// and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
+
+// and align row shouldn't be smaller than that (the rest of the rows can)
+
+// and alphanumeric chars is percent-encoded.
+
+// and compile search regexp
+
+// and in PL/pgSQL RAISE ... USING
+
+// and increment current pos
+
+// and no other characters are allowed but spaces;
+
+// and remove it afterwards.
+
+// and smartquotes on. Could be either a String or an Array.
+
+// and titles (user defined function/procedure/package)
+
+// annotation is also used in this language
+
+// anonymous function start
+
+// are multiples of 3.
+
+// are the ones that are *expected* to be seen, so we fast-path
+
+// are treated as their own separate text tokens. Then emphasis rule either
+
+// argument list of parametric mixins
+
+// array listing
+
+// as Fortran 77 style comments
+
+// as it's own language since it would just fail auto-detect testing or
+
+// assume that it's an IPv6 address.
+
+// at this point, either we have an explicit point where the
+
+// atSign can be anywhere.
+
+// at_rule eating first "{" is a good thing
+
+// attribute coming up so we don't steal a comma from a potential
+
+// attribute=value
+
+// attributes
+
+// auth portion cannot go past, or the last @ char is the decider.
+
+// autoconvert URL-like texts to links
+
+// avoid close detection with C# and JS
+
+// avoids the need to check length every time exec is called
+
+// backreferenceRe matches an open parenthesis or backreference. To avoid
+
+// backreferences so they continue to match.
+
+// basically, this is the equivalent of /^[-:|][-:|\s]*$/ regexp
+
+// be considered part of the block
+
+// because emails enclosed in quotes are far more common
+
+// because it doesn’t let it to be parsed as
+
+// because it looks like attributes in HTML tags
+
+// because, if they are pointing at the same token, replaceAt
+
+// begin: '@',
+
+// begin: IDENT_RE, end: '[,|\\s]'
+
+// beta configuration options, subject to change, welcome to discuss
+
+// between letter variants.
+
+// bigfloat number
+
+// binary
+
+// block attributes
+
+// block comment
+
+// block parser variables
+
+// block-level tag.
+
+// boost for obvious PHP
+
+// both are not allowed
+
+// break on Less variables @var: ...
+
+// broken by replacing non-ASCII by nothing
+
+// broken sequence
+
+// built-in functions imported from https://web.archive.org/web/20160513042710/https://support.office.com/en-us/article/Excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188
+
+// built-in types
+
+// built-ins) are automatically generated from Julia v0.6 itself through
+
+// bundled size (e.g. a browser build).
+
+// but I'll just leave this here.
+
+// but can start with > (markdown blockquote)
+
+// but guard against overflow
+
+// but if blockquote is terminated by another tag, they shouldn't
+
+// but it could still be a valid reference if we roll back
+
+// but only have a single open/close tag vs one per line
+
+// but we list only those realistically expected in code display.
+
+// but we should filter last element, because it means list finish
+
+// calling the `hljs.configure` function.
+
+// can also be done as...
+
+// can be 'blockquote', 'list', 'root', 'paragraph' or 'reference'
+
+// case of a "normal" key
+
+// case of an empty key
+
+// case of key containing non-alphanumeric chars => relevance = 0
+
+// catch middle element of the ternary operator
+
+// change current state, then restore it after parser subcall
+
+// character literal
+
+// character literals always contain one char
+
+// characters ''
+
+// check if it's outdented, i.e. it's inside list item and indented
+
+// check the block quote marker
+
+// chop off from the tail first.
+
+// class declaration
+
+// class name
+
+// class tag
+
+// className: 'number',
+
+// classNames in built-in modes.
+
+// classes
+
+// classes and objects
+
+// close raw block
+
+// closing block statement
+
+// closing delimiters must not be a multiple of 3 unless both lengths
+
+// closing tag
+
+// code snippets that should be verified when the documentation is built. They can be
+
+// code unit is the high surrogate of a surrogate pair
+
+// collapse two adjacent text nodes
+
+// collect unique names
+
+// comes *before* the @-sign.
+
+// command parameters
+
+// comment blocks
+
+// comments
+
+// compilation
+
+// compile lazily, because "host"-containing variables can change on tlds update.
+
+// compiled once on the first module load.
+
+// compiler annotation
+
+// compiler conditionals
+
+// compiler meta
+
+// complexity.
+
+// consecutive commas, not for highlighting but just for relevance
+
+// considered for a potential match
+
+// console.log("match", match[0], match.rule && match.rule.begin)
+
+// containers: ie, `vector <int> rooms (9);`
+
+// content and will need to change their setup to only require handlebars, but
+
+// context as 'meta-string' and there's no syntax to remove explicitly set
+
+// control codes
+
+// convertion to flat mode.
+
+// copy of this software and associated documentation files (the
+
+// correct bounding ( ) before the =>.  There could be any number of
+
+// could be a comma delimited list of params to a function call
+
+// could mess up indices when quote length != 1
+
+// count heading level
+
+// covers label === '' and label === undefined
+
+// create a fake namespace object
+
+// css classes applied to them - and one bad language won't break the
+
+// current one. In plain English: if this delimiter does not open
+
+// custom method guard
+
+// cut lines range from source.
+
+// dart:core
+
+// dart:html
+
+// dates must have a certain length, this prevents matching
+
+// decent number of iterations yet our index (cursor position in our
+
+// decimal & fp mixed for simplicity
+
+// default the build script will load in alphabetical order) and if not (perhaps
+
+// default to space if it's the beginning of the line
+
+// default to space if it's the end of the line
+
+// define __esModule on exports
+
+// define getter function for harmony exports
+
+// define sub-mode in order to prevent highlighting of block-parameter named "as"
+
+// define these here so at least they only have to be
+
+// definition and shouldn't highlight anything that looks like one:
+
+// delete node.children;
+
+// derivitives: c, c++, arduino turn auto-detect back on for themselves
+
+// different parents without issue
+
+// dimension
+
+// disable "rule of 3" length checks meant for emphasis
+
+// disable highlighting in commands CREATE AGGREGATE/COLLATION/DATABASE/OPERTOR/TEXT SEARCH .../TYPE
+
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+
+// dns
+
+// do not highlight inbuilt strings as variable or xml element names
+
+// document attributes
+
+// doesn't allow spaces in keywords anyways and we still check for the boundary
+
+// dots
+
+// double quoted keys
+
+// double them in the output. There are more void elements in HTML
+
+// e.g. allow ` |---| `, disallow ` ---||--- `
+
+// easier to handle this case. if(!global) { ...}
+
+// eat "if" prior to string so that it won't accidentally be
+
+// eat recursive parens in sub expressions
+
+// eat spaces (not newlines) so we can find
+
+// eat to avoid empty params
+
+// eat up @'s in emails to prevent them to be recognized as doctags
+
+// eats variables
+
+// edge case for when illegal matches $ (end of line) which is technically
+
+// either REPL-like or script-like, but are usually REPL-like and therefore we apply
+
+// encode(string, keepEscaped)
+
+// encoded sequences.
+
+// end
+
+// end the highlighting if we are on a new line and the line does not have at
+
+// end: '$',
+
+// endsWithParent: true,
+
+// enter this mode and stay.  Instead it might merely match `,
+
+// entire highlighter
+
+// enums
+
+// equal to its position, otherwise it's `-1`.
+
+// escaped
+
+// escaped identifier
+
+// eslint-disable-next-line no-undefined
+
+// even if on:end fires an `ignore` it's still possible
+
+// ex:
+
+// example, admonition & sidebar blocks
+
+// excludes method names from keyword processing
+
+// existing position but also skip the current rule ONLY". What happens is
+
+// explicit integer
+
+// explosion under V8. It effectively means `| var1 var2 ... |` with
+
+// export an "instance" of the highlighter
+
+// exports.replaceEntities     = replaceEntities;
+
+// expose the module cache
+
+// expose the modules object (__webpack_modules__)
+
+// express version except: ! & * < = > !! # @ @@
+
+// extract
+
+// extracted by mini-css-extract-plugin
+
+// fail if list has another type
+
+// fail if terminating block found
+
+// fails to find any actual attrs. But this still does the job because
+
+// far looking only for "number", ignoring potential string matches (or
+
+// fences (``` lang, ~~~ lang)
+
+// figure out if it's got a host
+
+// find the first instance of any hostEndingChars
+
+// first
+
+// first character of the second line should be '|', '-', ':',
+
+// first handler (when ignoreIllegals is true)
+
+// first internal before callbacks, then the public ones
+
+// first parse unambiguous selectors (i.e. those not starting with tag)
+
+// fixed in v12 (couldn't find any details).
+
+// fixme: it does not include dot for numbers like .5em :(
+
+// fka "attribute-assignment", parameters of the form 'key=value'
+
+// float number w/ exponent
+
+// float number w/out exponent
+
+// following conditions:
+
+// for a very generally defined mode (starts with a word, ends with line-end
+
+// for each marker and each delimiter length modulo 3.
+
+// for exports
+
+// for kw in Base.REPLCompletions.complete_keyword("")
+
+// for languages with keywords that include non-word characters checking for
+
+// for name in Base.REPLCompletions.completions("", 0)[1]
+
+// foreach(println, ["in", "isa", "where"])
+
+// found in other languages
+
+// found valid marker
+
+// found!
+
+// fragment id &ref
+
+// fragment reference *ref
+
+// from spec:
+
+// function (/*str, lang*/) { return ''; }
+
+// function types
+
+// function/procedure declaration/definition
+
+// function: -> =>
+
+// functions
+
+// functions named as keywords, followed by '('
+
+// future "booger" matches that might be valid.)
+
+// future lookups. This is required to make sure algorithm has linear
+
+// g can still be undefined, but nothing to do about it...
+
+// garbage at the end of the line after title,
+
+// generic Less highlighter (used almost everywhere except selectors):
+
+// getDefaultExport function for compatibility with non-harmony modules
+
+// give it a temporary name if it doesn't have one in the meta-data
+
+// got a fragment string.
+
+// gradle
+
+// guess schemaless links
+
+// hack: in range constraints, lower must follow "<"
+
+// hack: in range constraints, upper must follow either , or <
+
+// hard or soft error
+
+// has already been here, but just to make sure we can do that.
+
+// header row will define an amount of columns in the entire table,
+
+// heading (#, ##, ...)
+
+// headings
+
+// helpers
+
+// heredocs
+
+// hex colors
+
+// hex value
+
+// high surrogate, and there is a next character
+
+// highlight doc strings mentioned in Stan reference
+
+// highlight labeled statements
+
+// highlight map keys and named parameters as attrs
+
+// hmm, I wonder if we ought to include other exponent markers?
+
+// hopefully no one would use PATH type in XMLTABLE...
+
+// horizontal rules
+
+// how the browser resolves relative URLs.
+
+// however, I have yet to see handwritten Ada code where
+
+// http://a@b?@c => user:a host:c path:/?@c
+
+// http://a@b@c/ => user:a@b host:c
+
+// http://jgm.github.io/CommonMark/spec.html#html-blocks
+
+// http://serverfault.com/questions/638260/
+
+// http://spec.commonmark.org/0.15/#ascii-punctuation-character
+
+// http://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html
+
+// https://community.bistudio.com/wiki/Functions_Library_(Arma_3)#Adding_a_Function
+
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
+
+// https://github.com/commonmark/cmark/issues/178#issuecomment-270417442
+
+// https://github.com/highlightjs/highlight.js/issues/1086
+
+// https://github.com/substack/deep-freeze/blob/master/index.js
+
+// https://msdn.microsoft.com/en-us/library/ms714428(v=vs.85).aspx
+
+// https://spec.commonmark.org/0.29/#line-ending
+
+// https://www.postgresql.org/docs/11/static/datatype.html
+
+// https://www.postgresql.org/docs/11/static/functions-aggregate.html
+
+// https://yaml.org/spec/1.2/spec.html#id2784064
+
+// i.e. latest empty line should not count
+
+// id tag
+
+// identifiers in quotes
+
+// if "booger" is ignored then we'd really need a regex to scan from the
+
+// if (mode["after:begin"]) {
+
+// if hostname begins with [ and ends with ]
+
+// if indent wasn't changed
+
+// if it's indented more than 3 spaces, it should be a code block
+
+// if it's not a basic code point
+
+// if it's not defined (in strikethrough or 3rd party plugins),
+
+// if opening marker is "(", switch it to closing marker ")"
+
+// if we have dependencies on parents then we need a unique
+
+// if we have variants then essentially "replace" the mode with the variants
+
+// if we increase `i` as we go, then subtract off its starting
+
+// if we still have not hit it, then the entire thing is a host.
+
+// illegal match, we do not continue processing
+
+// images and links
+
+// in 'avrasm' autodetection test...
+
+// in XMLTABLE
+
+// in all copies or substantial portions of the Software.
+
+// in the middle of the words, i.e.:
+
+// in which case we don't even need to call highlight
+
+// increase level if we find text `[`, which is not a part of any token
+
+// incrementing `n` each time, so we'll fix that now:
+
+// indent of the current dd block (-1 if there isn't any)
+
+// indent of the current list block (-1 if there isn't any)
+
+// indented literal block
+
+// indents for each line (tabs expanded)
+
+// infinite loops are BAD, this is a last ditch catch all. if we have a
+
+// inherit is a workaround for a bug that makes shared modes with endsWithParent compile only the ending of one of the parents
+
+// inline code snippets (TODO should get same treatment as strong and emphasis)
+
+// inline emphasis
+
+// inline emphasis (alt)
+
+// inline javascript (or whatever host language) *multiline* string
+
+// inline smart quotes
+
+// inline strong
+
+// inside a list, it would be positioned after list marker)
+
+// inside any of the following blocks:
+
+// instance of ourselves, so we can be reused with many
+
+// instantiation
+
+// integer in base up to 36
+
+// interface or namespace declaration
+
+// interface or namespace name
+
+// interpolate-able strings
+
+// interpolation
+
+// into opening/closing tags
+
+// into opening/closing tags (which messes up levels inside).
+
+// ipv6 address
+
+// is a different step that is not required here.
+
+// is currently an exercise for the caller. :-)
+
+// is the last character of a preceding identifier, as in: `func?4`
+
+// it also places each individual regular expression into it's own
+
+// it can start an emphasis sequence or end an emphasis sequence.
+
+// it prevents the value contain rule from grabbing this instead and
+
+// it's considered a lazy continuation regardless of what's there
+
+// jboss-cli
+
+// jinja templates Ansible
+
+// jldoctest Markdown blocks are used in the Julia manual and package docs indicate
+
+// join logically computes regexps.join(separator), but fixes the
+
+// julia-repl highlighting to them. More information can be found in Documenter's
+
+// jump line-by-line until empty one or EOF
+
+// just be changing the object it was passed
+
+// key: everything until whitespace or = or : (taking into account backslashes)
+
+// keywords
+
+// keywords aren’t needed for highlighting per se, they only boost relevance
+
+// keywords that should have no default relevance value
+
+// keywords: 'AppDataCommonDir AppDataDir AutoItExe AutoItPID AutoItVersion AutoItX64 COM_EventObj CommonFilesDir Compiled ComputerName ComSpec CPUArch CR CRLF DesktopCommonDir DesktopDepth DesktopDir DesktopHeight DesktopRefresh DesktopWidth DocumentsCommonDir error exitCode exitMethod extended FavoritesCommonDir FavoritesDir GUI_CtrlHandle GUI_CtrlId GUI_DragFile GUI_DragId GUI_DropId GUI_WinHandle HomeDrive HomePath HomeShare HotKeyPressed HOUR IPAddress1 IPAddress2 IPAddress3 IPAddress4 KBLayout LF LocalAppDataDir LogonDNSDomain LogonDomain LogonServer MDAY MIN MON MSEC MUILang MyDocumentsDir NumParams OSArch OSBuild OSLang OSServicePack OSType OSVersion ProgramFilesDir ProgramsCommonDir ProgramsDir ScriptDir ScriptFullPath ScriptLineNumber ScriptName SEC StartMenuCommonDir StartMenuDir StartupCommonDir StartupDir SW_DISABLE SW_ENABLE SW_HIDE SW_LOCK SW_MAXIMIZE SW_MINIMIZE SW_RESTORE SW_SHOW SW_SHOWDEFAULT SW_SHOWMAXIMIZED SW_SHOWMINIMIZED SW_SHOWMINNOACTIVE SW_SHOWNA SW_SHOWNOACTIVATE SW_SHOWNORMAL SW_UNLOCK SystemDir TAB TempDir TRAY_ID TrayIconFlashing TrayIconVisible UserName UserProfileDir WDAY WindowsDir WorkingDir YDAY YEAR',
+
+// kind:
+
+// label
+
+// labeled as an f-string as in:
+
+// lang.disableAutodetect = false;
+
+// language is case-insensitive
+
+// language-* takes precedence over non-prefixed class names.
+
+// languages that have serious errors are replaced with essentially a
+
+// larger one:
+
+// lastChar defaults to 0x20
+
+// least six spaces in the beginning
+
+// leave only shortcuts here. But, who care...
+
+// leaves them as text (needed to merge with adjacent text) or turns them
+
+// left for the future implementation.
+
+// less than said list item:
+
+// lheading (---, ===)
+
+// like this: `~~~~~` -> `~` + `~~` + `~~`, leaving one marker at the
+
+// limit conditions when list can interrupt
+
+// line begin offsets for fast jumps
+
+// line comment
+
+// line end offsets for fast jumps
+
+// line index in src
+
+// lines count
+
+// lines ending with ; or # aren't really comments, probably auto-detect fail
+
+// link to parser instance
+
+// listing and literal blocks
+
+// lists (can only capture indicators)
+
+// literals
+
+// looks like #-comment
+
+// loose/tight mode for lists
+
+// losing information in the process.
+
+// low relevance prevents us from claming XML/HTML where this rule would
+
+// low surrogate
+
+// make \` close code sequence, but not open it;
+
+// make sure tail has spaces only
+
+// manual scores always win over common keywords
+
+// manual: https://juliadocs.github.io/Documenter.jl/latest/man/doctests.html
+
+// mark paragraphs tight if needed
+
+// markdown
+
+// markdown-it default options
+
+// markers can be mixed with spaces, but there should be at least 3 of them
+
+// markup
+
+// match at this very spot
+
+// match group, keeping track of the sequencing of those match groups
+
+// match groups that make up the multi-matcher)
+
+// match strings inside of XML tags
+
+// matching these here allows us to treat them more like regular CSS
+
+// maybe inside generic
+
+// means first tab should be expanded to 4-21%4 === 3 spaces.
+
+// merge adjacent text nodes into one and re-calculate all token levels
+
+// merge all the modes/regexs into our main object
+
+// merge those into one strong delimiter.
+
+// middle of word
+
+// might have found a valid shortcut link, disable reference parsing
+
+// mode & 1: value is a module id, require it
+
+// mode & 2: merge all properties of value into the ns
+
+// mode & 4: return value when already ns object
+
+// mode & 8|1: behave like require
+
+// modes. For example, to parse bold/italic only.
+
+// module
+
+// module.parent = undefined by default
+
+// mojolicious block
+
+// mojolicious line
+
+// monad builder keywords (matches before non-bang kws)
+
+// monkey
+
+// most notably, `__proto__`)
+
+// multi line string
+
+// multi-line string
+
+// must not follow a word character or be followed by a single quote or space
+
+// must not follow a word character or be followed by an asterisk or space
+
+// must not follow a word character or be followed by an underline or space
+
+// name of the function/procedure
+
+// named loops and declare blocks
+
+// named tags
+
+// nearest following numeric constant. Without with trick we find a lot of "keywords"
+
+// needed to allow markdown as a sublanguage to work
+
+// never used
+
+// new type declarations
+
+// nextChar defaults to 0x20
+
+// no closing '>'
+
+// no idea what language to use, return raw code
+
+// no more regexs to potentially match here, so we move the cursor forward one
+
+// no need to move the cursor, we still have additional regexes to try and
+
+// no special dependency issues, just return ourselves
+
+// node.text = node.children.join("");
+
+// normally if you call `tokenize(state, startLine, nextLine)`,
+
+// not a string technically but makes sense to be highlighted in the same style
+
+// not highlight RANGE if not in frame_clause (not 100% correct, but seems satisfactory)
+
+// not implemented in the language
+
+// now we prefer to keep things local.
+
+// number
+
+// number literals
+
+// number with leading decimal
+
+// number with trailing decimal
+
+// numbered local labels
+
+// numbers
+
+// numbers are any valid C-style number that
+
+// numeric literal
+
+// object attr container
+
+// object handles
+
+// octal
+
+// of each line (bMarks) and real beginning of that line.
+
+// offsets of the first non-space characters (tabs not expanded)
+
+// only 6
+
+// only regexes not matched previously will now be
+
+// open block statement
+
+// open raw block "{{{{raw}}}} content not evaluated {{{{/raw}}}}"
+
+// opening tag
+
+// optimization of pairs parse (emphasis, strikes).
+
+// or '' if the source string is not changed and should be escaped externaly.
+
+// or -1 on fail.
+
+// or root check will fail every second time
+
+// or whitespace - this does no harm in any case since our keyword engine
+
+// otherwise it’s identified as tag
+
+// our matcher is [string, "booger", number]
+
+// package definition, maybe inside generic
+
+// paragraph might "eat" one newline after it in nested lists
+
+// paragraphs will look below nextLine for paragraph continuation,
+
+// parameters of the form '{{#with x as | y |}}...{{/with}}'
+
+// parser failed to find ']', so it's not a valid link
+
+// parsing a valid shortcut link failed, fallback to reference
+
+// parsing) still 3x behind our index then something is very wrong
+
+// partially expanding tabs in code blocks, e.g '\t\tfoobar'
+
+// passthrough blocks
+
+// patched tShift masked characters to look like spaces (blockquotes, list markers)
+
+// persons to whom the Software is furnished to do so, subject to the
+
+// plug::ins
+
+// plugins for frameworks
+
+// points before the last delimiter, or `0` if there is none, then copy
+
+// points were copied; start at the beginning otherwise.
+
+// position, but the second full matcher starting at the position after:
+
+// pragma
+
+// pre-processor
+
+// prevening this rule from firing when we actually DO have keys.
+
+// prevent references like module.id from being highlighted as module definitions
+
+// prevents expressions like `@class` from incorrect flagging
+
+// primary tags
+
+// println("false")
+
+// println("true")
+
+// process essentially allows us to say "match at this position, excluding
+
+// properly highlight all modifiers
+
+// protocols that always contain a // bit.
+
+// protocols that can allow "unsafe" and "unwise" chars.
+
+// protocols that never have a hostname.
+
+// psuedo selectors
+
+// pull out port.
+
+// quirk for blockquotes, this line should already be checked by that rule
+
+// quoteblocks
+
+// re-calculate levels after emphasis/strikethrough turns some text nodes
+
+// re-export Token class to use in block rules
+
+// re-export Token class to use in core rules
+
+// recognized as a function definition
+
+// ref: http://julia.readthedocs.org/en/latest/manual/variables/#allowed-variable-names
+
+// regex can't start with *, and it supports an "illegal" in the main mode
+
+// regex can't start with space to parse x / 2 / 3 as two divisions
+
+// regex in both fortran and irpf90 should match
+
+// regexp container
+
+// regexp locations (~, ~*)
+
+// registered function - no need in them due to all functions are highlighted,
+
+// relevance booster
+
+// relevance: 5
+
+// remove 'trait' when removed from KEYWORDS
+
+// renderer
+
+// replace current node
+
+// replace shortcut with full name
+
+// replace token.content *before* tokens[item.token].content,
+
+// required block content indent (for example, if we are
+
+// resolution will treat //foo/bar as host=foo,path=bar because that's
+
+// restore old state
+
+// return
+
+// return TokenTree._walk(builder, this.rootNode);
+
+// return auto-detection back on
+
+// return type
+
+// returnBegin: true,
+
+// returns `true` if any rule reported success
+
+// returns the end of the label
+
+// roboconf - лютый костыль )))
+
+// rules so everything between the {} gets regular rule highlighting,
+
+// save cursor state, we could require to rollback later
+
+// scan marker length
+
+// scientific notation
+
+// score.
+
+// scripting commands
+
+// search end of block
+
+// second_best (with underscore) is the expected API
+
+// secondary tags
+
+// see comment above the definition
+
+// self is not valid at the top-level
+
+// set offset past spaces and ">"
+
+// set state.tight if we had an empty line before current tag
+
+// should be placed on proper position for tests.
+
+// should have at least two lines
+
+// should not be `://` & `///`, that protects from errors in protocol name
+
+// should skip all tokens except 'text', 'html_inline' or 'code_inline'
+
+// simple array accesses a[123] and [] and other common patterns
+
+// simply because 1 variable just can't beat 99 properties :)
+
+// simply match with C++.
+
+// single-line comments
+
+// sit isolated from other words
+
+// situation and we should not care about content.
+
+// skip DELIM
+
+// skip disabled methods
+
+// skip generic stuff
+
+// skip heading spaces for next line
+
+// skip leading whitespaces from next line
+
+// skip one optional space after '>'
+
+// skip trailing spaces until the rest of the line
+
+// so all that's left to do is to call tokenizer.
+
+// so even if it's empty, it has to be present.
+
+// so no point trying to find the end of it in silent mode
+
+// so plugins won't have to depend on them explicitly, which reduces their
+
+// so we bail
+
+// so we need to re-calculate all offsets to appear as
+
+// so you can force a score of 1 if you really insist
+
+// someone does not put spaces around :
+
+// sometimes they can end up matching nothing at all
+
+// space
+
+// special case: 1"" - count first quote as an inch
+
+// special handling of some words, which are reserved only in some contexts
+
+// spit the "skipped" character that our regex choked on back into the output sequence
+
+// sql (ada default.txt has a lot of sql keywords)
+
+// start of the sequence.
+
+// starts with domain name. So we prepend http:// in those cases,
+
+// state.blkIndent was non-zero, we now set it to zero,
+
+// stolen form the VHDL highlighter
+
+// string
+
+// string literal or template
+
+// strings
+
+// strings "foobar"
+
+// strip [ and ] from the hostname
+
+// sub-expressions inside also surrounded by parens.
+
+// sub-languages: are not fully supported by hljs by 11/15/2015
+
+// sub.example.*
+
+// substitution within a macro
+
+// sum of the lengths of the delimiter runs containing the opening and
+
+// supported numeric literals:
+
+// sure algorithm has linear complexity (see *_*_*_*_*_... case).
+
+// swallow composed identifiers to avoid parsing them as keywords
+
+// swallow namespace qualifiers before symbols
+
+// table
+
+// table environment
+
+// table header row
+
+// tags
+
+// template string
+
+// template variable or helper-call that is NOT html-escaped
+
+// template variable or helper-call that is html-escaped
+
+// terminals
+
+// testcase number
+
+// testcase status and description
+
+// that we might trigger the end node because of a parent mode
+
+// the base c-like language will NEVER be auto-detected, rather the
+
+// the default mode which is how it should be.
+
+// the entire sequence in future checks. This is required to make
+
+// the first basic code points to the output.
+
+// the first instance of /, ?, ;, or # ends the host.
+
+// the first key:value pairing
+
+// the following scripts for each.
+
+// the function class is a bit different for AspectJ compared to the Java language
+
+// the host field still retains them, though
+
+// the host is the remaining to the left of the first non-host char
+
+// the last backtick, but as if it was a normal character
+
+// the local part (i.e. everything up to `@`) intact.
+
+// the mode is ended by the title
+
+// the plugin can change anything in result to suite it
+
+// the plugin can change the desired language or the code to be highlighted
+
+// the reason is: `\` is correct code block
+
+// the title mode below matches only exactly once
+
+// them.
+
+// then fall into the scary lookahead-discriminator variant.
+
+// there's a hostname.
+
+// these are explicitly named internal function calls
+
+// thing. Example of matching "booger":
+
+// this avoids needing to use a whole Vue compilation pipeline just
+
+// this brakes first and last tag, but this is the only way to embed a valid html
+
+// this could be a closing quote, rewind the stack to get a match
+
+// this does not
+
+// this function assumes that first character ("[") already matches;
+
+// this happens in compileMode, where this function is called from
+
+// this happens when we have badly behaved rules that have optional matchers to the degree that
+
+// this is *the only* Less specific statement used in most of the sources, so...
+
+// this is purely for cleaner HTML output
+
+// this mode also handles mixin definitions and calls
+
+// this mode works as the only relevance counter
+
+// this outer rule makes sure we actually have a WHOLE regex and not simply
+
+// this prevents 'new Name(...), or throw ...' from being recognized as a function definition
+
+// this should be ... } else { ... branch
+
+// this swallows entire URLs to avoid detecting numbers within
+
+// this works
+
+// this would be a code block normally, but after paragraph
+
+// title
+
+// to avoid highlight it as a label, named parameter, or map key
+
+// to build Highlight.js
+
+// to catch known shells and boost relevancy
+
+// to catch unknown shells but still highlight the shebang
+
+// to lower case
+
+// to maintain them by hand. Hence these names (i.e. keywords, literals and
+
+// to move forward https://github.com/markdown-it/linkify-it/issues/1
+
+// to prevent false regex triggers for the division function:
+
+// to prevent it from being confused as the function title
+
+// to the left of the last @ sign, unless some host-ending character
+
+// treat beginning of the line as a whitespace
+
+// treat end of the line as a whitespace
+
+// trim before proceeding.
+
+// trim off any earlier non-relevant match groups (ie, the other regex
+
+// trimming space in "-    \n  3" case, indent is 1 here
+
+// true if this sequence can be a terminator, false otherwise
+
+// try to scan for link with schema - that's the most simple rule
+
+// twemoji shows question
+
+// types
+
+// types or variables
+
+// units
+
+// unmatched surrogate; only append this code unit, in case the next
+
+// unprintable ASCII chars + non-ASCII chars
+
+// uppercase U+0398 (Θ), U+03f4 (ϴ) and lowercase U+03b8 (θ), U+03d1 (ϑ)
+
+// uppercased versions).
+
+// url should be normalized at this point, and existing entities are decoded
+
+// use contains to gobble up multiple lines to allow the block to be whatever size
+
+// use paragraph to match terminatorRules
+
+// use the second matcher result
+
+// used in lists to determine if they interrupt a paragraph
+
+// used in strings for escaping/interpolation/substitution
+
+// used only to properly balance nested parens inside mixin call, def. arg list
+
+// user@server is *always* interpreted as a hostname, and url
+
+// using `keywords.$pattern` to pass the keyword pattern
+
+// using more strict pattern for higher relevance to increase chances of Less detection.
+
+// v0.12 TODO(isaacs): This is not quite how Chrome does things.
+
+// v7 уникальные ключевые слова, отсутствующие в v8 ==> keyword
+
+// validate a little.
+
+// value at the end to obtain `delta`.
+
+// value container
+
+// value will be 0, for 2nd it's 1 and so on.
+
+// value: everything until end of line (again, taking into account backslashes)
+
+// var src_pseudo_letter_non_d = '(?:(?![0-9]|' + src_ZPCc + ')' + src_Any + ')';
+
+// variables
+
+// vbscript
+
+// verbatim string
+
+// verbatim tags
+
+// version of format and total amount of testcases
+
+// was the first match), a simple resume would scan ahead who knows how
+
+// we also need to allow for multiple possible comments inbetween
+
+// we are done with functions
+
+// we can default it to 0 to disable those checks.
+
+// we can only have a single title
+
+// we have to count the parens to make sure we actually have the
+
+// we know that it's going to be a valid blockquote,
+
+// we need our own copy of contains
+
+// we need this to make sure size of hostname is not
+
+// we need to look ahead to make sure that we actually have an
+
+// we need to re-match the 'function' keyword, so that
+
+// we replace non-ASCII char with a temporary placeholder
+
+// we test again with ASCII char only
+
+// we'd need a separate private state variable for this purpose.
+
+// we've found a 0 width match and we're stuck, so we need to advance
+
+// we've indicated that there is a hostname,
+
+// webpackBootstrap
+
+// which can be terminated by this one.
+
+// which gets added to `i`. The overflow checking is easier
+
+// which is what we want for page and font-face
+
+// whitespace adjacent to `|` being optional.
+
+// whitespaces: space, tab, formfeed
+
+// with code comments
+
+// with indent=2 becomes '  \tfoobar'
+
+// with zeroing the containing mode relevance. Use case in point is Markdown that
+
+// without EXPANSION
+
+// without increase matcher complicity. Than can change in future.
+
+// without limitation the rights to use, copy, modify, merge, publish,
+
+// workaround for this case
+
+// workaround to avoid highlighting
+
+// worse case someone will have HTMLbars and handlebars competing for the same
+
+// wrap-around to considering all matches again
+
+// xml (broken by Foo : Bar type), elm (broken by Foo : Bar type), vbscript-html (broken by body keyword)
+
+// xmlelement, xmlpi - special NAME
+
+// xmlparse, xmlserialize
+
+// yes, Less identifiers may begin with a digit
+
+// {
+
+// }
+
+// ~~strike through~~
+
+// ~~~~~~~~
+
+// İ, ϴ, ẞ, Ω, K, Å - those are already uppercased, but have differently
+
+// Не форматировать не классифицированные значения. Необходимо для исключения подсветки значений как built_in.
+
+// Определение идентификаторов
+
+// Определение имен функций
+
+// недопустимые конструкции
+
+// общий паттерн для определения идентификаторов
+
+//"$bit", "$bitcount",
+
+//"$bitfind", "$bitlogic", "$case", "$char", "$classmethod", "$classname",
+
+//"$change", "$mv", "$mvat", "$mvfmt", "$mvfmts", "$mviconv",
+
+//"$compile", "$data", "$decimal", "$double", "$extract", "$factor",
+
+//"$find", "$fnumber", "$get", "$increment", "$inumber", "$isobject",
+
+//"$io", "$job", "$key", "$namespace", "$principal", "$quit", "$roles",
+
+//"$isvaliddouble", "$isvalidnum", "$justify", "$length", "$list",
+
+//"$listbuild", "$listdata", "$listfind", "$listfromstring", "$listget",
+
+//"$listlength", "$listnext", "$listsame", "$listtostring", "$listvalid",
+
+//"$locate", "$match", "$method", "$name", "$nconvert", "$next",
+
+//"$mviconvs", "$mvinmat", "$mvlover", "$mvoconv", "$mvoconvs", "$mvraise",
+
+//"$mvtrans", "$mvv", "$mvname", "$zbitand", "$zbitcount", "$zbitfind",
+
+//"$normalize", "$now", "$number", "$order", "$parameter", "$piece",
+
+//"$prefetchoff", "$prefetchon", "$property", "$qlength", "$qsubscript",
+
+//"$query", "$random", "$replace", "$reverse", "$sconvert", "$select",
+
+//"$sortbegin", "$sortend", "$stack", "$text", "$translate", "$view",
+
+//"$storage", "$system", "$test", "$this", "$tlevel", "$username",
+
+//"$wascii", "$wchar", "$wextract", "$wfind", "$wiswide", "$wlength",
+
+//"$wreverse", "$xecute", "$zabs", "$zarccos", "$zarcsin", "$zarctan",
+
+//"$x", "$y", "$za", "$zb", "$zchild", "$zeof", "$zeos", "$zerror",
+
+//"$zbitget", "$zbitlen", "$zbitnot", "$zbitor", "$zbitset", "$zbitstr",
+
+//"$zbitxor", "$zincrement", "$znext", "$zorder", "$zprevious", "$zsort",
+
+//"$zconvert", "$zcrc", "$zcyc", "$zdascii", "$zdchar", "$zf",
+
+//"$zcos", "$zcot", "$zcsc", "$zdate", "$zdateh", "$zdatetime",
+
+//"$zdatetimeh", "$zexp", "$zhex", "$zln", "$zlog", "$zpower", "$zsec",
+
+//"$zhorolog", "$zio", "$zjob", "$zmode", "$znspace", "$zparent", "$zpi",
+
+//"$ziswide", "$zlascii", "$zlchar", "$zname", "$zposition", "$zqascii",
+
+//"$zpos", "$zreference", "$zstorage", "$ztimestamp", "$ztimezone",
+
+//"$zqchar", "$zsearch", "$zseek", "$zstrip", "$zwascii", "$zwchar",
+
+//"$zsin", "$zsqr", "$ztan", "$ztime", "$ztimeh", "$zboolean",
+
+//"$ztrap", "$zversion"
+
+//"$zwidth", "$zwpack", "$zwbpack", "$zwunpack", "$zwbunpack", "$zzenkaku",
+
+//"device", "$ecode", "$estack", "$etrap", "$halt", "$horolog",
+
+//'^/{4,}$',
+
+//'function',
+
+//*/
+
+//////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ARM syntax
+
+//GNU ARM syntax
+
+//GNU MIPS syntax
+
+//GNU preprocs
+
+//Metatags and globals:
+
+//Rule name
+
+//adds 1e5, 1e-10
+
+//bin
+
+//built in func
+
+//built_in: 'EXTRACT',
+
+//built_in: 'XMLELEMENT XMLPI',
+
+//built_in: 'XMLPARSE XMLSERIALIZE',
+
+//className: "fn_ref",
+
+//className: "fn_ref_params",
+
+//className: 'built_in',
+
+//end: /\(/,
+
+//hex
+
+//literal
+
+//local labels: %?[FB]?[AT]?\d{1,2}\w+
+
+//meaning that it would fail to highlight anything
+
+//subst would be the most accurate however fails the point of highlighting. variable is comparably the most accurate that actually has some effect
+
+//symbol would be most accurate however is highlighted just like built_in and that makes up a lot of AutoHotkey code

@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const path = require("path");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = {
     entry: __dirname + "/src/js/index.js",
@@ -9,13 +11,13 @@ module.exports = {
         filename: 'main.js'
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.js$/,
                 loader: "babel-loader"
             }, {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader"})
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             }, {
                 test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
                 loader: "file-loader",
@@ -26,18 +28,34 @@ module.exports = {
         ]
     },
     plugins: [
-        new ExtractTextPlugin("[name].css"),
-        new webpack.LoaderOptionsPlugin({minimize: true}),
-        new webpack.optimize.UglifyJsPlugin({
-            beautify: false,
-            mangle: {
-                screw_ie8: true,
-                keep_fnames: true
-            },
-            compress: {
-                screw_ie8: true
-            },
-            comments: false
-        })
-    ]
+        new MiniCssExtractPlugin({
+            filename: "[name].css"
+        }),
+        new webpack.LoaderOptionsPlugin({minimize: true})
+    ],
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                extractComments: 'all',
+                terserOptions: {
+                    compress: true,
+                    output: {
+                      comments: false,
+                      beautify: false
+                    }
+                }
+            }),
+            new CssMinimizerPlugin({
+                minimizerOptions: {
+                  preset: [
+                    'default',
+                    {
+                      discardComments: { removeAll: true },
+                    },
+                  ],
+                },
+              }),
+        ],
+    }
 }
