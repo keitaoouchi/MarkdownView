@@ -1,5 +1,5 @@
-osx_image: xcode10.2
-language: objective-c
+osx_image: xcode11.6
+language: swift
 before_install:
   - brew update
   - brew outdated carthage || brew upgrade carthage
