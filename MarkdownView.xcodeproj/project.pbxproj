@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E2E8207252F50A300F48771 /* ModuleCocoaPods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2E8206252F50A300F48771 /* ModuleCocoaPods.swift */; };
 		FC9CC4C51EC43FA90013238C /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BD1EC43FA90013238C /* index.html */; };
 		FC9CC4C61EC43FA90013238C /* main.css in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BE1EC43FA90013238C /* main.css */; };
 		FC9CC4C71EC43FA90013238C /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BF1EC43FA90013238C /* main.js */; };
@@ -15,12 +16,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FC9CC4BD1EC43FA90013238C /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = webassets/dist/index.html; sourceTree = SOURCE_ROOT; };
-		FC9CC4BE1EC43FA90013238C /* main.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = main.css; path = webassets/dist/main.css; sourceTree = SOURCE_ROOT; };
-		FC9CC4BF1EC43FA90013238C /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = webassets/dist/main.js; sourceTree = SOURCE_ROOT; };
+		3E2E8206252F50A300F48771 /* ModuleCocoaPods.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleCocoaPods.swift; sourceTree = "<group>"; };
+		FC9CC4BD1EC43FA90013238C /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = Sources/MarkdownView/Resources/index.html; sourceTree = SOURCE_ROOT; };
+		FC9CC4BE1EC43FA90013238C /* main.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = main.css; path = Sources/MarkdownView/Resources/main.css; sourceTree = SOURCE_ROOT; };
+		FC9CC4BF1EC43FA90013238C /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = Sources/MarkdownView/Resources/main.js; sourceTree = SOURCE_ROOT; };
 		FCA050151EC41211001DAD5F /* MarkdownView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MarkdownView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		FCA050181EC41211001DAD5F /* MarkdownView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MarkdownView.h; sourceTree = "<group>"; };
-		FCA050191EC41211001DAD5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FCA050181EC41211001DAD5F /* MarkdownView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MarkdownView.h; path = ../MarkdownView.h; sourceTree = "<group>"; };
+		FCA050191EC41211001DAD5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../Info.plist; sourceTree = "<group>"; };
 		FCFB6FD21EC4381600297562 /* MarkdownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkdownView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,12 +56,14 @@
 		FCA050171EC41211001DAD5F /* MarkdownView */ = {
 			isa = PBXGroup;
 			children = (
+				3E2E8206252F50A300F48771 /* ModuleCocoaPods.swift */,
 				FCFB6FD21EC4381600297562 /* MarkdownView.swift */,
 				FCA050181EC41211001DAD5F /* MarkdownView.h */,
 				FCA050191EC41211001DAD5F /* Info.plist */,
 				FCA050201EC4123C001DAD5F /* Assets */,
 			);
-			path = MarkdownView;
+			name = MarkdownView;
+			path = Sources/MarkdownView;
 			sourceTree = "<group>";
 		};
 		FCA050201EC4123C001DAD5F /* Assets */ = {
@@ -157,6 +161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCFB6FD51EC4381600297562 /* MarkdownView.swift in Sources */,
+				3E2E8207252F50A300F48771 /* ModuleCocoaPods.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +290,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = MarkdownView/Info.plist;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -312,7 +317,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_OPTIMIZATION_LEVEL = fast;
-				INFOPLIST_FILE = MarkdownView/Info.plist;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
