@@ -51,15 +51,6 @@ open class MarkdownView: UIView {
   @objc public func load(markdown: String?, enableImage: Bool = true) {
     guard let markdown = markdown else { return }
 
-    let bundle = Bundle(for: MarkdownView.self)
-
-    let htmlURL: URL? =
-      bundle.url(forResource: "index",
-                 withExtension: "html") ??
-      bundle.url(forResource: "index",
-                 withExtension: "html",
-                 subdirectory: "MarkdownView.bundle")
-
     if let url = htmlURL {
       let templateRequest = URLRequest(url: url)
 

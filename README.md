@@ -5,6 +5,7 @@
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Version](https://img.shields.io/cocoapods/v/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
 [![License](https://img.shields.io/cocoapods/l/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
+[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 
 > MarkdownView is a WKWebView based UI element, and internally use bootstrap, highlight.js, markdown-it.
 
@@ -55,7 +56,16 @@ md.onTouchLink = { [weak self] request in
 
 ## Installation
 
-MarkdownView is available through [CocoaPods](http://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage).
+MarkdownView is available through [Swift Package Manager](https://swift.org/package-manager/) or [CocoaPods](http://cocoapods.org) or [Carthage](https://github.com/Carthage/Carthage).
+
+### Swift Package Manager
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/keitaoouchi/MarkdownView.git", from: "1.7.1")
+]
+```
+Alternatively, you can add the package directly via Xcode.
 
 ### CocoaPods
 

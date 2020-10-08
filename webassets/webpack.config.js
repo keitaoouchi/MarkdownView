@@ -7,7 +7,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 module.exports = {
     entry: __dirname + "/src/js/index.js",
     output: {
-        path: __dirname + '/dist',
+        path: __dirname + '/../Sources/MarkdownView/Resources',
         filename: 'main.js'
     },
     module: {
