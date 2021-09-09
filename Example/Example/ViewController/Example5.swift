@@ -1,0 +1,37 @@
+import UIKit
+import MarkdownView
+
+class Example5ViewController: UIViewController {
+  
+  init() {
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    view.backgroundColor = .systemBackground
+
+    let md = MarkdownView()
+    view.addSubview(md)
+    md.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      md.topAnchor.constraint(equalTo: view.topAnchor),
+      md.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      md.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      md.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+    ])
+
+    let markdown = ["# h1 title", "## h2 title", "### h3 title"].joined(separator: "\n")
+    let css = [
+      "h1 { color:red; }",
+      "h2 { color:green; }",
+      "h3 { color:blue; }",
+    ].joined(separator: "")
+    md.load(markdown: markdown, enableImage: true, css: css)
+  }
+
+}

@@ -23,12 +23,17 @@ final class ViewController: UIViewController {
     let example4Button = UIButton()
     example4Button.setTitle("Arbitrary markdown Example", for: .normal)
     example4Button.addTarget(self, action: #selector(openExample4), for: .touchUpInside)
+    
+    let example5Button = UIButton()
+    example5Button.setTitle("Custom CSS", for: .normal)
+    example5Button.addTarget(self, action: #selector(openExample5), for: .touchUpInside)
 
     [
       example1Button,
       example2Button,
       example3Button,
-      example4Button
+      example4Button,
+      example5Button
     ].forEach { button in
 
       button.setTitleColor(UIColor.systemBlue, for: .normal)
@@ -65,6 +70,11 @@ final class ViewController: UIViewController {
   @objc func openExample4(sender: Any) {
     let example = storyboard?.instantiateViewController(
       withIdentifier: "Example4") as! Example4ViewController
+    navigationController?.pushViewController(example, animated: true)
+  }
+  
+  @objc func openExample5(sender: Any) {
+    let example = Example5ViewController()
     navigationController?.pushViewController(example, animated: true)
   }
 }
