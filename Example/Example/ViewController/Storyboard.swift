@@ -1,7 +1,7 @@
 import UIKit
 import MarkdownView
 
-class Example2ViewController: UIViewController {
+class StoryboardSampleViewController: UIViewController {
 
   @IBOutlet weak var mdView: MarkdownView!
 

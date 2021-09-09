@@ -2,7 +2,7 @@ import UIKit
 import MarkdownView
 import SafariServices
 
-class Example3ViewController: UIViewController {
+class ScrollViewSampleViewController: UIViewController {
 
   @IBOutlet weak var mdView: MarkdownView!
 

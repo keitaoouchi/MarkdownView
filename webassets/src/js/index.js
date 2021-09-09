@@ -6,6 +6,19 @@ import './../css/gist.css'
 import './../css/github.css'
 import './../css/index.css'
 
+let markdown = new MarkdownIt({
+  html: true,
+  breaks: true,
+  linkify: true,
+  highlight: function(code){
+      return hljs.highlightAuto(code).value;
+  }
+})
+
+markdown.use(emoji)
+
+window.usePlugin = (plugin) => markdown.use(plugin)
+
 window.showMarkdown = (percentEncodedMarkdown, enableImage = true) => {
 
   if (!percentEncodedMarkdown) {
@@ -14,20 +27,9 @@ window.showMarkdown = (percentEncodedMarkdown, enableImage = true) => {
 
   const markdownText = decodeURIComponent(percentEncodedMarkdown)
 
-  let markdown = new MarkdownIt({
-    html: true,
-    breaks: true,
-    linkify: true,
-    highlight: function(code){
-        return hljs.highlightAuto(code).value;
-    }
-  })
-
   if (!enableImage) {
     markdown = markdown.disable('image')
   }
-
-  markdown.use(emoji)
 
   let html = markdown.render(markdownText)
 

@@ -8,32 +8,32 @@ final class ViewController: UIViewController {
     let stackView = UIStackView()
     stackView.axis = .vertical
 
-    let example1Button = UIButton()
-    example1Button.setTitle("Code Only Example", for: .normal)
-    example1Button.addTarget(self, action: #selector(openExample1), for: .touchUpInside)
+    let btn1 = UIButton()
+    btn1.setTitle("Code Only Example", for: .normal)
+    btn1.addTarget(self, action: #selector(openCodeOnlySample(sender:)), for: .touchUpInside)
 
-    let example2Button = UIButton()
-    example2Button.setTitle("Storyboard Example", for: .normal)
-    example2Button.addTarget(self, action: #selector(openExample2), for: .touchUpInside)
+    let btn2 = UIButton()
+    btn2.setTitle("Storyboard Example", for: .normal)
+    btn2.addTarget(self, action: #selector(openStoryboardSample(sender:)), for: .touchUpInside)
 
-    let example3Button = UIButton()
-    example3Button.setTitle("ScrollView Example", for: .normal)
-    example3Button.addTarget(self, action: #selector(openExample3), for: .touchUpInside)
-
-    let example4Button = UIButton()
-    example4Button.setTitle("Arbitrary markdown Example", for: .normal)
-    example4Button.addTarget(self, action: #selector(openExample4), for: .touchUpInside)
+    let btn3 = UIButton()
+    btn3.setTitle("ScrollView Example", for: .normal)
+    btn3.addTarget(self, action: #selector(openScrollViewSample(sender:)), for: .touchUpInside)
     
-    let example5Button = UIButton()
-    example5Button.setTitle("Custom CSS", for: .normal)
-    example5Button.addTarget(self, action: #selector(openExample5), for: .touchUpInside)
+    let btn4 = UIButton()
+    btn4.setTitle("Custom CSS", for: .normal)
+    btn4.addTarget(self, action: #selector(openExample5), for: .touchUpInside)
+    
+    let btn5 = UIButton()
+    btn5.setTitle("Add Plugin", for: .normal)
+    btn5.addTarget(self, action: #selector(openExample6), for: .touchUpInside)
 
     [
-      example1Button,
-      example2Button,
-      example3Button,
-      example4Button,
-      example5Button
+      btn1,
+      btn2,
+      btn3,
+      btn4,
+      btn5
     ].forEach { button in
 
       button.setTitleColor(UIColor.systemBlue, for: .normal)
@@ -49,32 +49,30 @@ final class ViewController: UIViewController {
     stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
   }
 
-  @objc func openExample1(sender: Any) {
-    let example = storyboard?.instantiateViewController(
-      withIdentifier: "Example1") as! Example1ViewController
+  @objc func openCodeOnlySample(sender: Any) {
+    let example = CodeOnlySampleViewController()
     navigationController?.pushViewController(example, animated: true)
   }
 
-  @objc func openExample2(sender: Any) {
+  @objc func openStoryboardSample(sender: Any) {
     let example = storyboard?.instantiateViewController(
-      withIdentifier: "Example2") as! Example2ViewController
+      withIdentifier: "StoryboardSampleViewController") as! StoryboardSampleViewController
     navigationController?.pushViewController(example, animated: true)
   }
 
-  @objc func openExample3(sender: Any) {
+  @objc func openScrollViewSample(sender: Any) {
     let example = storyboard?.instantiateViewController(
-      withIdentifier: "Example3") as! Example3ViewController
-    navigationController?.pushViewController(example, animated: true)
-  }
-
-  @objc func openExample4(sender: Any) {
-    let example = storyboard?.instantiateViewController(
-      withIdentifier: "Example4") as! Example4ViewController
+      withIdentifier: "ScrollViewSampleViewController") as! ScrollViewSampleViewController
     navigationController?.pushViewController(example, animated: true)
   }
   
   @objc func openExample5(sender: Any) {
-    let example = Example5ViewController()
+    let example = CustomCssSampleViewController()
+    navigationController?.pushViewController(example, animated: true)
+  }
+  
+  @objc func openExample6(sender: Any) {
+    let example = PluginsSampleViewController()
     navigationController?.pushViewController(example, animated: true)
   }
 }

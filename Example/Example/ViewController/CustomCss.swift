@@ -1,10 +1,11 @@
 import UIKit
 import MarkdownView
 
-class Example5ViewController: UIViewController {
+class CustomCssSampleViewController: UIViewController {
   
   init() {
     super.init(nibName: nil, bundle: nil)
+    view.backgroundColor = .systemBackground
   }
   
   required init?(coder: NSCoder) {
@@ -13,7 +14,12 @@ class Example5ViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .systemBackground
+    
+    let css = [
+      "h1 { color:red; }",
+      "h2 { color:green; }",
+      "h3 { color:blue; }",
+    ].joined(separator: "\n")
 
     let md = MarkdownView()
     view.addSubview(md)
@@ -26,12 +32,7 @@ class Example5ViewController: UIViewController {
     ])
 
     let markdown = ["# h1 title", "## h2 title", "### h3 title"].joined(separator: "\n")
-    let css = [
-      "h1 { color:red; }",
-      "h2 { color:green; }",
-      "h3 { color:blue; }",
-    ].joined(separator: "")
-    md.load(markdown: markdown, enableImage: true, css: css)
+    md.load(markdown: markdown, enableImage: false, css: css, plugins: nil)
   }
 
 }
