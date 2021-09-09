@@ -1,4 +1,4 @@
-osx_image: xcode11.6
+osx_image: xcode12.5
 language: swift
 before_install:
   - brew update
