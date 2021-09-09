@@ -47,6 +47,19 @@ md.onTouchLink = { [weak self] request in
 }
 ```
 
+### Experimental Features
+
+This is not stable :bow:
+
+#### Custom CSS Styling
+
+Please check `Example/ViewController/CustomCss.swift`. 
+
+#### Plugins
+
+Please check `Example/ViewController/Plugins.swift`. 
+Each plugin should be self-contained, with no external dependent plugins.
+
 ## Requirements
 
 | Target            | Version |
