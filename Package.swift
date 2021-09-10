@@ -19,7 +19,6 @@ let package = Package(
             name: "MarkdownView",
             path: "Sources/MarkdownView",
             exclude: [
-                "ModuleCocoaPods.swift",
                 "Resources/main.js.LICENSE.txt"
             ],
             resources: [

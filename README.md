@@ -53,12 +53,16 @@ This is not stable :bow:
 
 #### Custom CSS Styling
 
-Please check `Example/ViewController/CustomCss.swift`. 
+Please check [Example/ViewController/CustomCss.swift](https://github.com/keitaoouchi/MarkdownView/blob/master/Example/Example/ViewController/CustomCss.swift). 
+
+<img src="https://github.com/keitaoouchi/MarkdownView/blob/master/sample_css.png" width=300>
 
 #### Plugins
 
-Please check `Example/ViewController/Plugins.swift`. 
+Please check [Example/ViewController/Plugins.swift](https://github.com/keitaoouchi/MarkdownView/blob/master/Example/Example/ViewController/Plugins.swift). 
 Each plugin should be self-contained, with no external dependent plugins.
+
+<img src="https://github.com/keitaoouchi/MarkdownView/blob/master/sample_plugin.png" width=300>
 
 ## Requirements
 

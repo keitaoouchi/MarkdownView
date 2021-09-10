@@ -149,6 +149,19 @@ private extension MarkdownView {
 // MARK: - Misc
 
 private extension MarkdownView {
+  var htmlURL: URL {
+    #if SWIFT_PACKAGE
+    let bundle = Bundle.module
+    #else
+    let bundle = Bundle(for: MarkdownView.self)
+    #endif
+    return bundle.url(forResource: "index",
+                      withExtension: "html") ??
+            bundle.url(forResource: "index",
+                      withExtension: "html",
+                      subdirectory: "MarkdownView.bundle")!
+  }
+
   func escape(markdown: String) -> String? {
     return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
   }
