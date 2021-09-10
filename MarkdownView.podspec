@@ -11,7 +11,8 @@ Pod::Spec.new do |s|
   ]
   s.resource_bundles = {
     'MarkdownView' => [
-      'Sources/MarkdownView/Resources/index.html',
+      'Sources/MarkdownView/Resources/styled.html',
+      'Sources/MarkdownView/Resources/non_styled.html',
       'Sources/MarkdownView/Resources/main.css',
       'Sources/MarkdownView/Resources/main.js'
     ]
