@@ -34,13 +34,13 @@ open class MarkdownView: UIView {
   /// You can use this for performance optimization.
   ///
   /// - Note: `webView` needs complete loading before invoking `show` method.
-  public convenience init(css: String?, plugins: [String]?) {
+  public convenience init(css: String?, plugins: [String]?, styled: Bool = true) {
     self.init(frame: .zero)
     
     let configuration = WKWebViewConfiguration()
     configuration.userContentController = makeContentController(css: css, plugins: plugins, markdown: nil, enableImage: nil)
     self.webView = makeWebView(with: configuration)
-    self.webView?.load(URLRequest(url: htmlURL))
+    self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
 
   override init (frame: CGRect) {
@@ -64,14 +64,14 @@ extension MarkdownView {
   /// Load markdown with a newly configured webView.
   ///
   /// If you want to preserve already applied css or plugins, use `show` instead.
-  @objc public func load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil) {
+  @objc public func load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil, styled: Bool = true) {
     guard let markdown = markdown else { return }
 
     self.webView?.removeFromSuperview()
     let configuration = WKWebViewConfiguration()
     configuration.userContentController = makeContentController(css: css, plugins: plugins, markdown: markdown, enableImage: enableImage)
     self.webView = makeWebView(with: configuration)
-    self.webView?.load(URLRequest(url: htmlURL))
+    self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
   
   public func show(markdown: String) {
@@ -149,18 +149,31 @@ private extension MarkdownView {
 // MARK: - Misc
 
 private extension MarkdownView {
-  var htmlURL: URL {
+  static var styledHtmlUrl: URL = {
     #if SWIFT_PACKAGE
     let bundle = Bundle.module
     #else
     let bundle = Bundle(for: MarkdownView.self)
     #endif
-    return bundle.url(forResource: "index",
+    return bundle.url(forResource: "styled",
                       withExtension: "html") ??
-            bundle.url(forResource: "index",
+            bundle.url(forResource: "styled",
                       withExtension: "html",
                       subdirectory: "MarkdownView.bundle")!
-  }
+  }()
+  
+  static var nonStyledHtmlUrl: URL = {
+    #if SWIFT_PACKAGE
+    let bundle = Bundle.module
+    #else
+    let bundle = Bundle(for: MarkdownView.self)
+    #endif
+    return bundle.url(forResource: "non_styled",
+                      withExtension: "html") ??
+            bundle.url(forResource: "non_styled",
+                      withExtension: "html",
+                      subdirectory: "MarkdownView.bundle")!
+  }()
 
   func escape(markdown: String) -> String? {
     return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)

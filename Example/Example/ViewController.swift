@@ -22,18 +22,23 @@ final class ViewController: UIViewController {
     
     let btn4 = UIButton()
     btn4.setTitle("Custom CSS", for: .normal)
-    btn4.addTarget(self, action: #selector(openExample5), for: .touchUpInside)
+    btn4.addTarget(self, action: #selector(openCustomCssSample(sender:)), for: .touchUpInside)
     
     let btn5 = UIButton()
     btn5.setTitle("Add Plugin", for: .normal)
-    btn5.addTarget(self, action: #selector(openExample6), for: .touchUpInside)
+    btn5.addTarget(self, action: #selector(openPluginSample(sender:)), for: .touchUpInside)
+    
+    let btn6 = UIButton()
+    btn6.setTitle("Non Styled", for: .normal)
+    btn6.addTarget(self, action: #selector(openNonStyledSample(sender:)), for: .touchUpInside)
 
     [
       btn1,
       btn2,
       btn3,
       btn4,
-      btn5
+      btn5,
+      btn6
     ].forEach { button in
 
       button.setTitleColor(UIColor.systemBlue, for: .normal)
@@ -66,13 +71,18 @@ final class ViewController: UIViewController {
     navigationController?.pushViewController(example, animated: true)
   }
   
-  @objc func openExample5(sender: Any) {
+  @objc func openCustomCssSample(sender: Any) {
     let example = CustomCssSampleViewController()
     navigationController?.pushViewController(example, animated: true)
   }
   
-  @objc func openExample6(sender: Any) {
+  @objc func openPluginSample(sender: Any) {
     let example = PluginsSampleViewController()
+    navigationController?.pushViewController(example, animated: true)
+  }
+  
+  @objc func openNonStyledSample(sender: Any) {
+    let example = NonStyledSampleViewController()
     navigationController?.pushViewController(example, animated: true)
   }
 }
