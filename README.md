@@ -64,6 +64,8 @@ Each plugin should be self-contained, with no external dependent plugins.
 
 <img src="https://github.com/keitaoouchi/MarkdownView/blob/master/sample_plugin.png" width=300>
 
+[Here](https://github.com/keitaoouchi/markdownview-sample-plugin) is a sample project that builds `markdown-it-new-katex` as a compatible library.
+
 ## Requirements
 
 | Target            | Version |
