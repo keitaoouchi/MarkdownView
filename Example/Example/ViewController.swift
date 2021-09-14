@@ -31,6 +31,10 @@ final class ViewController: UIViewController {
     let btn6 = UIButton()
     btn6.setTitle("Non Styled", for: .normal)
     btn6.addTarget(self, action: #selector(openNonStyledSample(sender:)), for: .touchUpInside)
+    
+    let btn7 = UIButton()
+    btn7.setTitle("Remote Stylesheet", for: .normal)
+    btn7.addTarget(self, action: #selector(openRemoteStylesheetSample(sender:)), for: .touchUpInside)
 
     [
       btn1,
@@ -38,7 +42,8 @@ final class ViewController: UIViewController {
       btn3,
       btn4,
       btn5,
-      btn6
+      btn6,
+      btn7
     ].forEach { button in
 
       button.setTitleColor(UIColor.systemBlue, for: .normal)
@@ -83,6 +88,11 @@ final class ViewController: UIViewController {
   
   @objc func openNonStyledSample(sender: Any) {
     let example = NonStyledSampleViewController()
+    navigationController?.pushViewController(example, animated: true)
+  }
+  
+  @objc func openRemoteStylesheetSample(sender: Any) {
+    let example = RemoteStyleSheetsSampleViewController()
     navigationController?.pushViewController(example, animated: true)
   }
 }

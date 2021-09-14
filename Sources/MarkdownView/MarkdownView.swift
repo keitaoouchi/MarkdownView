@@ -34,11 +34,11 @@ open class MarkdownView: UIView {
   /// You can use this for performance optimization.
   ///
   /// - Note: `webView` needs complete loading before invoking `show` method.
-  public convenience init(css: String?, plugins: [String]?, styled: Bool = true) {
+  public convenience init(css: String?, plugins: [String]?, stylesheets: [URL]? = nil, styled: Bool = true) {
     self.init(frame: .zero)
     
     let configuration = WKWebViewConfiguration()
-    configuration.userContentController = makeContentController(css: css, plugins: plugins, markdown: nil, enableImage: nil)
+    configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: nil, enableImage: nil)
     self.webView = makeWebView(with: configuration)
     self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
@@ -64,12 +64,12 @@ extension MarkdownView {
   /// Load markdown with a newly configured webView.
   ///
   /// If you want to preserve already applied css or plugins, use `show` instead.
-  @objc public func load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil, styled: Bool = true) {
+  @objc public func load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil, stylesheets: [URL]? = nil, styled: Bool = true) {
     guard let markdown = markdown else { return }
 
     self.webView?.removeFromSuperview()
     let configuration = WKWebViewConfiguration()
-    configuration.userContentController = makeContentController(css: css, plugins: plugins, markdown: markdown, enableImage: enableImage)
+    configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: markdown, enableImage: enableImage)
     self.webView = makeWebView(with: configuration)
     self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
@@ -131,6 +131,15 @@ private extension MarkdownView {
       "var s = document.createElement('style');",
       "s.innerHTML = `\(css)`;",
       "document.head.appendChild(s);"
+    ].joined()
+  }
+  
+  func linkScript(_ url: URL) -> String {
+    [
+      "var link = document.createElement('link');",
+      "link.href = '\(url.absoluteURL)';",
+      "link.rel = 'stylesheet';",
+      "document.head.appendChild(link);"
     ].joined()
   }
   
@@ -206,7 +215,11 @@ private extension MarkdownView {
     return wv
   }
   
-  func makeContentController(css: String?, plugins: [String]?, markdown: String?, enableImage: Bool?) -> WKUserContentController {
+  func makeContentController(css: String?,
+                             plugins: [String]?,
+                             stylesheets: [URL]?,
+                             markdown: String?,
+                             enableImage: Bool?) -> WKUserContentController {
     let controller = WKUserContentController()
     
     if let css = css {
@@ -217,6 +230,11 @@ private extension MarkdownView {
     plugins?.forEach({ plugin in
       let scriptInjection = WKUserScript(source: usePluginScript(plugin), injectionTime: .atDocumentEnd, forMainFrameOnly: true)
       controller.addUserScript(scriptInjection)
+    })
+    
+    stylesheets?.forEach({ url in
+      let linkInjection = WKUserScript(source: linkScript(url), injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+      controller.addUserScript(linkInjection)
     })
     
     if let markdown = markdown {
