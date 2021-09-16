@@ -5114,8 +5114,6 @@ module.exports = function text(state, silent) {
 
 // The same as abothe but without [0-9]
 
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-
 // This is here for relevance.
 
 // This is necessary because initially emphasis delimiter markers (*, _, ~)
