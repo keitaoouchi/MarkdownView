@@ -5,6 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = {
+    mode: 'production',
     entry: __dirname + "/src/js/index.js",
     output: {
         path: __dirname + '/../Sources/MarkdownView/Resources',
