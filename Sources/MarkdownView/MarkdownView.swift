@@ -16,6 +16,12 @@ open class MarkdownView: UIView {
     }
   }
 
+  @objc public var scrollDelegate: UIScrollViewDelegate? = nil {
+    didSet {
+      webView?.scrollView.delegate = scrollDelegate
+    }
+  }
+    
   @objc public var isScrollEnabled: Bool = true {
     didSet {
       webView?.scrollView.isScrollEnabled = isScrollEnabled
