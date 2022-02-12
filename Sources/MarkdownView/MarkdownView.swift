@@ -9,6 +9,7 @@ import WebKit
 open class MarkdownView: UIView {
 
   private var webView: WKWebView?
+  private var updateHeightHandler: UpdateHeightHandler?
   
   private var intrinsicContentHeight: CGFloat? {
     didSet {
@@ -39,12 +40,22 @@ open class MarkdownView: UIView {
     
     let configuration = WKWebViewConfiguration()
     configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: nil, enableImage: nil)
+    if let handler = updateHeightHandler {
+      configuration.userContentController.add(handler, name: "updateHeight")
+    }
     self.webView = makeWebView(with: configuration)
     self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
 
   override init (frame: CGRect) {
     super.init(frame : frame)
+    
+    let updateHeightHandler = UpdateHeightHandler { [weak self] height in
+      guard height > self?.intrinsicContentHeight ?? 0 else { return }
+      self?.onRendered?(height)
+      self?.intrinsicContentHeight = height
+    }
+    self.updateHeightHandler = updateHeightHandler
   }
 
   public required init?(coder aDecoder: NSCoder) {
@@ -70,6 +81,9 @@ extension MarkdownView {
     self.webView?.removeFromSuperview()
     let configuration = WKWebViewConfiguration()
     configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: markdown, enableImage: enableImage)
+    if let handler = updateHeightHandler {
+      configuration.userContentController.add(handler, name: "updateHeight")
+    }
     self.webView = makeWebView(with: configuration)
     self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
@@ -78,14 +92,10 @@ extension MarkdownView {
     guard let webView = webView else { return }
 
     let escapedMarkdown = self.escape(markdown: markdown) ?? ""
-    let script = "window.showMarkdown('\(escapedMarkdown)', true);\(evaluateHeightScript)"
-    webView.evaluateJavaScript(script) { [weak self] result, error in
-      if let _ = error { return }
-
-      if let height = result as? CGFloat {
-        self?.onRendered?(height)
-        self?.intrinsicContentHeight = height
-      }
+    let script = "window.showMarkdown('\(escapedMarkdown)', true);"
+    webView.evaluateJavaScript(script) { _, error in
+      guard let error = error else { return }
+      print("[MarkdownView][Error] \(error)")
     }
   }
 }
@@ -93,10 +103,6 @@ extension MarkdownView {
 // MARK: - WKNavigationDelegate
 
 extension MarkdownView: WKNavigationDelegate {
-
-  public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    evaluateHeight(in: webView)
-  }
 
   public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
@@ -112,19 +118,29 @@ extension MarkdownView: WKNavigationDelegate {
     }
 
   }
+}
 
+// MARK: -
+private class UpdateHeightHandler: NSObject, WKScriptMessageHandler {
+  var onUpdate: ((CGFloat) -> Void)
+  
+  init(onUpdate: @escaping (CGFloat) -> Void) {
+    self.onUpdate = onUpdate
+  }
+  
+  public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    switch message.name {
+    default:
+      if let height = message.body as? CGFloat {
+        self.onUpdate(height)
+      }
+    }
+  }
 }
 
 // MARK: - Scripts
 
 private extension MarkdownView {
-  var evaluateHeightScript: String {
-    [
-      "var _body = document.body;",
-      "var _html = document.documentElement;",
-      "Math.max(_body.scrollHeight, _body.offsetHeight, _html.clientHeight, _html.scrollHeight, _html.offsetHeight);"
-    ].joined()
-  }
   
   func styleScript(_ css: String) -> String {
     [
@@ -186,17 +202,6 @@ private extension MarkdownView {
 
   func escape(markdown: String) -> String? {
     return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
-  }
-  
-  func evaluateHeight(in webView: WKWebView) {
-    webView.evaluateJavaScript(evaluateHeightScript) { [weak self] result, error in
-      if let _ = error { return }
-
-      if let height = result as? CGFloat {
-        self?.onRendered?(height)
-        self?.intrinsicContentHeight = height
-      }
-    }
   }
 
   func makeWebView(with configuration: WKWebViewConfiguration) -> WKWebView {

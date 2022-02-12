@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  MarkdownView: 44a260beec01538e6cdbbce9c2f631b1f3634907
+  MarkdownView: 55e0e15bd82c09786cbb6d17bd2d4ee04c392fe9
 
 PODFILE CHECKSUM: aca8c849eff30cf020f460dc2fb5cc0b4a16e14a
 
-COCOAPODS: 1.11.0
+COCOAPODS: 1.11.2

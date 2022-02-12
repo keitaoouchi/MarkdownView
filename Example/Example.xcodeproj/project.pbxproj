@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E3DF024278C5387009DD55A /* SampleUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3DF023278C5387009DD55A /* SampleUI.swift */; };
 		3E5E1E1E26E8F1620098F0E3 /* CustomCss.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E5E1E1D26E8F1610098F0E3 /* CustomCss.swift */; };
 		3E71C76026EA0D7400C79EA9 /* Plugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E71C75F26EA0D7400C79EA9 /* Plugins.swift */; };
 		3E910F3026F06F6E009C311B /* RemoteStylesheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E910F2F26F06F6E009C311B /* RemoteStylesheets.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3E3DF023278C5387009DD55A /* SampleUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleUI.swift; sourceTree = "<group>"; };
 		3E5E1E1D26E8F1610098F0E3 /* CustomCss.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCss.swift; sourceTree = "<group>"; };
 		3E71C75F26EA0D7400C79EA9 /* Plugins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plugins.swift; sourceTree = "<group>"; };
 		3E910F2F26F06F6E009C311B /* RemoteStylesheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteStylesheets.swift; sourceTree = "<group>"; };
@@ -58,6 +60,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3E3DF022278C5375009DD55A /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				3E3DF023278C5387009DD55A /* SampleUI.swift */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
+		};
 		3E5E1E1F26E8F1670098F0E3 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +120,7 @@
 		DE524D631EC47CB100E8C2F9 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				3E3DF022278C5375009DD55A /* SwiftUI */,
 				3E5E1E1F26E8F1670098F0E3 /* ViewController */,
 				FCB2E9501ECAF36500285B87 /* sample.md */,
 				FCB2E94E1ECADF3700285B87 /* README.md */,
@@ -246,6 +257,7 @@
 				3E5E1E1E26E8F1620098F0E3 /* CustomCss.swift in Sources */,
 				3E71C76026EA0D7400C79EA9 /* Plugins.swift in Sources */,
 				FCB2E94B1ECA93CB00285B87 /* ScrollView.swift in Sources */,
+				3E3DF024278C5387009DD55A /* SampleUI.swift in Sources */,
 				DE524D671EC47CB100E8C2F9 /* CodeOnly.swift in Sources */,
 				DE524D651EC47CB100E8C2F9 /* AppDelegate.swift in Sources */,
 			);

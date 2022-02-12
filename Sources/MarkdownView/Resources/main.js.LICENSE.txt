@@ -7,14 +7,19 @@ https://github.com/highlightjs/highlight.js/issues/2880#issuecomment-747275419
 
 /*
 
-This is a preservation of the old bloated SQL grammar which includes pretty much
-the kitchen sink because no one was keeping track of which keywords belong to
-which databases.  This is likely to be removed in the future.
+Goals:
 
-- Oracle SQL should be factored into it's own 3rd party grammar.
-- MySQL should be factored out into it's own 3rd party grammar.
+SQL is intended to highlight basic/common SQL keywords and expressions
 
-*/
+- If pretty much every single SQL server includes supports, then it's a canidate.
+- It is NOT intended to include tons of vendor specific keywords (Oracle, MySQL,
+  PostgreSQL) although the list of data types is purposely a bit more expansive.
+- For more specific SQL grammars please see:
+  - PostgreSQL and PL/pgSQL - core
+  - T-SQL - https://github.com/highlightjs/highlightjs-tsql
+  - sql_more (core)
+
+ */
 
 /*
         {
@@ -34,27 +39,15 @@ which databases.  This is likely to be removed in the future.
         */
 
 /*
-      On any opening or closing tag of the original markup we first close
-      the entire highlighted node stack, then render the original tag along
-      with all the following original tags at the same offset and then
-      reopen all the tags on the highlighted stack.
-      */
-
-/*
       The lookahead pattern (?=...) ensures that 'begin' only matches
       '<style' as a single word, followed by a whitespace or an
-      ending braket. The '$' is needed for the lexeme to be recognized
-      by hljs.subMode() that tests lexemes outside the stream.
+      ending bracket.
       */
 
 /*
-      Why might be find ourselves here?  Only one occasion now.  An end match that was
-      triggered but could not be completed.  When might this happen?  When an `endSameasBegin`
-      rule sets the end rule to a specific match.  Since the overall mode termination rule that's
-      being used to scan the text isn't recompiled that means that any match that LOOKS like
-      the end (but is not, because it is not an exact match to the beginning) will
-      end up here.  A definite end match, but when `doEndMatch` tries to "reapply"
-      the end rule and fails to match, we wind up here, and just silently ignore the end.
+      Why might be find ourselves here?  An potential end match that was
+      triggered but could not be completed.  IE, `doEndMatch` returned NO_MATCH.
+      (this could be because a callback requests the match be ignored, etc)
        This causes no real harm other than stopping a few times too many.
       */
 
@@ -93,20 +86,6 @@ which databases.  This is likely to be removed in the future.
   */
 
 /*
-    To avoid starting the stream just before it should stop the order is
-    ensured that original always starts first and closes last:
-     if (event1 == 'start' && event2 == 'start')
-      return original;
-    if (event1 == 'start' && event2 == 'stop')
-      return highlighted;
-    if (event1 == 'stop' && event2 == 'start')
-      return original;
-    if (event1 == 'stop' && event2 == 'stop')
-      return highlighted;
-     ... which is collapsed to:
-    */
-
-/*
   Formal syntax is not published, helpful link:
   https://github.com/kornilova-l/matlab-IntelliJ-plugin/blob/master/src/main/grammar/Matlab.bnf
 */
@@ -125,6 +104,7 @@ which databases.  This is likely to be removed in the future.
  Author: Oleg Efimov <efimovov@gmail.com>
  Description: Apache/Nginx Access Logs
  Website: https://httpd.apache.org/docs/2.4/logs.html#accesslog
+ Category: web, logs
  Audit: 2020
  */
 
@@ -151,6 +131,15 @@ which databases.  This is likely to be removed in the future.
  */
 
 /*
+ Language: GAMS
+ Author: Stefan Bechert <stefan.bechert@gmx.net>
+ Contributors: Oleg Efimov <efimovov@gmail.com>, Mikko Kouhia <mikko.kouhia@iki.fi>
+ Description: The General Algebraic Modeling System language
+ Website: https://www.gams.com
+ Category: scientific
+ */
+
+/*
  Language: Gherkin
  Author: Sam Pikesley (@pikesley) <sam.pikesley@theodi.org>
  Description: Gherkin is the format for cucumber specifications. It is a domain specific language which helps you to describe business behavior without the need to go into detail of implementation.
@@ -162,14 +151,6 @@ which databases.  This is likely to be removed in the future.
  Author: Guillaume Laforge <glaforge@gmail.com>
  Description: Groovy programming language implementation inspired from Vsevolod's Java mode
  Website: https://groovy-lang.org
- */
-
-/*
- Language: HTMLBars (legacy)
- Requires: xml.js
- Description: Matcher for Handlebars as well as EmberJS additions.
- Website: https://github.com/tildeio/htmlbars
- Category: template
  */
 
 /*
@@ -203,13 +184,6 @@ which databases.  This is likely to be removed in the future.
  */
 
 /*
- Language: SQL More (mix of MySQL, Oracle, etc)
- Contributors: Nikolay Lisienko <info@neor.ru>, Heiko August <post@auge8472.de>, Travis Odom <travis.a.odom@gmail.com>, Vadimtro <vadimtro@yahoo.com>, Benjamin Auder <benjamin.auder@gmail.com>
- Website: https://en.wikipedia.org/wiki/SQL
- Category: database
- */
-
-/*
  Language: Zephir
  Description: Zephir, an open source, high-level language designed to ease the creation and maintainability of extensions for PHP with a focus on type and memory safety.
  Author: Oleg Efimov <efimovov@gmail.com>
@@ -228,7 +202,7 @@ which databases.  This is likely to be removed in the future.
 Language: .properties
 Contributors: Valentin Aitken <valentin@nalisbg.com>, Egor Rogov <e.rogov@postgrespro.ru>
 Website: https://en.wikipedia.org/wiki/.properties
-Category: common, config
+Category: config
 */
 
 /*
@@ -281,7 +255,7 @@ Author: Ruslan Keba <rukeba@gmail.com>
 Contributors: Ivan Sagalaev <maniac@softwaremaniacs.org>
 Website: https://httpd.apache.org
 Description: language definition for Apache configuration files (httpd.conf & .htaccess)
-Category: common, config
+Category: config, web
 Audit: 2020
 */
 
@@ -400,12 +374,6 @@ Website: https://isocpp.org
 */
 
 /*
-Language: C-like (deprecated, use C and C++ instead)
-Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
-Contributors: Evgeny Stepanischev <imbolk@gmail.com>, Zaven Muradyan <megalivoithos@gmail.com>, Roel Deckers <admin@codingcat.nl>, Sam Wu <samsam2310@gmail.com>, Jordi Petit <jordi.petit@gmail.com>, Pieter Vantorre <pietervantorre@gmail.com>, Google Inc. (David Benjamin) <davidben@google.com>
-*/
-
-/*
 Language: C/AL
 Author: Kenneth Fuglsang Christensen <kfuglsang@gmail.com>
 Description: Provides highlighting of Microsoft Dynamics NAV C/AL code files
@@ -430,7 +398,7 @@ vim: ts=2 sw=2 st=2
 
 /*
 Language: CSS
-Category: common, css
+Category: common, css, web
 Website: https://developer.mozilla.org/en-US/docs/Web/CSS
 */
 
@@ -484,7 +452,7 @@ Language: CoffeeScript
 Author: Dmytrii Nagirniak <dnagir@gmail.com>
 Contributors: Oleg Efimov <efimovov@gmail.com>, Cédric Néhémie <cedric.nehemie@gmail.com>
 Description: CoffeeScript is a programming language that transcompiles to JavaScript. For info about language see http://coffeescript.org/
-Category: common, scripting
+Category: scripting
 Website: https://coffeescript.org
 */
 
@@ -631,7 +599,7 @@ Website: https://en.wikipedia.org/wiki/Extended_Backus–Naur_form
 /*
 Language: F#
 Author: Jonas Follesø <jonas@follesoe.no>
-Contributors: Troy Kershaw <hello@troykershaw.com>, Henrik Feldt <henrik@haf.se>
+Contributors: Troy Kershaw <hello@troykershaw.com>, Henrik Feldt <henrik@haf.se>, Melvyn Laïly <melvyn.laily@gmail.com>
 Website: https://docs.microsoft.com/en-us/dotnet/fsharp/
 Category: functional
 */
@@ -713,7 +681,7 @@ Category: scripting
 /*
 Language: HTML, XML
 Website: https://www.w3.org/XML/
-Category: common
+Category: common, web
 Audit: 2020
 */
 
@@ -721,7 +689,7 @@ Audit: 2020
 Language: HTTP
 Description: HTTP request and response headers with automatic body highlighting
 Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
-Category: common, protocols
+Category: protocols, web
 Website: https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview
 */
 
@@ -793,7 +761,7 @@ Language: JSON
 Description: JSON (JavaScript Object Notation) is a lightweight data-interchange format.
 Author: Ivan Sagalaev <maniac@softwaremaniacs.org>
 Website: http://www.json.org
-Category: common, protocols
+Category: common, protocols, web
 */
 
 /*
@@ -806,7 +774,7 @@ Website: https://www.java.com/
 /*
 Language: JavaScript
 Description: JavaScript (JS) is a lightweight, interpreted, or just-in-time compiled programming language with first-class functions.
-Category: common, scripting
+Category: common, scripting, web
 Website: https://developer.mozilla.org/en-US/docs/Web/JavaScript
 */
 
@@ -891,7 +859,7 @@ Language: Less
 Description: It's CSS, with just a little more.
 Author:   Max Mikhailov <seven.phases.max@gmail.com>
 Website: http://lesscss.org
-Category: common, css
+Category: common, css, web
 */
 
 /*
@@ -1038,10 +1006,17 @@ Website: https://nsis.sourceforge.io/Main_Page
 */
 
 /*
+Language: NestedText
+Description: NestedText is a file format for holding data that is to be entered, edited, or viewed by people.
+Website: https://nestedtext.org/
+Category: config
+*/
+
+/*
 Language: Nginx config
 Author: Peter Leonov <gojpeg@yandex.ru>
 Contributors: Ivan Sagalaev <maniac@softwaremaniacs.org>
-Category: common, config
+Category: config, web
 Website: https://www.nginx.com
 */
 
@@ -1331,7 +1306,7 @@ Language: SCSS
 Description: Scss is an extension of the syntax of CSS.
 Author: Kurt Emch <kurt@kurtemch.com>
 Website: https://sass-lang.com
-Category: common, css
+Category: common, css, web
 */
 
 /*
@@ -1350,6 +1325,7 @@ Contributors: Marvin Saignat <contact@zgmrvn.com>, Dedmen Miller <dedmen@dedmen.
 Description: Scripting language for the Arma game series
 Website: https://community.bistudio.com/wiki/SQF_syntax
 Category: scripting
+Last update: 28.03.2021, Arma 3 v2.02
 */
 
 /*
@@ -1412,7 +1388,7 @@ Website: https://en.wikipedia.org/wiki/Smalltalk
 /*
 Language: Stan
 Description: The Stan probabilistic programming language
-Author: Jeffrey B. Arnold <jeffrey.arnold@gmail.com>
+Author: Sean Pinkney <sean.pinkney@gmail.com>
 Website: http://mc-stan.org/
 Category: scientific
 */
@@ -1431,7 +1407,7 @@ Language: Stylus
 Author: Bryant Williams <b.n.williams@gmail.com>
 Description: Stylus is an expressive, robust, feature-rich CSS language built for nodejs.
 Website: https://github.com/stylus/stylus
-Category: css
+Category: css, web
 */
 
 /*
@@ -1569,11 +1545,28 @@ Category: common
 */
 
 /*
+Language: WebAssembly
+Website: https://webassembly.org
+Description:  Wasm is designed as a portable compilation target for programming languages, enabling deployment on the web for client and server applications.
+Category: web
+Audit: 2020
+*/
+
+/*
 Language: Wolfram Language
 Description: The Wolfram Language is the programming language used in Wolfram Mathematica, a modern technical computing system spanning most areas of technical computing.
 Authors: Patrick Scheibe <patrick@halirutan.de>, Robert Jacobson <robertjacobson@acm.org>
 Website: https://www.wolfram.com/mathematica/
 Category: scientific
+*/
+
+/*
+Language: Wren
+Description: Think Smalltalk in a Lua-sized package with a dash of Erlang and wrapped up in a familiar, modern syntax.
+Category: scripting
+Author: @joshgoebel
+Maintainer: @joshgoebel
+Website: https://wren.io/
 */
 
 /*
@@ -1610,6 +1603,11 @@ Author: Kristoffer Gronlund <kgronlund@suse.com>
 Website: http://crmsh.github.io
 Description: Syntax Highlighting for the crmsh DSL
 Category: config
+*/
+
+/*
+Syntax highlighting with language autodetection.
+https://highlightjs.org/
 */
 
 /*
@@ -1720,8 +1718,6 @@ module.exports = function text(state, silent) {
 
 /* Quoted string with variables inside */
 
-/* Stream merging support functions */
-
 /* Utility functions */
 
 /* Variables: simple (eg $(var)) and special (eg $@) */
@@ -1803,8 +1799,6 @@ module.exports = function text(state, silent) {
 
 /* parameters to instances */
 
-/* plugin itself */
-
 /* polymorphic variant */
 
 /* reserved deprecated keywords */
@@ -1851,7 +1845,7 @@ module.exports = function text(state, silent) {
 /**
      *  Process an individual match
      *
-     * @param {string} textBeforeMatch - text preceeding the match (since the last match)
+     * @param {string} textBeforeMatch - text preceding the match (since the last match)
      * @param {EnhancedMatch} [match] - the match itself
      */
 
@@ -1863,7 +1857,13 @@ module.exports = function text(state, silent) {
      */
 
 /**
-     * @param {Mode} mode - new mode to start
+     * @param {CompiledMode} mode - new mode to start
+     * @param {RegExpMatchArray} match
+     */
+
+/**
+     * @param {CompiledScope} scope
+     * @param {RegExpMatchArray} match
      */
 
 /**
@@ -1893,7 +1893,7 @@ module.exports = function text(state, silent) {
 /**
      * Return keyword data if a match is a keyword
      * @param {CompiledMode} mode - current mode
-     * @param {RegExpMatchArray} match - regexp match data
+     * @param {string} matchText - the textual match
      * @returns {KeywordData | false}
      */
 
@@ -1909,19 +1909,6 @@ module.exports = function text(state, silent) {
     This is how we keep track of which mode matched, and what type of rule
     (`illegal`, `begin`, end, etc).
   */
-
-/**
-    intended usage: When one language truly requires another
-     Unlike `getLanguage`, this will throw when the requested language
-    is not available.
-     @param {string} name - name of the language to fetch/require
-    @returns {Language | never}
-  */
-
-/**
-   *
-   * @param {HighlightedHTMLElement} el
-   */
 
 /**
    *
@@ -1946,10 +1933,6 @@ module.exports = function text(state, silent) {
 /**
    * @param {Emitter & {root: DataNode}} emitter
    * @param {string} name
-   */
-
-/**
-   * @param {Event} event
    */
 
 /**
@@ -2022,14 +2005,13 @@ module.exports = function text(state, silent) {
    */
 
 /**
-   * Applies highlighting to a DOM node containing code. Accepts a DOM node and
-   * two optional parameters for fixMarkup.
+   * Applies highlighting to a DOM node containing code.
    *
    * @param {HighlightedHTMLElement} element - the HTML element to highlight
   */
 
 /**
-   * Builds a regex with the case sensativility of the current language
+   * Builds a regex with the case sensitivity of the current language
    *
    * @param {RegExp | string} value
    * @param {boolean} [global]
@@ -2058,7 +2040,7 @@ module.exports = function text(state, silent) {
    *
    * Ex: "for if when while|5"
    *
-   * @param {string} className
+   * @param {string} scopeName
    * @param {Array<string>} keywordList
    */
 
@@ -2081,10 +2063,9 @@ module.exports = function text(state, silent) {
    * NEW API
    * highlight(code, {lang, ignoreIllegals})
    *
-   * @param {string} codeOrlanguageName - the language to use for highlighting
+   * @param {string} codeOrLanguageName - the language to use for highlighting
    * @param {string | HighlightOptions} optionsOrCode - the code to highlight
    * @param {boolean} [ignoreIllegals] - whether to ignore illegal matches, default is to bail
-   * @param {CompiledMode} [continuation] - current continuation mode, if any
    *
    * @returns {HighlightResult} Result - an object that represents the result
    * @property {string} language - the language name
@@ -2109,6 +2090,11 @@ module.exports = function text(state, silent) {
    */
 
 /**
+   * DEPRECATED
+   * @param {HighlightedHTMLElement} el
+   */
+
+/**
    * Determines if a given language has auto-detection enabled
    * @param {string} name - name of the language
    */
@@ -2119,12 +2105,6 @@ module.exports = function text(state, silent) {
    *
    * @param {CompiledMode} mode
    * @returns {ResumableMultiRegex}
-   */
-
-/**
-   * Highlights to all <pre><code> blocks on a page
-   *
-   * @type {Function & {called?: boolean}}
    */
 
 /**
@@ -2393,7 +2373,11 @@ module.exports = function text(state, silent) {
 /**
    * Token#info -> String
    *
-   * fence infostring
+   * Additional information:
+   *
+   * - Info string for "fence" tokens
+   * - The value "auto" for autolink "link_open" and "link_close" tokens
+   * - The string value of the item marker for ordered-list "list_item_open" tokens
    **/
 
 /**
@@ -2503,7 +2487,7 @@ module.exports = function text(state, silent) {
    - language (detected language)
   - relevance (int)
   - value (an HTML string with highlighting markup)
-  - second_best (object with the same structure for second-best heuristically
+  - secondBest (object with the same structure for second-best heuristically
     detected language, may be absent)
      @param {string} code
     @param {Array<string>} [languageSubset]
@@ -2511,26 +2495,22 @@ module.exports = function text(state, silent) {
   */
 
 /**
-  Note: fixMarkup is deprecated and will be removed entirely in v11
-   @param {string} arg
-  @returns {string}
-  */
-
-/**
-  Post-processing of the highlighted markup:
-   - replace TABs with something more useful
-  - replace real line-breaks with '<br>' for non-pre containers
-     @param {string} html
-    @returns {string}
-  */
+ *
+ * @type {CompilerExt}
+ */
 
 /**
  * @implements {Emitter}
  */
 
 /**
+ * @param { Array<string | RegExp | Object> } args
+ * @returns {object}
+ */
+
+/**
  * @param {(string | RegExp)[]} regexps
- * @param {string} separator
+ * @param {{joinWith: string}} opts
  * @returns {string}
  */
 
@@ -2540,13 +2520,13 @@ module.exports = function text(state, silent) {
  */
 
 /**
+ * @param {CompiledMode} mode
+ */
+
+/**
  * @param {HLJSApi} hljs
  * @returns {LanguageDetail}
  * */
-
-/**
- * @param {Node} node
- */
 
 /**
  * @param {RegExp | string } re
@@ -2554,14 +2534,8 @@ module.exports = function text(state, silent) {
  */
 
 /**
- * @param {RegExp} re
+ * @param {RegExp | string} re
  * @returns {number}
- */
-
-/**
- * @param {any} original - the original stream
- * @param {any} highlighted - stream of the highlighted source
- * @param {string} value - the original source itself
  */
 
 /**
@@ -2580,13 +2554,6 @@ module.exports = function text(state, silent) {
 
 /**
  * @type {Record<string, boolean>}
- */
-
-/**
- * @typedef Event
- * @property {'start'|'stop'} event
- * @property {number} offset
- * @property {Node} node
  */
 
 /**
@@ -2630,10 +2597,22 @@ module.exports = function text(state, silent) {
  */
 
 /**
+ * Allows recursive regex expressions to a given depth
+ *
+ * ie: recurRegex("(abc~~~)", /~~~/g, 2) becomes:
+ * (abc(abc(abc)))
+ *
+ * @param {string} re
+ * @param {RegExp} substitution (should be a g mode regex)
+ * @param {number} depth
+ * @returns {string}``
+ */
+
+/**
  * Any of the passed expresssions may match
  *
  * Creates a huge this | this | that | that match
- * @param {(RegExp | string)[] } args
+ * @param {(RegExp | string)[] | [...(RegExp | string)[], RegexEitherOptions]} args
  * @returns {string}
  */
 
@@ -2643,7 +2622,6 @@ module.exports = function text(state, silent) {
  * Given the raw result of a language definition (Language), compiles this so
  * that it is ready for highlighting code.
  * @param {Language} language
- * @param {{plugins: HLJSPlugin[]}} opts
  * @returns {CompiledLanguage}
  */
 
@@ -2836,7 +2814,7 @@ module.exports = function text(state, silent) {
 
 /**
  * Renderer.render(tokens, options, env) -> String
- * - tokens (Array): list on block tokens to renter
+ * - tokens (Array): list on block tokens to render
  * - options (Object): params of parser instance
  * - env (Object): additional data from parsed input (references, for example)
  *
@@ -2852,7 +2830,7 @@ module.exports = function text(state, silent) {
 
 /**
  * Renderer.renderInline(tokens, options, env) -> String
- * - tokens (Array): list on block tokens to renter
+ * - tokens (Array): list on block tokens to render
  * - options (Object): params of parser instance
  * - env (Object): additional data from parsed input (references, for example)
  *
@@ -2868,6 +2846,35 @@ module.exports = function text(state, silent) {
  * Default token renderer. Can be overriden by custom function
  * in [[Renderer#rules]].
  **/
+
+/**
+ * Renumbers labeled scope names to account for additional inner match
+ * groups that otherwise would break everything.
+ *
+ * Lets say we 3 match scopes:
+ *
+ *   { 1 => ..., 2 => ..., 3 => ... }
+ *
+ * So what we need is a clean match like this:
+ *
+ *   (a)(b)(c) => [ "a", "b", "c" ]
+ *
+ * But this falls apart with inner match groups:
+ *
+ * (a)(((b)))(c) => ["a", "b", "b", "b", "c" ]
+ *
+ * Our scopes are now "out of alignment" and we're repeating `b` 3 times.
+ * What needs to happen is the numbers are remapped:
+ *
+ *   { 1 => ..., 2 => ..., 5 => ... }
+ *
+ * We also need to know that the ONLY groups that should be output
+ * are 1, 2, and 5.  This function handles this behavior.
+ *
+ * @param {CompiledMode} mode
+ * @param {Array<RegExp | string>} regexes
+ * @param {{key: "beginScope"|"endScope"}} opts
+ */
 
 /**
  * Returns the proper score for a given keyword
@@ -3257,7 +3264,7 @@ module.exports = function text(state, silent) {
  *   highlight: function (str, lang) {
  *     if (lang && hljs.getLanguage(lang)) {
  *       try {
- *         return hljs.highlight(lang, str, true).value;
+ *         return hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
  *       } catch (__) {}
  *     }
  *
@@ -3277,7 +3284,7 @@ module.exports = function text(state, silent) {
  *     if (lang && hljs.getLanguage(lang)) {
  *       try {
  *         return '<pre class="hljs"><code>' +
- *                hljs.highlight(lang, str, true).value +
+ *                hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
  *                '</code></pre>';
  *       } catch (__) {}
  *     }
@@ -3327,13 +3334,57 @@ module.exports = function text(state, silent) {
  * @type {CompilerExt}
  */
 
+/**
+ * this exists only to allow `scope: {}` to be used beside `match:`
+ * Otherwise `beginScope` would necessary and that would look weird
+
+  {
+    match: [ /def/, /\w+/ ]
+    scope: { 1: "keyword" , 2: "title" }
+  }
+
+ * @param {CompiledMode} mode
+ */
+
+/**
+@typedef {import('highlight.js').CallbackResponse} CallbackResponse
+@typedef {import('highlight.js').CompilerExt} CompilerExt
+*/
+
+/**
+@typedef {import('highlight.js').Mode} Mode
+@typedef {import('highlight.js').CompiledMode} CompiledMode
+@typedef {import('highlight.js').CompiledScope} CompiledScope
+@typedef {import('highlight.js').Language} Language
+@typedef {import('highlight.js').HLJSApi} HLJSApi
+@typedef {import('highlight.js').HLJSPlugin} HLJSPlugin
+@typedef {import('highlight.js').PluginEvent} PluginEvent
+@typedef {import('highlight.js').HLJSOptions} HLJSOptions
+@typedef {import('highlight.js').LanguageFn} LanguageFn
+@typedef {import('highlight.js').HighlightedHTMLElement} HighlightedHTMLElement
+@typedef {import('highlight.js').BeforeHighlightContext} BeforeHighlightContext
+@typedef {import('highlight.js/private').MatchType} MatchType
+@typedef {import('highlight.js/private').KeywordData} KeywordData
+@typedef {import('highlight.js/private').EnhancedMatch} EnhancedMatch
+@typedef {import('highlight.js/private').AnnotatedError} AnnotatedError
+@typedef {import('highlight.js').AutoHighlightResult} AutoHighlightResult
+@typedef {import('highlight.js').HighlightOptions} HighlightOptions
+@typedef {import('highlight.js').HighlightResult} HighlightResult
+*/
+
+/**
+@typedef {import('highlight.js').Mode} Mode
+@typedef {import('highlight.js').CompiledMode} CompiledMode
+@typedef {import('highlight.js').Language} Language
+@typedef {import('highlight.js').HLJSPlugin} HLJSPlugin
+@typedef {import('highlight.js').CompiledLanguage} CompiledLanguage
+*/
+
 /**  */
 
 /** */
 
 /** @implements CallbackResponse */
-
-/** @param {Attr} attr */
 
 /** @param {Node} node */
 
@@ -3341,9 +3392,9 @@ module.exports = function text(state, silent) {
 
 /** @param {string} s */
 
-/** @type DataNode */
+/** @type CompiledMode */
 
-/** @type Event[] */
+/** @type DataNode */
 
 /** @type HLJSOptions */
 
@@ -3355,11 +3406,19 @@ module.exports = function text(state, silent) {
 
 /** @type LanguageFn */
 
+/** @type Mode */
+
 /** @type Node */
+
+/** @type Record<number,boolean> */
 
 /** @type Record<string,CompiledMode> */
 
 /** @type Record<string,any> */
+
+/** @type string[] */
+
+/** @type { object & {capture?: boolean} }  */
 
 /** @type {AnnotatedError} */
 
@@ -3367,7 +3426,7 @@ module.exports = function text(state, silent) {
 
 /** @type {CompiledMode} */
 
-/** @type {HLJSPlugin} */
+/** @type {Language} */
 
 /** @type {ModeCallback} */
 
@@ -3375,9 +3434,27 @@ module.exports = function text(state, silent) {
 
 /** @type {Record<string, string>} */
 
+/** @type {Record<string,any>} */
+
+/** @type {RegExp | string} */
+
 /** @type {Renderer} */
 
+/** @type {T} */
+
 /** @type {{type?: MatchType, index?: number, rule?: Mode}}} */
+
+/** @typedef { {capture?: boolean} } RegexEitherOptions */
+
+/** @typedef {import('highlight.js').CallbackResponse} CallbackResponse */
+
+/** @typedef {import('highlight.js').CompiledMode} CompiledMode */
+
+/** @typedef {import('highlight.js').Emitter} Emitter */
+
+/** @typedef {import('highlight.js').ModeCallback} ModeCallback */
+
+/** @typedef {import('highlight.js').Mode} Mode */
 
 /** @typedef {{kind?: string, sublanguage?: boolean, children: Node[]} | string} Node */
 
@@ -3524,7 +3601,7 @@ module.exports = function text(state, silent) {
 
 /** internal
  * Renderer.renderInlineAsText(tokens, options, env) -> String
- * - tokens (Array): list on block tokens to renter
+ * - tokens (Array): list on block tokens to render
  * - options (Object): params of parser instance
  * - env (Object): additional data from parsed input (references, for example)
  *
@@ -3734,11 +3811,7 @@ module.exports = function text(state, silent) {
 
 //   interesting elements
 
-//   let resp = new Response(mode);
-
 //   light-brown  - #9A9900
-
-//   mode["after:begin"](match, resp);
 
 //   name: XXX,
 
@@ -3760,6 +3833,8 @@ module.exports = function text(state, silent) {
 
 //  * octal literal (e.g. 0o76543210)
 
+//  - AND markers are the same
+
 //  - a
 
 //  - canSplitWord - determine if these markers can be found inside a word
@@ -3779,6 +3854,8 @@ module.exports = function text(state, silent) {
 //  - start - position to scan from (it should point at a valid marker);
 
 //  - string       - string to encode
+
+//  - they have adjacent tokens
 
 //  0..25 map to ASCII a..z or A..Z
 
@@ -3878,15 +3955,29 @@ module.exports = function text(state, silent) {
 
 // "echo" relevance has been set to 0 to avoid auto-detect conflicts with shell transcripts
 
+// "false", // keyword literal already
+
+// "false", // literal
+
 // "get",
+
+// "not", // built_in
 
 // "null",
 
+// "null", // literal
+
 // "plaintext" stand-in so that the code blocks will still get normal
+
+// "programming" type syntax) this gives us a strong signal that we've
 
 // "set",
 
 // "strings"
+
+// "true", // keyword literal already
+
+// "true", // literal
 
 // "value" container
 
@@ -3928,11 +4019,11 @@ module.exports = function text(state, silent) {
 
 // ' >\t  test '
 
-// '%' for more consistent coloring of @keyframes "tags"
-
 // '\u0398\u03f4\u03b8\u03d1'.toLowerCase().toUpperCase() === '\u0398\u0398\u0398\u0398'
 
 // '^/{4,}$',
+
+// 'compact extract func_get_arg func_get_args func_num_args get_called_class get_parent_class ' +
 
 // 'function',
 
@@ -3948,9 +4039,13 @@ module.exports = function text(state, silent) {
 
 // (?!_) cause 1.5x slowdown
 
+// (Strictly speaking, some of the followings are only allowed inside triple quoted interpolated strings...)
+
 // (c) (C) → ©
 
 // (collapsed reference link and shortcut reference link respectively)
+
+// (due to parsing ambiguity with list)
 
 // (list item is empty, list terminates before "foo"):
 
@@ -3972,11 +4067,15 @@ module.exports = function text(state, silent) {
 
 // (which will then blow up when regex's `illegal` sees the newline)
 
+// **INTERNAL** Not intended for outside usage
+
 // *.example.com
 
 // +- → ±
 
 // - [...] elements, where the meaning of parentheses and escapes change
+
+// - abstract member definitions in classes: abstract Property : int * string
 
 // - fractionals 1/2, 1/4, 3/4 -> ½, ¼, ¾
 
@@ -3992,7 +4091,11 @@ module.exports = function text(state, silent) {
 
 // - other escape sequences, so we do not misparse escape sequences as
 
+// - record fields definitions: { A : int \n B : string }
+
 // - return true
+
+// - return type annotations: let f f' = f' () : returnTypeAnnotation
 
 // - update `state.line`
 
@@ -4020,8 +4123,6 @@ module.exports = function text(state, silent) {
 
 // // parameter types
 
-// /:
-
 // 0'a etc.
 
 // 0-prefixed implicit octal integer, optionally rational and/or imaginary
@@ -4046,6 +4147,8 @@ module.exports = function text(state, silent) {
 
 // 1. foo " bar " baz - not replaced
 
+// 1. gets numbers that are by themselves
+
 // 110xxxxx 10xxxxxx
 
 // 1110xxxx 10xxxxxx 10xxxxxx
@@ -4060,6 +4163,8 @@ module.exports = function text(state, silent) {
 
 // 2. foo-"-bar-"-baz - replaced
 
+// 2. numbers that are separated by _
+
 // 2.3. Identifiers and keywords
 
 // 26..35 map to ASCII 0..9
@@ -4069,6 +4174,8 @@ module.exports = function text(state, silent) {
 // 3. Trailing colon is treated like a part of the path,
 
 // 3. foo"bar"baz     - not replaced
+
+// 3. numbers that are separted by .
 
 // 4. If #2 and #3 result in matches, which came first?
 
@@ -4080,19 +4187,23 @@ module.exports = function text(state, silent) {
 
 // 7.4.1 Declaration Modifiers
 
+// : or ::
+
 // :\ and :-\ not used because of conflict with markdown escaping
 
 // <<labeles>>
-
-// <comments up next>` and then immediately end after the , because it
 
 // <https://www.php.net/manual/en/book.spl.php>
 
 // <https://www.php.net/manual/en/language.constants.predefined.php>
 
-// <lower = ..., upper = ...> or <upper = ...>
+// <https://www.php.net/manual/en/language.types.type-juggling.php>
 
-// <something>
+// <https://www.php.net/manual/en/reserved.classes.php>
+
+// <https://www.php.net/manual/en/reserved.interfaces.php>
+
+// <https://www.php.net/manual/en/reserved.php>
 
 // <tag ...
 
@@ -4118,8 +4229,6 @@ module.exports = function text(state, silent) {
 
 // @ts-ignore
 
-// @ts-nocheck
-
 // A function \module_function_name:signature or \__module_function_name:signature,
 
 // A negative indentation means that this is a paragraph continuation
@@ -4127,6 +4236,8 @@ module.exports = function text(state, silent) {
 // A position of the token this delimiter corresponds to.
 
 // A quark \q_the_name or \q__the_name or
+
+// A single $ can be used as an operator
 
 // A variable \scope_module_and_name_type or \scope__module_ane_name_type,
 
@@ -4156,8 +4267,6 @@ module.exports = function text(state, silent) {
 
 // Alternative implementation, for memory.
 
-// An amount of characters before this one that's equivalent to
-
 // An amount of virtual spaces (tabs expanded) between beginning
 
 // Applying first lower then upper case normalizes any character:
@@ -4173,6 +4282,10 @@ module.exports = function text(state, silent) {
 // BACKREF_RE matches an open parenthesis or backreference. To avoid
 
 // BLAH = ...;
+
+// BUG: because ending with \n is necessary for some cases, multi-line type annotations are not properly supported.
+
+// BUG: might conflict with record deconstruction. e.g. let f { Name = name } = name // will highlight f
 
 // Backquoted string
 
@@ -4198,13 +4311,11 @@ module.exports = function text(state, silent) {
 
 // Build schema condition
 
-// Built-in macro variables take precedence
+// Built-in macro variables
 
 // Builtin constants
 
 // But .toLowerCase() doesn't change ϑ (it's already lowercase),
-
-// But a type might: `<Array<Array<number>>`, etc.
 
 // CLONE
 
@@ -4213,6 +4324,8 @@ module.exports = function text(state, silent) {
 // CSS classes are set accordingly
 
 // CSS language prefix for fenced blocks
+
+// CSSFactory, CSSFactoryT
 
 // Cache last tested result. Used to skip repeating steps on next `match` call.
 
@@ -4260,6 +4373,8 @@ module.exports = function text(state, silent) {
 
 // Colors from RouterOS terminal:
 
+// Comes from @RunDevelopment accessed 11/29/2021 at
+
 // Comments
 
 // Common
@@ -4274,8 +4389,6 @@ module.exports = function text(state, silent) {
 
 // Compile postponed aliases
 
-// Compile regexp
-
 // Component sections
 
 // Constants
@@ -4283,6 +4396,8 @@ module.exports = function text(state, silent) {
 // Consume .built_in to prevent highlighting properties and methods.
 
 // Consume .keyword to prevent highlighting properties and methods as keywords.
+
+// Control abstraction objects
 
 // Convert '\n' in paragraphs into <br>
 
@@ -4314,11 +4429,15 @@ module.exports = function text(state, silent) {
 
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 
+// Data step and PROC SQL statements
+
 // Data types https://docs.microsoft.com/dotnet/visual-basic/language-reference/data-types
 
 // Dates
 
 // Decimal literal:
+
+// Decimal numbers
 
 // DecimalBigIntegerLiteral
 
@@ -4372,8 +4491,6 @@ module.exports = function text(state, silent) {
 
 // EOL -> fail
 
-// ES6 class
-
 // EXPAND
 
 // Element names can contain letters, digits, hyphens, underscores, and periods
@@ -4390,6 +4507,12 @@ module.exports = function text(state, silent) {
 
 // Encode unsafe characters with percent-encoding, skipping already
 
+// Escaped identifier
+
+// Examples where \n is required at the end:
+
+// Exceptions for hyphenated keywords
+
 // Exclude params in functions without params
 
 // Execute the module function
@@ -4398,9 +4521,13 @@ module.exports = function text(state, silent) {
 
 // Expression keywords prevent 'keyword Name(...)' from being
 
+// F# allows a lot of things inside string placeholders.
+
 // FIXME these comments should be allowed to span indented lines
 
 // FIXME: Support Unicode identifiers.
+
+// FPs, FPsT
 
 // Facet sections
 
@@ -4422,6 +4549,8 @@ module.exports = function text(state, silent) {
 
 // Find rule index by name
 
+// Find whitespaces tail of pending chars.
+
 // Finish the basic string with a delimiter unless it's empty.
 
 // First 2 params - rule name & source. Secondary array - list of rules,
@@ -4433,6 +4562,8 @@ module.exports = function text(state, silent) {
 // Float
 
 // Float number and x87 BCD
+
+// Float32Array, OutT
 
 // Flush pending text
 
@@ -4446,7 +4577,11 @@ module.exports = function text(state, silent) {
 
 // For validation mode we can terminate immediately
 
+// For visual consistency, highlight type brackets as operators.
+
 // Forbid some cunstructs from other languages to improve autodetect. In fact
+
+// Found matching closer length.
 
 // Freeze prop if it is an object
 
@@ -4454,13 +4589,17 @@ module.exports = function text(state, silent) {
 
 // Function definitions
 
+// Function that look like language construct or language construct that look like function:
+
 // Function title
 
 // Functions and user-defined functions: write $ztime(60*60*3), $$myFunc(10), $$^Val(1)
 
+// Fundamental objects
+
 // Fuzzy link can't be prepended with .:/\- and non punctuation.
 
-// GFM table, non-standard
+// GFM table, https://github.github.com/gfm/#tables-extension-
 
 // GNU ARM syntax
 
@@ -4486,8 +4625,6 @@ module.exports = function text(state, silent) {
 
 // Grammar extensions allow "syntactic sugar" to be added to the grammar modes
 
-// HACK: This lets handlebars do the auto-detection if it's been loaded (by
-
 // HEX values
 
 // HTML block
@@ -4503,6 +4640,8 @@ module.exports = function text(state, silent) {
 // Handle `@param` to highlight the parameter name following
 
 // Handle the basic code points.
+
+// Hard coded exceptions
 
 // Helper methods, should not be used directly
 
@@ -4520,17 +4659,17 @@ module.exports = function text(state, silent) {
 
 // Hexadecimal notation, e.g., $7F.
 
+// Hexadecimal numbers without fraction and optional binary power
+
 // HexadecimalFloatingPointLiteral
 
 // Highlighter function. Should return escaped HTML,
-
-// Higlights all when DOMContentLoaded fires
 
 // Horizontal rule
 
 // However, most prefer all uppercase and uppercase is customary.
 
-// I don't consider this a breaking change
+// I tried to stay relevant by adding only the most idiomatic
 
 // INCLUDE ( ... ) in index_parameters in CREATE TABLE
 
@@ -4556,6 +4695,8 @@ module.exports = function text(state, silent) {
 
 // If nesting level exceeded - skip tail to the end. That's not ordinary
 
+// If no definitions are given, return empty regex to avoid replacements with 'undefined'.
+
 // If not supported schema check requested - terminate
 
 // If one of the delimiters can both open and close emphasis, then the
@@ -4569,8 +4710,6 @@ module.exports = function text(state, silent) {
 // If the previous delimiter has the same marker and is adjacent to this one,
 
 // If there is an @ in the hostname, then non-host chars *are* allowed
-
-// If there was an un-closed backtick, go back to just after
 
 // If this delimiter is matched as a valid opener, `end` will be
 
@@ -4595,6 +4734,8 @@ module.exports = function text(state, silent) {
 // Increment state.level and decrement it later to limit recursion.
 
 // Indentation of subsequent lines must be the same to
+
+// Indexed collections
 
 // Initialize the state.
 
@@ -4622,6 +4763,10 @@ module.exports = function text(state, silent) {
 
 // Internal state vartiables
 
+// Internationalization
+
+// Is first token on the line
+
 // It costs 10% of performance, but allows extend terminators list, if place it
 
 // It exists only as a hack because blockquotes override bMarks
@@ -4631,6 +4776,8 @@ module.exports = function text(state, silent) {
 // It's an unmatched surrogate; only append this code unit, in case the
 
 // It's harmless to do here, because no tokens are created. But ideally,
+
+// It's possible to find something that LOOKS like the start of the
 
 // It's used only when expanding tabs, you can think about it as
 
@@ -4645,6 +4792,8 @@ module.exports = function text(state, silent) {
 // JSX
 
 // Just a shortcut for bulk export
+
+// Keyed collections
 
 // Keywords from all version of PureBASIC 5.00 upward ...
 
@@ -4676,7 +4825,11 @@ module.exports = function text(state, silent) {
 
 // List of emphasis-like delimiters for current tag
 
+// List of keywords that may not require parenthesis
+
 // List of valid html blocks names, accorting to commonmark spec
+
+// List or symbolic operator characters from the FSharp Spec 4.1, minus the dot, and with `?` added, used for nullable operators.
 
 // Lists
 
@@ -4718,9 +4871,13 @@ module.exports = function text(state, silent) {
 
 // Match typed numeric constants (1000, 12.34!, 1.2e5, 1.5#, 1.2D2)
 
+// Matches at least 2 chars operators
+
 // Matches tuples as well as the parameter list of a function type.
 
-// May be, one day we will add .clone() for token and simplify this part, but
+// Matching numbers immediately following punctuation and operators is
+
+// May be, one day we will add .deepClone() for token and simplify this part, but
 
 // Merge objects
 
@@ -4730,9 +4887,11 @@ module.exports = function text(state, silent) {
 
 // More to read about domain names
 
+// Most of them are declared in Microsoft.FSharp.Core
+
 // NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 
-// NOTE: this might not work how you think.  We don't actually always
+// NOTE: This is ugh, but added specifically for https://github.com/highlightjs/highlight.js/issues/3276
 
 // NOTE: this will cause links to behave incorrectly in the following case,
 
@@ -4760,6 +4919,8 @@ module.exports = function text(state, silent) {
 
 // Note: this is equivalent to unicode case folding; unicode normalization
 
+// Nothing found in the cache, scan until the end of the line (or until marker is found)
+
 // Now split string to nodes
 
 // Now we have a portion which is definitely the auth.
@@ -4782,11 +4943,19 @@ module.exports = function text(state, silent) {
 
 // One-line quoted comment string
 
+// Only for relevance, not highlighting.
+
+// Opening `(` of a parameter or argument list
+
 // Operators https://docs.microsoft.com/dotnet/visual-basic/language-reference/operators
+
+// Operators/punctuation when they're not directly followed by numbers
 
 // Optional type
 
 // Other LaTeX3 macro names that are not covered by the three rules above.
+
+// Other keywords:
 
 // Other numbers
 
@@ -4838,8 +5007,6 @@ module.exports = function text(state, silent) {
 
 // Prevent -> from being highlighting as an operator.
 
-// Prevent void elements from having an end tag that would actually
-
 // Prevents element names from being highlighted as keywords.
 
 // Previously calculated lower bounds (previous fails)
@@ -4878,6 +5045,8 @@ module.exports = function text(state, silent) {
 
 // Quirk to enforce "hard termination mode" for paragraphs;
 
+// Quite possibly a tag, lets look for a matching closing tag...
+
 // R also supports quoted identifiers, which are near-arbitrary sequences
 
 // RE pattern for 2-character tlds (autogenerated by ./support/tlds_2char_gen.js)
@@ -4890,11 +5059,17 @@ module.exports = function text(state, silent) {
 
 // Reference can not terminate anything. This check is for safety only.
 
+// Reference cell assignment
+
 // Reference: RFC 3986, RFC 1808, RFC 2396
+
+// Reflection
 
 // Regexps to match html elements
 
 // Regular expression for Ada numeric literals.
+
+// Relevance boost for the most common assignment form.
 
 // Remove element from array and put another array at those position.
 
@@ -4910,7 +5085,9 @@ module.exports = function text(state, silent) {
 
 // Requests
 
-// Required to make sure the opening < of the generic parameter clause
+// Reserved classes:
+
+// Reserved interfaces:
 
 // Reset compiled data
 
@@ -4923,6 +5100,8 @@ module.exports = function text(state, silent) {
 // Review our test case against browsers more comprehensively.
 
 // Roxygen comments
+
+// Ruby i18n
 
 // Ruby/Rails erb
 
@@ -4938,8 +5117,6 @@ module.exports = function text(state, silent) {
 
 // SAME position for only: [string, number] but ignoring "booger" (if it
 
-// SAS is case-insensitive
-
 // STATIC_MEMBER,
 
 // STEP 21 is case insensitive in theory, in practice all non-comments are capitalized.
@@ -4947,6 +5124,8 @@ module.exports = function text(state, silent) {
 // Scan a sequence of emphasis-like markers, and determine whether
 
 // Scan string until end reached
+
+// Scanned through the end, didn't find anything
 
 // Schemas compiler. Build regexps.
 
@@ -4972,7 +5151,7 @@ module.exports = function text(state, silent) {
 
 // Sequences. We actually skip everything between CACHE|INCREMENT|MAXVALUE|MINVALUE and
 
-// Shell built-ins
+// Shell modifiers
 
 // Should be something like \p{\L\N\S\M} (\w but without `_`)
 
@@ -5014,11 +5193,15 @@ module.exports = function text(state, silent) {
 
 // Some control constructions: do ##class(Package.ClassName).Method(), ##super()
 
+// Some different length found, put it in cache as upper limit of where closer can be found
+
 // Some implementations (CNC controls) of G-code are interoperable with uppercase and lowercase letters seamlessly.
 
 // Some keywords more or less unique to I7, for relevance.
 
 // Some tags can terminate paragraph without empty line.
+
+// Somewhat arbitrary list of builtin functions and values.
 
 // Source: https://www.freepascal.org/docs-html/ref/refse6.html
 
@@ -5028,9 +5211,7 @@ module.exports = function text(state, silent) {
 
 // Special case:
 
-// Special case: only hexadecimal binary powers can contain fractions.
-
-// Special emphasis for datalines|cards
+// Special case: only hexadecimal binary powers can contain fractions
 
 // Specific
 
@@ -5050,6 +5231,8 @@ module.exports = function text(state, silent) {
 
 // Strings, see https://www.postgresql.org/docs/11/static/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS
 
+// Structured data
+
 // Support explicitly typed variables that end with $%! or #.
 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
@@ -5064,19 +5247,23 @@ module.exports = function text(state, silent) {
 
 // TODO: These spaces are not required by the Ada syntax
 
-// TODO: Use `beforeMatch:` for indentation once available
+// TODO: Use multi-class for indentation once available
 
-// TODO: Use `beforeMatch:` for leading spaces
+// TODO: Use multi-class for leading spaces
 
 // TODO: We need negative look-behind support to do this properly
 
-// TODO: can this be removed somehow?
+// TODO: apply hinting work similar to what was done in cpp.js
 
 // TODO: characters.
+
+// TODO: could be title.class or title.function
 
 // TODO: find a better solution?
 
 // TODO: fix to allow these to work with sublanguage also
+
+// TODO: how to include ", (, ) without breaking grammars that use these for
 
 // TODO: other constructors (build-in, infix).
 
@@ -5096,13 +5283,13 @@ module.exports = function text(state, silent) {
 
 // TODO: split into different categories of keywords
 
+// TODO: this is most likely an incorrect classification
+
+// TODO: title.function vs title.class
+
+// TRULY found a comment - vs perhaps scanning with the wrong language.
+
 // TS gets a simpler shebang rule than JS
-
-// Taken from http://developer.couchbase.com/documentation/server/4.5/n1ql/n1ql-language-reference/functions.html
-
-// Taken from http://developer.couchbase.com/documentation/server/4.5/n1ql/n1ql-language-reference/literals.html
-
-// Taken from http://developer.couchbase.com/documentation/server/current/n1ql/n1ql-language-reference/reservedwords.html
 
 // The above copyright notice and this permission notice shall be included
 
@@ -5114,11 +5301,15 @@ module.exports = function text(state, silent) {
 
 // The same as abothe but without [0-9]
 
+// These are not language construct (function) but operate on the currently-executing function and can access the current symbol table
+
+// Things that don't currently seem allowed by the compiler: types definition, attributes usage.
+
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+
 // This is here for relevance.
 
 // This is necessary because initially emphasis delimiter markers (*, _, ~)
-
-// This is now either a tag or a type.
 
 // This is to support parse stuff like "  http://foo.com  \n"
 
@@ -5148,6 +5339,8 @@ module.exports = function text(state, silent) {
 
 // Try to take previous element from cache, if .test() called before
 
+// Type casting and conversion operators:
+
 // Type identifier
 
 // Types
@@ -5155,6 +5348,10 @@ module.exports = function text(state, silent) {
 // URLs are obnoxious.
 
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// Unicode Hex 0000 - FFFF
+
+// Unicode Octal 0 - 377
 
 // Unicode entries:
 
@@ -5166,13 +5363,11 @@ module.exports = function text(state, silent) {
 
 // Use reversed logic in links start/end match
 
-// Used to skip sequences like "*****" in one step, for 1st asterisk
-
 // Useful for some operations with tokens
 
 // User agent / relevance boost
 
-// User-defined macro functions highlighted after
+// User-defined macro functions
 
 // Utilities
 
@@ -5201,6 +5396,8 @@ module.exports = function text(state, silent) {
 // We should terminate list on style change. Remember first one to compare.
 
 // We try to support full Ada2012
+
+// WebAssembly
 
 // Which ever results in a match first is then used. So this 3-4 step
 
@@ -5240,7 +5437,17 @@ module.exports = function text(state, silent) {
 
 // __beforeBegin is considered private API, internal use only
 
+// `<Array<Array<number>>`, etc.
+
+// `<From extends string>`
+
+// `<T, A extends keyof T, V>`
+
+// `<blah />` (self-closing)
+
 // `<em><em>whatever</em></em>` -> `<strong>whatever</strong>`
+
+// `<something>`
 
 // ```
 
@@ -5258,11 +5465,13 @@ module.exports = function text(state, silent) {
 
 // `index` is the index of the next character to be consumed.
 
-// `mode.lexemes` was the old standard before we added and now recommend
+// `no-way`, etc.
 
 // `return some()`, `else if()`, `(x*sum(1, 2))`
 
 // `test/markup/r/roxygen.txt` for an example.
+
+// `};` combined is just to avoid tons of useless punctuation nodes
 
 // a 0 width match but not a begin/end match so it's not caught by the
 
@@ -5280,6 +5489,8 @@ module.exports = function text(state, silent) {
 
 // a space separates the REPL prefix from the actual code
 
+// a type annotation is a
+
 // a whole lot of languages
 
 // a word boundary is not sufficient, so instead we check for a word boundary
@@ -5287,6 +5498,8 @@ module.exports = function text(state, silent) {
 // abstracts
 
 // actually we want them all except SQL; listed are those with known implementations
+
+// add '%' to exclude list because of https://github.com/markdown-it/markdown-it/issues/720
 
 // add non-matched text to the current mode buffer
 
@@ -5300,13 +5513,11 @@ module.exports = function text(state, silent) {
 
 // aka. 0x7FFFFFFF or 2^31-1
 
-// aliases for themselves
+// aliases
 
 // all prior rules are also skipped which can result in matching the wrong
 
 // allow FORTRAN 77 style comments
-
-// allow HTMLBars to participate in the auto-detection
 
 // allow `C = value` for assignments so they aren't misdetected
 
@@ -5317,6 +5528,8 @@ module.exports = function text(state, silent) {
 // allow empty columns before and after table, but not in between columns;
 
 // allow escaped single quote followed by word char
+
+// allow for multiple declarations, e.g.:
 
 // allow matching common delimiters
 
@@ -5332,19 +5545,15 @@ module.exports = function text(state, silent) {
 
 // ambiguously named function calls get a relevance of 0
 
-// an emphasis, neither do previous `jump` characters.
+// an HTML injection attack - it's likely too late if this is already in
 
 // an emphasis.
 
 // an expression such as:
 
-// an extra boost because Java is more popular than other languages with
-
 // an incorrect parse, it additionally matches the following:
 
 // an initial tab length, e.g. bsCount=21 applied to string `\t123`
-
-// an install is only using `htmlbars`, not `handlebars`) then this will still
 
 // and .toUpperCase doesn't normalize 6 of them (list of exceptions:
 
@@ -5354,17 +5563,21 @@ module.exports = function text(state, silent) {
 
 // and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
 
-// and align row shouldn't be smaller than that (the rest of the rows can)
+// and align row should be exactly the same (the rest of the rows can differ)
 
 // and alphanumeric chars is percent-encoded.
 
 // and compile search regexp
+
+// and for whether this closer can be an opener;
 
 // and in PL/pgSQL RAISE ... USING
 
 // and increment current pos
 
 // and module_and_name may contain single underscores.
+
+// and most used symbols that are not already declared as types.
 
 // and no other characters are allowed but spaces;
 
@@ -5381,6 +5594,8 @@ module.exports = function text(state, silent) {
 // and we don't want to mishandle e.g. `fn(.5)`,
 
 // annotation is also used in this language
+
+// anonymous function
 
 // anonymous function start
 
@@ -5404,13 +5619,15 @@ module.exports = function text(state, silent) {
 
 // assume that it's an IPv6 address.
 
+// async is optional
+
 // at least one identifier
+
+// at this point modeBuffer should just be the match
 
 // at this point, either we have an explicit point where the
 
 // atSign can be anywhere.
-
-// attribute coming up so we don't steal a comma from a potential
 
 // attribute value mode
 
@@ -5430,13 +5647,15 @@ module.exports = function text(state, silent) {
 
 // avoid conflicts with other rules
 
-// avoid possible breakage with v10 clients expecting
-
 // avoids the need to check length every time exec is called
 
 // backreferences so they continue to match.
 
+// backtick length => last seen position
+
 // bare number
+
+// basic types
 
 // basically, this is the equivalent of /^[-:|][-:|\s]*$/ regexp
 
@@ -5446,9 +5665,15 @@ module.exports = function text(state, silent) {
 
 // because emails enclosed in quotes are far more common
 
+// because the namespace name can include `\` and we still want each
+
 // because, if they are pointing at the same token, replaceAt
 
 // begin: '@',
+
+// begin: /[ ]+([()"]?([A-Za-z'-]{3,}|is|a|I|so|us|[tT][oO]|at|if|in|it|on)[.]?[()":]?([.][ ]|[ ]|\))){3}/
+
+// beginScope just wraps the begin match itself in a scope
 
 // beta configuration options, subject to change, welcome to discuss
 
@@ -5470,7 +5695,9 @@ module.exports = function text(state, silent) {
 
 // boost for obvious PHP
 
-// both are not allowed
+// borrowed from Prism, TODO: split out into variants
+
+// both use and namespace still use "old style" rules (vs multi-match)
 
 // bounding ( ).  There could be any number of sub-expressions inside
 
@@ -5482,15 +5709,13 @@ module.exports = function text(state, silent) {
 
 // built in func
 
-// built-in functions imported from https://web.archive.org/web/20160513042710/https://support.office.com/en-us/article/Excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188
-
-// built-in plugins, likely to be moved out of core in the future
-
 // built-in types
 
 // built-ins) are automatically generated from Julia 1.5.2 itself through
 
 // built_in and that makes up a lot of AutoHotkey code meaning that it
+
+// built_in may need more nuance
 
 // built_in: 'EXTRACT',
 
@@ -5512,8 +5737,6 @@ module.exports = function text(state, silent) {
 
 // but only have a single open/close tag vs one per line
 
-// but we list only those realistically expected in code display.
-
 // but we should filter last element, because it means list finish
 
 // by applying a class name
@@ -5524,11 +5747,13 @@ module.exports = function text(state, silent) {
 
 // can be 'blockquote', 'list', 'root', 'paragraph' or 'reference'
 
-// case of a "normal" key
+// can contain any constant value
+
+// case of a key-value pair
 
 // case of an empty key
 
-// case of key containing non-alphanumeric chars => relevance = 0
+// catch ... so it won't trigger the property rule below
 
 // catch middle element of the ternary operator
 
@@ -5546,9 +5771,17 @@ module.exports = function text(state, silent) {
 
 // check if it's outdented, i.e. it's inside list item and indented
 
+// check that first two markers match and adjacent
+
+// check that last two markers are adjacent (we can safely assume they match)
+
 // check the block quote marker
 
 // chop off from the tail first.
+
+// class Car
+
+// class Car extends vehicle
 
 // class declaration
 
@@ -5590,11 +5823,17 @@ module.exports = function text(state, silent) {
 
 // command parameters
 
+// comment - but then if there is no readable text - good chance it is a
+
 // comment blocks
+
+// comment delimiters?
 
 // comment within a datatype comment includes no keywords
 
 // comments
+
+// common keywords with Java
 
 // common variable name
 
@@ -5612,6 +5851,8 @@ module.exports = function text(state, silent) {
 
 // complexity.
 
+// computation expressions:
+
 // consecutive commas, not for highlighting but just for relevance
 
 // considered for a potential match
@@ -5620,13 +5861,11 @@ module.exports = function text(state, silent) {
 
 // containers: ie, `vector <int> rooms (9);`
 
-// content and will need to change their setup to only require handlebars, but
-
 // context as 'meta-string' and there's no syntax to remove explicitly set
 
 // contextual
 
-// continuation not supported at all via the new API
+// contractions - can't we'd they're let's, etc
 
 // control codes
 
@@ -5650,7 +5889,7 @@ module.exports = function text(state, silent) {
 
 // css classes applied to them - and one bad language won't break the
 
-// current one. In plain English: if this delimiter does not open
+// css variables
 
 // custom method guard
 
@@ -5666,6 +5905,8 @@ module.exports = function text(state, silent) {
 
 // decent number of iterations yet our index (cursor position in our
 
+// decimal
+
 // decimal floating-point-literal (subsumes decimal-literal)
 
 // decimal integer/float, optionally exponential or rational, optionally imaginary
@@ -5679,8 +5920,6 @@ module.exports = function text(state, silent) {
 // def method_name(
 
 // def method_name;
-
-// default the build script will load in alphabetical order) and if not (perhaps
 
 // default to 1 relevance if not specified
 
@@ -5740,9 +5979,11 @@ module.exports = function text(state, silent) {
 
 // double quoted keys
 
-// double them in the output. There are more void elements in HTML
+// e.g. [<Attributes("")>] or [<``module``: MyCustomAttributeThatWorksOnModules>]
 
 // e.g. allow ` |---| `, disallow ` ---||--- `
+
+// eat !important after mixin call or it will be colored as tag
 
 // eat "if" prior to string so that it won't accidentally be
 
@@ -5762,11 +6003,19 @@ module.exports = function text(state, silent) {
 
 // either REPL-like or script-like, but are usually REPL-like and therefore we apply
 
+// either a single non escaped char...
+
+// element to be treated as its own *individual* title
+
+// empty strings for alt or link text
+
 // encode(string, keepEscaped)
 
 // encoded sequences.
 
 // end
+
+// end if another doc comment
 
 // end parens
 
@@ -5778,7 +6027,7 @@ module.exports = function text(state, silent) {
 
 // endsWithParent: true,
 
-// enter this mode and stay.  Instead it might merely match `,
+// ensure the number is not part of an identifier, and we cannot use
 
 // entire highlighter
 
@@ -5790,7 +6039,7 @@ module.exports = function text(state, silent) {
 
 // escaped constrained formatting marks (i.e., \* \_ or \`)
 
-// escaped identifier
+// escaped pipe, '\|'
 
 // escaped unconstrained formatting marks (i.e., \\** \\__ or \\``)
 
@@ -5822,13 +6071,19 @@ module.exports = function text(state, silent) {
 
 // express version except: ! & * < = > !! # @ @@
 
+// extern void f(int), g(char);
+
+// extra complexity to deal with `enum class` and `enum struct`
+
 // extract
+
+// extracted by mini-css-extract-plugin
 
 // fail if list has another type
 
 // fail if terminating block found
 
-// fails to find any actual attrs. But this still does the job because
+// false match and not a comment.
 
 // far looking only for "number", ignoring potential string matches (or
 
@@ -5856,6 +6111,10 @@ module.exports = function text(state, silent) {
 
 // flexibility required.
 
+// flexible type name
+
+// float        // 0.42 4.2E-1M 42E1 42M
+
 // float number w/ exponent
 
 // float number w/out exponent
@@ -5866,15 +6125,17 @@ module.exports = function text(state, silent) {
 
 // for a very generally defined mode (starts with a word, ends with line-end
 
-// for each marker and each delimiter length modulo 3.
+// for a visual example please see:
+
+// for each marker, each delimiter length modulo 3,
+
+// for example ev_ are types of events
 
 // for exports
 
 // for kw in collect(x.keyword for x in REPLCompletions.complete_keyword(""))
 
 // for languages with keywords that include non-word characters checking for
-
-// for now)
 
 // for performance out of fear of regex.either(...Mathematica.SYSTEM_SYMBOLS)
 
@@ -5922,25 +6183,33 @@ module.exports = function text(state, silent) {
 
 // generic Less highlighter (used almost everywhere except selectors):
 
+// generic type name
+
 // give it a temporary name if it doesn't have one in the meta-data
 
 // got a fragment string.
 
+// grabs complex numbers with i
+
+// grabs scientific notation
+
 // gradle
+
+// groovy specific keywords
 
 // guard: constrained formatting mark may not be preceded by ":", ";" or
 
 // guess schemaless links
 
+// hack to avoid the space from being included. the space is necessary to
+
 // hack: eating everything after the first title
-
-// hack: in range constraints, lower must follow "<"
-
-// hack: in range constraints, upper must follow either , or <
 
 // hack: prevents detection of keywords after dots
 
 // hack: prevents detection of keywords in some circumstances
+
+// handled by simpleSelfClosing rule
 
 // handled in a separate mode. See `test/markup/r/names.txt` for examples.
 
@@ -5954,7 +6223,11 @@ module.exports = function text(state, silent) {
 
 // have historically been settled, ie the language that comes first always
 
+// have to look forward here to avoid polynomial backtracking
+
 // header row will define an amount of columns in the entire table,
+
+// headerIdx is the first delimiter of the current (where closer is) delimiter run
 
 // heading (#, ##, ...)
 
@@ -5968,15 +6241,25 @@ module.exports = function text(state, silent) {
 
 // hex colors
 
-// hexadecimal floating-point-literal (subsumes hexadecimal-literal)
+// hexadecimal                 // 0x2a
 
-// highlight doc strings mentioned in Stan reference
+// hexadecimal floating-point-literal (subsumes hexadecimal-literal)
 
 // highlight labeled statements
 
 // highlight map keys and named parameters as attrs
 
 // highlighting. variable is comparably the most accurate that actually
+
+// highlights distributions after ~
+
+// highlights distributions that end with special endings
+
+// highlights the 'T' in T[,] for only Stan language distributrions
+
+// highlights user defined distributions after ~
+
+// highlights user defined distributions with special endings
 
 // hmm, I wonder if we ought to include other exponent markers?
 
@@ -6000,8 +6283,6 @@ module.exports = function text(state, silent) {
 
 // http://spec.commonmark.org/0.15/#ascii-punctuation-character
 
-// http://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html
-
 // https://community.bistudio.com/wiki/Functions_Library_(Arma_3)#Adding_a_Function
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
@@ -6022,13 +6303,21 @@ module.exports = function text(state, silent) {
 
 // https://docs.swift.org/swift-book/ReferenceManual/LexicalStructure.html#ID411
 
+// https://github.com/PrismJS/prism/blob/c53ad2e65b7193ab4f03a1797506a54bbb33d5a2/components/prism-stan.js#L56
+
+// https://github.com/commonmark/cmark/commit/34250e12ccebdc6372b8b49c44fab57c72443460
+
 // https://github.com/commonmark/cmark/issues/178#issuecomment-270417442
 
 // https://github.com/highlightjs/highlight.js/issues/1086
 
-// https://llvm.org/docs/LangRef.html#namedmetadatastructure
+// https://github.com/highlightjs/highlight.js/issues/2521
 
-// https://perldoc.perl.org/perlre#Modifiers
+// https://github.com/highlightjs/highlight.js/issues/2827
+
+// https://github.com/highlightjs/highlight.js/issues/3149
+
+// https://llvm.org/docs/LangRef.html#namedmetadatastructure
 
 // https://spec.commonmark.org/0.29/#line-ending
 
@@ -6044,19 +6333,15 @@ module.exports = function text(state, silent) {
 
 // id tag
 
-// identifier followed by a equal-sign (without the equal sign)
-
 // identifiers in quotes
 
 // ie if C++ and Arduino are tied, it's more likely to be C++
 
 // if "booger" is ignored then we'd really need a regex to scan from the
 
-// if (mode["after:begin"]) {
-
 // if a highlight was requested before DOM was loaded, do now
 
-// if c and cpp are loaded after then they will reclaim these
+// if first character is '-', then second character must not be a space
 
 // if hostname begins with [ and ends with ]
 
@@ -6121,10 +6406,6 @@ module.exports = function text(state, silent) {
 // indents for each line (tabs expanded)
 
 // infinite loops are BAD, this is a last ditch catch all. if we have a
-
-// infix operator
-
-// inherit is a workaround for a bug that makes shared modes with endsWithParent compile only the ending of one of the parents
 
 // initializers
 
@@ -6192,15 +6473,13 @@ module.exports = function text(state, silent) {
 
 // is()
 
-// isn't parsed as a second title.
-
 // it also places each individual regular expression into it's own
 
 // it can start an emphasis sequence or end an emphasis sequence.
 
 // it from ending too early by matching another }
 
-// it prevents the value contain rule from grabbing this instead and
+// it optimizes skips in **<...>**a**<...>** pathological case
 
 // it will be the same actual JS object
 
@@ -6284,6 +6563,8 @@ module.exports = function text(state, silent) {
 
 // link to parser instance
 
+// list of common 1 and 2 letter words in English
+
 // listing and literal blocks
 
 // literal
@@ -6291,6 +6572,10 @@ module.exports = function text(state, silent) {
 // literals
 
 // local labels: %?[FB]?[AT]?\d{1,2}\w+
+
+// look-ahead prevents us from gobbling up opcodes
+
+// looking like plain text, more likely to be a comment
 
 // looks like #-comment
 
@@ -6300,7 +6585,7 @@ module.exports = function text(state, silent) {
 
 // low relevance prevents us from claming XML/HTML where this rule would
 
-// make \` close code sequence, but not open it;
+// macros
 
 // make sure tail has spaces only
 
@@ -6316,6 +6601,8 @@ module.exports = function text(state, silent) {
 
 // markdown-it default options
 
+// markers belong to same delimiter run if:
+
 // markers can be mixed with spaces, but there should be at least 3 of them
 
 // markup
@@ -6328,7 +6615,13 @@ module.exports = function text(state, silent) {
 
 // match groups that make up the multi-matcher)
 
+// match here to prevent the plain text rule below from gobbling up doctags
+
+// match keywords in type constraints. e.g.: when 'a : null
+
 // match strings inside of XML tags
+
+// match to avoid strange patterns inside that may break the parsing
 
 // matching these here allows us to treat them more like regular CSS
 
@@ -6340,7 +6633,7 @@ module.exports = function text(state, silent) {
 
 // merge adjacent text nodes into one and re-calculate all token levels
 
-// merge all the modes/regexs into our main object
+// merge all the modes/regexes into our main object
 
 // merge those into one strong delimiter.
 
@@ -6354,21 +6647,27 @@ module.exports = function text(state, silent) {
 
 // modifier (character varying)
 
+// modifiers
+
 // module
 
 // mojolicious block
 
 // mojolicious line
 
-// monad builder keywords (matches before non-bang kws)
+// monad builder keywords (matches before non-bang keywords)
 
 // monkey
+
+// more likely to be caught in development before making it to production
 
 // most notably, `__proto__`)
 
 // multi line string
 
 // multi-line string
+
+// must come before impl/for rule later
 
 // must ignore until the next formatting marks
 
@@ -6378,13 +6677,15 @@ module.exports = function text(state, silent) {
 
 // name of the function/procedure
 
-// named keys representing className (which can then point to a string or array)
+// named keys representing scopeName (which can then point to a string or array)
 
 // named loops and declare blocks
 
 // named tags
 
 // nearest following numeric constant. Without with trick we find a lot of "keywords"
+
+// necessary to prevent us gobbling up doctags like /* @author Bob Mcgill */
 
 // needed because we do not have look-behind on the below rule
 
@@ -6394,7 +6695,11 @@ module.exports = function text(state, silent) {
 
 // negative look-ahead tries to avoid matching patterns that are not
 
+// negative look-behind assertions. So instead we explicitly handle all
+
 // negative-look forward attemps to prevent false matches like:
+
+// negative-look forward attempts to prevent false matches like:
 
 // nested type?
 
@@ -6408,13 +6713,11 @@ module.exports = function text(state, silent) {
 
 // no closing '>'
 
-// no idea what language to use, return raw code
-
 // no module.id needed
 
 // no module.loaded needed
 
-// no more regexs to potentially match here, so we move the cursor forward one
+// no more regexes to potentially match here, so we move the cursor forward one
 
 // no need to move the cursor, we still have additional regexes to try and
 
@@ -6426,6 +6729,8 @@ module.exports = function text(state, silent) {
 
 // normally if you call `tokenize(state, startLine, nextLine)`,
 
+// not a C keyword but is, for all intents and purposes, treated exactly like one.
+
 // not a string technically but makes sense to be highlighted in the same style
 
 // not be auto-detected to avoid auto-detect conflicts between C and C++
@@ -6436,9 +6741,13 @@ module.exports = function text(state, silent) {
 
 // not include such support nor can we be sure all the grammars depending
 
-// not part of an identifier
+// not part of an identifier, or start of document
+
+// not positive, but these are not literals
 
 // not()
+
+// note: this is not an exhaustive list of contractions, just popular ones
 
 // now we prefer to keep things local.
 
@@ -6458,6 +6767,8 @@ module.exports = function text(state, silent) {
 
 // numbers
 
+// numbers and dates
+
 // numbers are any valid C-style number that
 
 // numeric literal
@@ -6467,6 +6778,8 @@ module.exports = function text(state, silent) {
 // object handles
 
 // obviously a single digit can also be used in this fashion
+
+// octal                       // 052
 
 // octal-literal
 
@@ -6482,10 +6795,6 @@ module.exports = function text(state, silent) {
 
 // one comment word, then possibly more
 
-// only 6
-
-// only in Haskell, not R
-
 // only regexes not matched previously will now be
 
 // open block statement
@@ -6500,6 +6809,8 @@ module.exports = function text(state, silent) {
 
 // optimization of pairs parse (emphasis, strikes).
 
+// optional space
+
 // optionally "long" in Python 2
 
 // optionally imaginary
@@ -6510,15 +6821,27 @@ module.exports = function text(state, silent) {
 
 // or -1 on fail.
 
+// or [<Sealed; NoEquality; NoComparison; CompiledName("FSharpAsync`1")>]
+
+// or a line with no comment
+
 // or root check will fail every second time
 
 // or whitespace - this does no harm in any case since our keyword engine
+
+// other important FSharp types
+
+// other native types or lowercase aliases
+
+// other symbolic keywords:
 
 // otherwise it’s identified as tag
 
 // otherwise say they are equal, which has the effect of sorting on
 
 // our matcher is [string, "booger", number]
+
+// output from inside match groups
 
 // package definition, maybe inside generic
 
@@ -6528,6 +6851,8 @@ module.exports = function text(state, silent) {
 
 // parameters of the form '{{#with x as | y |}}...{{/with}}'
 
+// parens type expression
+
 // parser failed to find ']', so it's not a valid link
 
 // parsing a valid shortcut link failed, fallback to reference
@@ -6535,6 +6860,8 @@ module.exports = function text(state, silent) {
 // parsing) still 3x behind our index then something is very wrong
 
 // partially expanding tabs in code blocks, e.g '\t\tfoobar'
+
+// pass
 
 // passthrough blocks
 
@@ -6544,11 +6871,11 @@ module.exports = function text(state, silent) {
 
 // persons to whom the Software is furnished to do so, subject to the
 
+// pipe separating cells, '|'
+
 // plaintext is always an option
 
 // plug::ins
-
-// plugins for frameworks
 
 // points were copied; start at the beginning otherwise.
 
@@ -6556,13 +6883,17 @@ module.exports = function text(state, silent) {
 
 // position, but the second full matcher starting at the position after:
 
+// positive (auto-detect, etc.)
+
+// possible combinations of (operator|punctuation), number.
+
 // pragma
 
 // pre-processor
 
 // prefix is optional with /regex/
 
-// prevening this rule from firing when we actually DO have keys.
+// preprocessor directives and fsi commands:
 
 // prevent keywords from coloring `type`
 
@@ -6574,11 +6905,15 @@ module.exports = function text(state, silent) {
 
 // prevents expressions like `@class` from incorrect flagging
 
+// prevents matching the following: `match s.stype with`
+
 // prevents these from being highlighted `title`
 
 // primary tags
 
 // process essentially allows us to say "match at this position, excluding
+
+// production (the code has likely already done its damage by the time
 
 // properly highlight all modifiers
 
@@ -6598,6 +6933,10 @@ module.exports = function text(state, silent) {
 
 // quoteblocks
 
+// quoted type name
+
+// ratio                       // 1/2
+
 // raw array if they wanted to perhaps manipulate it, etc.
 
 // re-calculate levels after emphasis/strikethrough turns some text nodes
@@ -6614,8 +6953,6 @@ module.exports = function text(state, silent) {
 
 // regex can't start with space to parse x / 2 / 3 as two divisions
 
-// regex in both fortran and irpf90 should match
-
 // regexp container
 
 // regexp locations (~, ~*)
@@ -6631,8 +6968,6 @@ module.exports = function text(state, silent) {
 // relevance 0 because this is acting as a beginKeywords really
 
 // relevance boost
-
-// relevance boost for assignment
 
 // relevance booster
 
@@ -6692,9 +7027,13 @@ module.exports = function text(state, silent) {
 
 // scan marker length
 
+// scope: "meta",
+
 // score.
 
 // scripting commands
+
+// se we still get relevance credit for JS library classes
 
 // search end of block
 
@@ -6710,6 +7049,10 @@ module.exports = function text(state, silent) {
 
 // set state.tight if we had an empty line before current tag
 
+// severity_level
+
+// should be a colon or the 'of' keyword
+
 // should be placed on proper position for tests.
 
 // should have at least two lines
@@ -6723,6 +7066,8 @@ module.exports = function text(state, silent) {
 // simply because 1 variable just can't beat 99 properties :)
 
 // since they appear "function like"
+
+// single quoted keys
 
 // single-line comments
 
@@ -6742,8 +7087,6 @@ module.exports = function text(state, silent) {
 
 // skip trailing spaces until the rest of the line
 
-// slated to be removed in v11
-
 // so all that's left to do is to call tokenizer.
 
 // so even if it's empty, it has to be present.
@@ -6753,6 +7096,8 @@ module.exports = function text(state, silent) {
 // so plugins won't have to depend on them explicitly, which reduces their
 
 // so we bail
+
+// so we can't go deleting $pattern from the original on the first
 
 // so we need to re-calculate all offsets to appear as
 
@@ -6770,11 +7115,15 @@ module.exports = function text(state, silent) {
 
 // special case: 1"" - count first quote as an inch
 
+// special characters
+
 // special handling of some words, which are reserved only in some contexts
 
 // spit the "skipped" character that our regex choked on back into the output sequence
 
 // sql (ada default.txt has a lot of sql keywords)
+
+// start of big noncapture group which
 
 // start of the sequence.
 
@@ -6808,10 +7157,6 @@ module.exports = function text(state, silent) {
 
 // sum of the lengths of the delimiter runs containing the opening and
 
-// support for v10 API
-
-// support users only loading c-like (legacy)
-
 // supported numeric literals:
 
 // sure algorithm has linear complexity (see *_*_*_*_*_... case).
@@ -6822,6 +7167,8 @@ module.exports = function text(state, silent) {
 
 // symbol would be most accurate however is highlighted just like
 
+// symbolic operators:
+
 // table
 
 // table environment
@@ -6831,6 +7178,8 @@ module.exports = function text(state, silent) {
 // tags
 
 // take no arguments so can be called without ()
+
+// technically this could be HTML, but it smells like a type
 
 // template string
 
@@ -6844,9 +7193,17 @@ module.exports = function text(state, silent) {
 
 // testcase status and description
 
+// text
+
+// textio
+
 // than being forced to use `begin`.  The extension then just moves `match` into
 
+// that has to be followed by
+
 // that we might trigger the end node because of a parent mode
+
+// the , gives away that this is not HTML
 
 // the distinction between match/begin
 
@@ -6855,8 +7212,6 @@ module.exports = function text(state, silent) {
 // the experience of writing (and reading grammars) a little bit nicer.
 
 // the first instance of /, ?, ;, or # ends the host.
-
-// the first key:value pairing
 
 // the following scripts for each.
 
@@ -6870,21 +7225,25 @@ module.exports = function text(state, silent) {
 
 // the interior part of an identifier
 
-// the last backtick, but as if it was a normal character
-
 // the local part (i.e. everything up to `@`) intact.
 
 // the mode is ended by the title
+
+// the most similar to tables
 
 // the plugin can change anything in result to suite it
 
 // the plugin can change the desired language or the code to be highlighted
 
-// the reason is: `\` is correct code block
-
 // the title mode below matches only exactly once
 
+// the type name is a normal identifier (we don't use IDENTIFIER_RE because there cannot be another apostrophe here):
+
+// the type name is a quoted identifier:
+
 // them.
+
+// then either of:
 
 // then fall into the scary lookahead-discriminator variant.
 
@@ -6893,8 +7252,6 @@ module.exports = function text(state, silent) {
 // these are explicitly named internal function calls
 
 // thing. Example of matching "booger":
-
-// this avoids needing to use a whole Vue compilation pipeline just
 
 // this brakes first and last tag, but this is the only way to embed a valid html
 
@@ -6905,6 +7262,8 @@ module.exports = function text(state, silent) {
 // this does not
 
 // this function assumes that first character ("[") already matches;
+
+// this guard makes sure that we have an entire heredoc and not a false
 
 // this happens in compileMode, where this function is called from
 
@@ -6926,15 +7285,13 @@ module.exports = function text(state, silent) {
 
 // this rule might not be 100% compliant with Asciidoctor 2.0 but we are entering undefined behavior territory...
 
-// this same syntax feature (this is just to preserve our tests passing
-
 // this should be ... } else { ... branch
 
 // this should update anywhere keywords is used since
 
 // this swallows entire URLs to avoid detecting numbers within
 
-// this to always be an integer
+// this tries to find sequences of 3 english words in a row (without any
 
 // this will be extended by TypeScript
 
@@ -6950,8 +7307,6 @@ module.exports = function text(state, silent) {
 
 // to avoid highlight it as a label, named parameter, or map key
 
-// to build Highlight.js
-
 // to catch known shells and boost relevancy
 
 // to catch unknown shells but still highlight the shebang
@@ -6964,11 +7319,13 @@ module.exports = function text(state, silent) {
 
 // to move forward https://github.com/markdown-it/linkify-it/issues/1
 
-// to prevent false regex triggers for the division function:
+// to prevent built ins from being confused as the class constructor call
 
 // to prevent it from being confused as the function title
 
 // to prevent it from grabbing the final : in a :: pair
+
+// to prevent keywords from being confused as the function title
 
 // to recognize keyframe 40% etc which are outside the scope of our
 
@@ -6976,9 +7333,15 @@ module.exports = function text(state, silent) {
 
 // too much like nested array access in so many languages
 
+// traits
+
 // treat beginning of the line as a whitespace
 
 // treat end of the line as a whitespace
+
+// treat next token as start of run,
+
+// tricky since we need to look at the character ahead of a number to
 
 // trim before proceeding.
 
@@ -7006,6 +7369,8 @@ module.exports = function text(state, silent) {
 
 // url should be normalized at this point, and existing entities are decoded
 
+// use 'blockquote' lists for termination because it's
+
 // use contains to gobble up multiple lines to allow the block to be whatever size
 
 // use paragraph to match terminatorRules
@@ -7014,13 +7379,9 @@ module.exports = function text(state, silent) {
 
 // used in lists to determine if they interrupt a paragraph
 
-// used in strings for escaping/interpolation/substitution
-
 // used only to properly balance nested parens inside mixin call, def. arg list
 
 // user@server is *always* interpreted as a hostname, and url
-
-// using `keywords.$pattern` to pass the keyword pattern
 
 // using more strict pattern for higher relevance to increase chances of Less detection.
 
@@ -7036,11 +7397,13 @@ module.exports = function text(state, silent) {
 
 // value container
 
-// value will be 0, for 2nd it's 1 and so on.
-
 // value: everything until end of line (again, taking into account backslashes)
 
 // var src_pseudo_letter_non_d = '(?:(?![0-9]|' + src_ZPCc + ')' + src_Any + ')';
+
+// variable names cannot conflict with block identifiers
+
+// variable radix from 2 to 36 // 2r101010, 8r52, 36r16
 
 // variables
 
@@ -7060,8 +7423,6 @@ module.exports = function text(state, silent) {
 
 // we already get points for <, we don't need poitns
 
-// we also need to allow for multiple possible comments inbetween
-
 // we are done with functions
 
 // we can default it to 0 to disable those checks.
@@ -7078,15 +7439,17 @@ module.exports = function text(state, silent) {
 
 // we may actually need this (12/2020)
 
+// we need a copy because keywords might be compiled multiple times
+
 // we need a null object, which inherit will guarantee
 
 // we need our own copy of contains
 
+// we need the known types, and we need the type constraint keywords and literals. e.g.: when 'a : null
+
 // we need this for now for jSX
 
 // we need this to make sure size of hostname is not
-
-// we need to look ahead to make sure that we actually have an
 
 // we need to pair up {} inside our subst to prevent
 
@@ -7094,9 +7457,15 @@ module.exports = function text(state, silent) {
 
 // we replace non-ASCII char with a temporary placeholder
 
+// we should be all text, no child nodes (unescaped HTML) - this is possibly
+
 // we test again with ASCII char only
 
+// we use _emit to keep track of which match groups are "top-level" to avoid double
+
 // we'd need a separate private state variable for this purpose.
+
+// we're seeing it)... but we yell loudly about this so that hopefully it's
 
 // we've found a 0 width match and we're stuck, so we need to advance
 
@@ -7130,6 +7499,8 @@ module.exports = function text(state, silent) {
 
 // wins in the case of a tie
 
+// winutils
+
 // with code comments
 
 // with indent=2 becomes '  \tfoobar'
@@ -7144,11 +7515,11 @@ module.exports = function text(state, silent) {
 
 // without requiring any underlying changes to the compiler internals.
 
+// word
+
 // workaround for this case
 
 // workaround to avoid highlighting
-
-// worse case someone will have HTMLbars and handlebars competing for the same
 
 // would fail to highlight anything
 
