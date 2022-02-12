@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E2E8207252F50A300F48771 /* ModuleCocoaPods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2E8206252F50A300F48771 /* ModuleCocoaPods.swift */; };
+		3E3DF021278C4880009DD55A /* MarkdownUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3DF020278C4880009DD55A /* MarkdownUI.swift */; };
 		FC9CC4C51EC43FA90013238C /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BD1EC43FA90013238C /* index.html */; };
 		FC9CC4C61EC43FA90013238C /* main.css in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BE1EC43FA90013238C /* main.css */; };
 		FC9CC4C71EC43FA90013238C /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BF1EC43FA90013238C /* main.js */; };
@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3E2E8206252F50A300F48771 /* ModuleCocoaPods.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleCocoaPods.swift; sourceTree = "<group>"; };
+		3E3DF020278C4880009DD55A /* MarkdownUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownUI.swift; sourceTree = "<group>"; };
 		FC9CC4BD1EC43FA90013238C /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = Sources/MarkdownView/Resources/index.html; sourceTree = SOURCE_ROOT; };
 		FC9CC4BE1EC43FA90013238C /* main.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = main.css; path = Sources/MarkdownView/Resources/main.css; sourceTree = SOURCE_ROOT; };
 		FC9CC4BF1EC43FA90013238C /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = Sources/MarkdownView/Resources/main.js; sourceTree = SOURCE_ROOT; };
@@ -56,8 +56,8 @@
 		FCA050171EC41211001DAD5F /* MarkdownView */ = {
 			isa = PBXGroup;
 			children = (
-				3E2E8206252F50A300F48771 /* ModuleCocoaPods.swift */,
 				FCFB6FD21EC4381600297562 /* MarkdownView.swift */,
+				3E3DF020278C4880009DD55A /* MarkdownUI.swift */,
 				FCA050181EC41211001DAD5F /* MarkdownView.h */,
 				FCA050191EC41211001DAD5F /* Info.plist */,
 				FCA050201EC4123C001DAD5F /* Assets */,
@@ -160,8 +160,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E3DF021278C4880009DD55A /* MarkdownUI.swift in Sources */,
 				FCFB6FD51EC4381600297562 /* MarkdownView.swift in Sources */,
-				3E2E8207252F50A300F48771 /* ModuleCocoaPods.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,7 +294,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keita.oouchi.MarkdownView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -321,7 +321,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 1.7.0;
+				MARKETING_VERSION = 1.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keita.oouchi.MarkdownView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

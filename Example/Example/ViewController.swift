@@ -1,4 +1,5 @@
 import UIKit
+import SwiftUI
 
 final class ViewController: UIViewController {
 
@@ -35,6 +36,10 @@ final class ViewController: UIViewController {
     let btn7 = UIButton()
     btn7.setTitle("Remote Stylesheet", for: .normal)
     btn7.addTarget(self, action: #selector(openRemoteStylesheetSample(sender:)), for: .touchUpInside)
+    
+    let btn8 = UIButton()
+    btn8.setTitle("SwiftUI", for: .normal)
+    btn8.addTarget(self, action: #selector(openSampleUI(sender:)), for: .touchUpInside)
 
     [
       btn1,
@@ -43,7 +48,8 @@ final class ViewController: UIViewController {
       btn4,
       btn5,
       btn6,
-      btn7
+      btn7,
+      btn8
     ].forEach { button in
 
       button.setTitleColor(UIColor.systemBlue, for: .normal)
@@ -93,6 +99,11 @@ final class ViewController: UIViewController {
   
   @objc func openRemoteStylesheetSample(sender: Any) {
     let example = RemoteStyleSheetsSampleViewController()
+    navigationController?.pushViewController(example, animated: true)
+  }
+  
+  @objc func openSampleUI(sender: Any) {
+    let example = UIHostingController(rootView: SampleUI())
     navigationController?.pushViewController(example, animated: true)
   }
 }

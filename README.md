@@ -7,17 +7,49 @@
 [![License](https://img.shields.io/cocoapods/l/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 
-> MarkdownView is a WKWebView based UI element, and internally use bootstrap, highlight.js, markdown-it.
+> MarkdownView is a WKWebView based UI element, and internally use markdown-it, highlight-js.
 
 ![GIF](https://github.com/keitaoouchi/MarkdownView/blob/master/sample.gif "GIF")
 
 ## How to use
 
+#### UIViewController
+
 ```swift
 import MarkdownView
 
-let md = MarkdownView()
-md.load(markdown: "# Hello World!")
+let markdownView = MarkdownView()
+markdownView.load(markdown: "# Hello World!")
+```
+
+#### SwiftUI
+
+```
+import SwiftUI
+import MarkdownView
+
+struct SampleUI: View {
+  var body: some View {
+    ScrollView {
+      Text("Header")
+        .frame(maxWidth: .infinity, idealHeight: 44)
+        .background(Color.red)
+        
+      MarkdownUI(body: markdown)
+      
+      Text("Footer")
+        .frame(maxWidth: .infinity, idealHeight: 44)
+        .background(Color.red)
+    }
+  }
+  
+  private var markdown: String {
+    let path = Bundle.main.path(forResource: "sample", ofType: "md")!
+    let url = URL(fileURLWithPath: path)
+    return try! String(contentsOf: url, encoding: String.Encoding.utf8)
+  }
+}
+
 ```
 
 ### Options
