@@ -1,5 +1,5 @@
 PODS:
-  - MarkdownView (1.8.3)
+  - MarkdownView (1.9.0)
 
 DEPENDENCIES:
   - MarkdownView (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  MarkdownView: 55e0e15bd82c09786cbb6d17bd2d4ee04c392fe9
+  MarkdownView: a3cace707de758a21246d45dba9430fdaf02776a
 
 PODFILE CHECKSUM: aca8c849eff30cf020f460dc2fb5cc0b4a16e14a
 
