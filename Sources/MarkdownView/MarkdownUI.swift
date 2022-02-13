@@ -9,11 +9,16 @@ public final class MarkdownUI: UIViewRepresentable {
     self._body = .constant(body ?? "")
     self.markdownView = MarkdownView(css: css, plugins: plugins, stylesheets: stylesheets, styled: styled)
     self.markdownView.isScrollEnabled = false
-    
-    self.markdownView.onRendered = { height in
-      print(height)
-      
-    }
+  }
+  
+  public func onTouchLink(perform action: @escaping ((URLRequest) -> Bool)) -> MarkdownUI {
+    self.markdownView.onTouchLink = action
+    return self
+  }
+  
+  public func onRendered(perform action: @escaping ((CGFloat) -> Void)) -> MarkdownUI {
+    self.markdownView.onRendered = action
+    return self
   }
 }
 
