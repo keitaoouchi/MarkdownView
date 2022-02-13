@@ -18,28 +18,27 @@
 ```swift
 import MarkdownView
 
-let markdownView = MarkdownView()
-markdownView.load(markdown: "# Hello World!")
+let md = MarkdownView()
+md.load(markdown: "# Hello World!")
 ```
 
 #### SwiftUI
 
-```
+```swift
 import SwiftUI
 import MarkdownView
 
 struct SampleUI: View {
   var body: some View {
-    ScrollView {
-      Text("Header")
-        .frame(maxWidth: .infinity, idealHeight: 44)
-        .background(Color.red)
-        
+    ScrollView {        
       MarkdownUI(body: markdown)
-      
-      Text("Footer")
-        .frame(maxWidth: .infinity, idealHeight: 44)
-        .background(Color.red)
+        .onTouchLink { link in 
+          print(link)
+          return false
+        }
+        .onRendered { height in 
+          print(height)
+        }
     }
   }
   
