@@ -182,16 +182,16 @@ private extension MarkdownView {
     #endif
       
     #if targetEnvironment(macCatalyst)
-        return bundle.url(
-            forResource: "styled",
-            withExtension: "html",
-            subdirectory: "MarkdownView.bundle/Contents/Resources")!
+    return bundle.url(
+        forResource: "styled",
+        withExtension: "html",
+        subdirectory: "MarkdownView.bundle/Contents/Resources")!
     #else
-        return bundle.url(forResource: "styled",
-                        withExtension: "html") ??
-        bundle.url(forResource: "styled",
-                 withExtension: "html",
-                 subdirectory: "MarkdownView.bundle")!
+    return bundle.url(forResource: "styled",
+                    withExtension: "html") ??
+    bundle.url(forResource: "styled",
+             withExtension: "html",
+             subdirectory: "MarkdownView.bundle")!
     #endif
   }()
   
