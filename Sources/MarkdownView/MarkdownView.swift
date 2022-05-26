@@ -180,11 +180,19 @@ private extension MarkdownView {
     #else
     let bundle = Bundle(for: MarkdownView.self)
     #endif
-    return bundle.url(forResource: "styled",
-                      withExtension: "html") ??
-            bundle.url(forResource: "styled",
-                      withExtension: "html",
-                      subdirectory: "MarkdownView.bundle")!
+      
+    #if targetEnvironment(macCatalyst)
+        return bundle.url(
+            forResource: "styled",
+            withExtension: "html",
+            subdirectory: "MarkdownView.bundle/Contents/Resources")!
+    #else
+        return bundle.url(forResource: "styled",
+                        withExtension: "html") ??
+        bundle.url(forResource: "styled",
+                 withExtension: "html",
+                 subdirectory: "MarkdownView.bundle")!
+    #endif
   }()
   
   static var nonStyledHtmlUrl: URL = {
