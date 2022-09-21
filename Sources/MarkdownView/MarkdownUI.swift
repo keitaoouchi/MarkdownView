@@ -1,6 +1,6 @@
 import SwiftUI
 
-public final class MarkdownUI: UIViewRepresentable {
+public struct MarkdownUI: UIViewRepresentable {
   private let markdownView: MarkdownView
   
   @Binding public var body: String
