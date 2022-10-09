@@ -30,6 +30,8 @@ open class MarkdownView: UIView {
   public convenience init() {
     self.init(frame: .zero)
   }
+    
+  public var markDown: String = ""
 
   /// Reserve a web view before displaying markdown.
   /// You can use this for performance optimization.
@@ -117,6 +119,10 @@ extension MarkdownView: WKNavigationDelegate {
       decisionHandler(.allow)
     }
 
+  }
+    
+  public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+      show(markdown: markDown)
   }
 }
 
