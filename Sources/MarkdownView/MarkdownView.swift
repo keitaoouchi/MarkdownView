@@ -6,12 +6,13 @@ import WebKit
  
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
+@MainActor
 open class MarkdownView: UIView {
 
-  private var webView: WKWebView?
-  private var updateHeightHandler: UpdateHeightHandler?
+  private var webView: WKWebView? = nil
+  private var updateHeightHandler: UpdateHeightHandler? = nil
   
-  private var intrinsicContentHeight: CGFloat? {
+  private var intrinsicContentHeight: CGFloat? = nil {
     didSet {
       self.invalidateIntrinsicContentSize()
     }
@@ -23,9 +24,8 @@ open class MarkdownView: UIView {
     }
   }
 
-  @objc public var onTouchLink: ((URLRequest) -> Bool)?
-
-  @objc public var onRendered: ((CGFloat) -> Void)?
+  public var onTouchLink: (@MainActor (URLRequest) -> Bool)?
+  public var onRendered: (@MainActor (CGFloat) -> Void)?
 
   public convenience init() {
     self.init(frame: .zero)
@@ -35,27 +35,34 @@ open class MarkdownView: UIView {
   /// You can use this for performance optimization.
   ///
   /// - Note: `webView` needs complete loading before invoking `show` method.
-  public convenience init(css: String?, plugins: [String]?, stylesheets: [URL]? = nil, styled: Bool = true) {
-    self.init(frame: .zero)
-    
-    let configuration = WKWebViewConfiguration()
-    configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: nil, enableImage: nil)
-    if let handler = updateHeightHandler {
-      configuration.userContentController.add(handler, name: "updateHeight")
-    }
-    self.webView = makeWebView(with: configuration)
-    self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
+  public convenience init(
+      css: String? = nil,
+      plugins: [String]? = nil,
+      stylesheets: [URL]? = nil,
+      styled: Bool = true
+  ) {
+      self.init(frame: .zero)
+      
+      Task { @MainActor in
+          await setupWebView(css: css, plugins: plugins, stylesheets: stylesheets, styled: styled)
+      }
   }
 
   override init (frame: CGRect) {
     super.init(frame : frame)
-    
-    let updateHeightHandler = UpdateHeightHandler { [weak self] height in
-      guard height > self?.intrinsicContentHeight ?? 0 else { return }
-      self?.onRendered?(height)
-      self?.intrinsicContentHeight = height
-    }
-    self.updateHeightHandler = updateHeightHandler
+    setupUpdateHeightHandler()
+  }
+  
+  private func setupUpdateHeightHandler() {
+      let updateHeightHandler = UpdateHeightHandler { [weak self] height in
+          Task { @MainActor in
+              guard let self = self,
+                    height > self.intrinsicContentHeight ?? 0 else { return }
+              self.onRendered?(height)
+              self.intrinsicContentHeight = height
+          }
+      }
+      self.updateHeightHandler = updateHeightHandler
   }
 
   public required init?(coder aDecoder: NSCoder) {
@@ -75,28 +82,82 @@ extension MarkdownView {
   /// Load markdown with a newly configured webView.
   ///
   /// If you want to preserve already applied css or plugins, use `show` instead.
-  @objc public func load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil, stylesheets: [URL]? = nil, styled: Bool = true) {
-    guard let markdown = markdown else { return }
-
-    self.webView?.removeFromSuperview()
-    let configuration = WKWebViewConfiguration()
-    configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: markdown, enableImage: enableImage)
-    if let handler = updateHeightHandler {
-      configuration.userContentController.add(handler, name: "updateHeight")
-    }
-    self.webView = makeWebView(with: configuration)
-    self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
+  public func load(
+      markdown: String?,
+      enableImage: Bool = true,
+      css: String? = nil,
+      plugins: [String]? = nil,
+      stylesheets: [URL]? = nil,
+      styled: Bool = true
+  ) async {
+      guard let markdown = markdown else { return }
+      
+      await setupWebView(
+          css: css,
+          plugins: plugins,
+          stylesheets: stylesheets,
+          markdown: markdown,
+          enableImage: enableImage,
+          styled: styled
+      )
   }
   
-  public func show(markdown: String) {
-    guard let webView = webView else { return }
-
-    let escapedMarkdown = self.escape(markdown: markdown) ?? ""
-    let script = "window.showMarkdown('\(escapedMarkdown)', true);"
-    webView.evaluateJavaScript(script) { _, error in
-      guard let error = error else { return }
-      print("[MarkdownView][Error] \(error)")
-    }
+  public func show(markdown: String) async {
+      guard let webView = webView else { return }
+      
+      let escapedMarkdown = escape(markdown: markdown) ?? ""
+      let script = "window.showMarkdown('\(escapedMarkdown)', true);"
+      
+      do {
+          _ = try await webView.evaluateJavaScript(script)
+      } catch {
+          print("[MarkdownView][Error] \(error)")
+      }
+  }
+  
+  private func setupWebView(
+      css: String? = nil,
+      plugins: [String]? = nil,
+      stylesheets: [URL]? = nil,
+      markdown: String? = nil,
+      enableImage: Bool? = nil,
+      styled: Bool = true
+  ) async {
+      webView?.removeFromSuperview()
+      
+      let configuration = WKWebViewConfiguration()
+      
+      // iOS 15+ の新しいAPI使用
+      configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+      
+      configuration.userContentController = makeContentController(
+          css: css,
+          plugins: plugins,
+          stylesheets: stylesheets,
+          markdown: markdown,
+          enableImage: enableImage
+      )
+      
+      if let handler = self.updateHeightHandler { // Ensure self.updateHeightHandler is used
+          configuration.userContentController.add(handler, name: "updateHeight")
+      }
+      
+      let newWebView = makeWebView(with: configuration)
+      self.webView = newWebView
+      
+      let url = styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl
+      do {
+          // WKWebView.load(_:) is not async. The async version is loadFileURL(_:allowingReadAccessTo:) or custom async wrappers.
+          // For now, sticking to the original non-async load for URLRequest.
+          // If a specific async behavior for load is needed, it would require more changes.
+          _ = newWebView.load(URLRequest(url: url))
+      } // Removed try/catch as load(URLRequest) is not throwing and not async.
+      // If async loading with error handling is desired, it should be:
+      // do {
+      //   _ = try await newWebView.load(URLRequest(url: url)) // This would require an extension or different load method
+      // } catch {
+      //   print("[MarkdownView][Error] Failed to load HTML: \(error)")
+      // }
   }
 }
 
@@ -171,35 +232,28 @@ private extension MarkdownView {
   }
 }
 
+// MARK: - Resource Management
+
+private extension MarkdownView {
+    
+    static var styledHtmlUrl: URL = {
+        guard let url = Bundle.module.url(forResource: "styled", withExtension: "html", subdirectory: "Resources") else {
+            fatalError("Could not find styled.html in bundle resources. Check that `Resources` directory is correctly included in the target and `Package.swift` resource processing is set to `.process` or `.copy` if it contains subdirectories.")
+        }
+        return url
+    }()
+    
+    static var nonStyledHtmlUrl: URL = {
+        guard let url = Bundle.module.url(forResource: "non_styled", withExtension: "html", subdirectory: "Resources") else {
+            fatalError("Could not find non_styled.html in bundle resources. Check that `Resources` directory is correctly included in the target and `Package.swift` resource processing is set to `.process` or `.copy` if it contains subdirectories.")
+        }
+        return url
+    }()
+}
+
 // MARK: - Misc
 
 private extension MarkdownView {
-  static var styledHtmlUrl: URL = {
-    #if SWIFT_PACKAGE
-    let bundle = Bundle.module
-    #else
-    let bundle = Bundle(for: MarkdownView.self)
-    #endif
-    return bundle.url(forResource: "styled",
-                      withExtension: "html") ??
-            bundle.url(forResource: "styled",
-                      withExtension: "html",
-                      subdirectory: "MarkdownView.bundle")!
-  }()
-  
-  static var nonStyledHtmlUrl: URL = {
-    #if SWIFT_PACKAGE
-    let bundle = Bundle.module
-    #else
-    let bundle = Bundle(for: MarkdownView.self)
-    #endif
-    return bundle.url(forResource: "non_styled",
-                      withExtension: "html") ??
-            bundle.url(forResource: "non_styled",
-                      withExtension: "html",
-                      subdirectory: "MarkdownView.bundle")!
-  }()
-
   func escape(markdown: String) -> String? {
     return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
   }

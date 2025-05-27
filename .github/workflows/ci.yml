@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: macos-14
+    
+    strategy:
+      matrix:
+        xcode: ['15.4']
+        ios: ['17.5']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+    
+    - name: Build and Test
+      run: |
+        xcodebuild test \
+          -scheme MarkdownView \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=${{ matrix.ios }}' \
+          -enableCodeCoverage YES
+    
+    - name: Swift Package Manager Test
+      run: swift test
