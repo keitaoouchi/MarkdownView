@@ -117,6 +117,24 @@ dependencies: [
 ```
 Alternatively, you can add the package directly via Xcode.
 
+### Resources
+
+The library bundles HTML, CSS and JavaScript files under `Sources/MarkdownView/Resources`.
+These are accessed with `Bundle.module` when using Swift Package Manager. Ensure the
+directory structure is preserved if you customize or copy these files:
+
+```
+Sources/MarkdownView/Resources/
+├── styled.html
+├── non_styled.html
+├── main.css
+├── main.js
+└── main.js.LICENSE.txt
+```
+
+If you add additional assets, update `Package.swift` and the podspec accordingly so the
+files are included in the bundle.
+
 ### CocoaPods
 
 ```ruby
