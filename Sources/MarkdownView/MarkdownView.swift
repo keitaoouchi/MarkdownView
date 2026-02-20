@@ -10,6 +10,8 @@ open class MarkdownView: UIView {
 
   private var webView: WKWebView?
   private var updateHeightHandler: UpdateHeightHandler?
+  private var isWebViewLoaded = false
+  private var pendingMarkdown: String?
   
   private var intrinsicContentHeight: CGFloat? {
     didSet {
@@ -51,7 +53,7 @@ open class MarkdownView: UIView {
     super.init(frame : frame)
     
     let updateHeightHandler = UpdateHeightHandler { [weak self] height in
-      guard height > self?.intrinsicContentHeight ?? 0 else { return }
+      guard height != self?.intrinsicContentHeight else { return }
       self?.onRendered?(height)
       self?.intrinsicContentHeight = height
     }
@@ -60,6 +62,13 @@ open class MarkdownView: UIView {
 
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
+
+    let updateHeightHandler = UpdateHeightHandler { [weak self] height in
+      guard height != self?.intrinsicContentHeight else { return }
+      self?.onRendered?(height)
+      self?.intrinsicContentHeight = height
+    }
+    self.updateHeightHandler = updateHeightHandler
   }
 }
 
@@ -79,6 +88,7 @@ extension MarkdownView {
     guard let markdown = markdown else { return }
 
     self.webView?.removeFromSuperview()
+    self.isWebViewLoaded = false
     let configuration = WKWebViewConfiguration()
     configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: markdown, enableImage: enableImage)
     if let handler = updateHeightHandler {
@@ -90,6 +100,11 @@ extension MarkdownView {
   
   public func show(markdown: String) {
     guard let webView = webView else { return }
+
+    guard isWebViewLoaded else {
+      pendingMarkdown = markdown
+      return
+    }
 
     let escapedMarkdown = self.escape(markdown: markdown) ?? ""
     let script = "window.showMarkdown('\(escapedMarkdown)', true);"
@@ -103,6 +118,14 @@ extension MarkdownView {
 // MARK: - WKNavigationDelegate
 
 extension MarkdownView: WKNavigationDelegate {
+
+  public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    isWebViewLoaded = true
+    if let markdown = pendingMarkdown {
+      pendingMarkdown = nil
+      show(markdown: markdown)
+    }
+  }
 
   public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 

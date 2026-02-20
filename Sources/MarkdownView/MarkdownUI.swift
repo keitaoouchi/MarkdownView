@@ -1,40 +1,46 @@
 import SwiftUI
 
-public final class MarkdownUI: UIViewRepresentable {
-  private let markdownView: MarkdownView
-  
+public struct MarkdownUI: UIViewRepresentable {
   @Binding public var body: String
-  
+
+  private let css: String?
+  private let plugins: [String]?
+  private let stylesheets: [URL]?
+  private let styled: Bool
+  private var onTouchLinkHandler: ((URLRequest) -> Bool)?
+  private var onRenderedHandler: ((CGFloat) -> Void)?
+
   public init(body: String? = nil, css: String? = nil, plugins: [String]? = nil, stylesheets: [URL]? = nil, styled: Bool = true) {
     self._body = .constant(body ?? "")
-    self.markdownView = MarkdownView(css: css, plugins: plugins, stylesheets: stylesheets, styled: styled)
-    self.markdownView.isScrollEnabled = false
+    self.css = css
+    self.plugins = plugins
+    self.stylesheets = stylesheets
+    self.styled = styled
   }
-  
-  public func onTouchLink(perform action: @escaping ((URLRequest) -> Bool)) -> MarkdownUI {
-    self.markdownView.onTouchLink = action
-    return self
-  }
-  
-  public func onRendered(perform action: @escaping ((CGFloat) -> Void)) -> MarkdownUI {
-    self.markdownView.onRendered = action
-    return self
-  }
-}
 
-extension MarkdownUI {
-  
+  public func onTouchLink(perform action: @escaping ((URLRequest) -> Bool)) -> MarkdownUI {
+    var copy = self
+    copy.onTouchLinkHandler = action
+    return copy
+  }
+
+  public func onRendered(perform action: @escaping ((CGFloat) -> Void)) -> MarkdownUI {
+    var copy = self
+    copy.onRenderedHandler = action
+    return copy
+  }
+
   public func makeUIView(context: Context) -> MarkdownView {
-    return markdownView
+    let view = MarkdownView(css: css, plugins: plugins, stylesheets: stylesheets, styled: styled)
+    view.isScrollEnabled = false
+    view.onTouchLink = onTouchLinkHandler
+    view.onRendered = onRenderedHandler
+    return view
   }
-  
+
   public func updateUIView(_ uiView: MarkdownView, context: Context) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-      self.markdownView.show(markdown: self.body)
-    }
-  }
-  
-  public func makeCoordinator() -> () {
-    
+    uiView.onTouchLink = onTouchLinkHandler
+    uiView.onRendered = onRenderedHandler
+    uiView.show(markdown: body)
   }
 }
