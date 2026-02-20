@@ -1,47 +1,47 @@
-# webassets — エージェント向けガイド
+# webassets — Agent Guide
 
-このディレクトリは MarkdownView（iOS WKWebView ライブラリ）が内包する
-Web レイヤーのソースと、そのビルド・テスト環境一式です。
+This directory contains the web layer source bundled with MarkdownView
+(an iOS WKWebView library), along with its build and test environment.
 
 ---
 
-## ディレクトリ構成
+## Directory Structure
 
 ```
 webassets/
-├── build.mjs                  # esbuild ビルドスクリプト
-├── package.json               # 依存関係・npm スクリプト
-├── playwright.config.js       # Playwright テスト設定
+├── build.mjs                  # esbuild build script
+├── package.json               # Dependencies & npm scripts
+├── playwright.config.js       # Playwright test configuration
 ├── src/
 │   ├── js/
-│   │   └── index.js           # JS エントリポイント（唯一のソース）
+│   │   └── index.js           # JS entry point (sole source file)
 │   └── css/
-│       ├── bootstrap.css      # Bootstrap v3.3.7（.table / .container のみ抜粋）
-│       ├── gist.css           # highlight.js テーマ（gist）
-│       ├── github.css         # GitHub Markdown スタイル
-│       └── index.css          # カスタム CSS（CSS 変数・ダークモード対応）
+│       ├── bootstrap.css      # Bootstrap v3.3.7 (only .table / .container rules)
+│       ├── gist.css           # highlight.js theme (gist)
+│       ├── github.css         # GitHub Markdown styles
+│       └── index.css          # Custom CSS (CSS variables & dark mode support)
 └── tests/
-    └── render.spec.js         # Playwright 機能テスト（16 件）
+    └── render.spec.js         # Playwright functional tests (16 cases)
 ```
 
-ビルド成果物は **`webassets/` の外** に出力されます。
+Build artifacts are output **outside of `webassets/`**.
 
 ```
 ../Sources/MarkdownView/Resources/
-├── main.js      # バンドル済み・最小化済み（~715 KB）
-└── main.css     # 同上
+├── main.js      # Bundled & minified (~715 KB)
+└── main.css     # Same
 ```
 
 ---
 
-## npm スクリプト
+## npm Scripts
 
-| コマンド | 内容 |
-|---------|------|
-| `npm run build` | esbuild でバンドル・最小化して `Sources/MarkdownView/Resources/` に出力 |
-| `npm test` | Playwright でヘッドレス Chromium テストを実行 |
+| Command | Description |
+|---------|-------------|
+| `npm run build` | Bundle & minify with esbuild, output to `Sources/MarkdownView/Resources/` |
+| `npm test` | Run headless Chromium tests with Playwright |
 
-依存パッケージのインストールは初回のみ必要です。
+Installing dependencies is only required on first setup.
 
 ```sh
 cd webassets
@@ -52,155 +52,156 @@ npm test
 
 ---
 
-## ビルド設定（build.mjs）
+## Build Configuration (build.mjs)
 
-- **バンドラ**: esbuild（webpack + Babel を置き換え）
-- **ターゲット**: `safari13`（iOS 13 以降の WKWebView に対応）
-- **出力**: IIFE 形式、最小化済み
-- **ライセンスコメント**: `legalComments: 'none'`（LICENSE.txt を生成しない）
+- **Bundler**: esbuild (replaces webpack + Babel)
+- **Target**: `safari13` (supports WKWebView on iOS 13+)
+- **Output**: IIFE format, minified
+- **License comments**: `legalComments: 'none'` (no LICENSE.txt generated)
 
-ビルド時間は通常 100 ms 未満です。
+Build time is typically under 100 ms.
 
 ---
 
-## JS エントリポイント（src/js/index.js）
+## JS Entry Point (src/js/index.js)
 
-### 依存ライブラリ
+### Dependencies
 
-| ライブラリ | バージョン | 役割 |
-|-----------|-----------|------|
-| `highlight.js` | ^11.11.1 | シンタックスハイライト |
-| `markdown-it` | ^14.1.0 | Markdown パース・レンダリング |
-| `markdown-it-emoji` | ^3.0.0 | 絵文字ショートコード変換 |
+| Library | Version | Purpose |
+|---------|---------|---------|
+| `highlight.js` | ^11.11.1 | Syntax highlighting |
+| `markdown-it` | ^14.1.0 | Markdown parsing & rendering |
+| `markdown-it-emoji` | ^3.0.0 | Emoji shortcode conversion |
 
-### highlight.js の言語セット
+### highlight.js Language Set
 
-`highlight.js/lib/core` に対して **113 言語を個別インポート** しています
-（全 192 言語をバンドルする方式から変更し、バンドルサイズを削減）。
+**113 languages are individually imported** into `highlight.js/lib/core`
+(changed from bundling all 192 languages to reduce bundle size).
 
-追加・削除する場合は `index.js` の import 宣言と `hljs.registerLanguage()` 呼び出しを
-対で編集してください。
+To add or remove languages, edit both the import statement and the
+`hljs.registerLanguage()` call in `index.js` as a pair.
 
-**注意**: `import markdownLang from "highlight.js/lib/languages/markdown"` は
-`let markdown = new MarkdownIt(...)` との変数名衝突を避けるため `markdownLang` という
-エイリアスを使用しています。変数名を変更する際はこの点に注意してください。
+**Note**: `import markdownLang from "highlight.js/lib/languages/markdown"` uses
+the alias `markdownLang` to avoid a variable name collision with
+`let markdown = new MarkdownIt(...)`. Keep this in mind when renaming variables.
 
-### markdown-it-emoji の import
+### markdown-it-emoji Import
 
-v3 より default export が廃止され named export に変わりました。
+Starting with v3, the default export was removed in favor of a named export.
 
 ```js
-// 正しい（v3 以降）
+// Correct (v3+)
 import { full as emoji } from "markdown-it-emoji";
 
-// 誤り（v2 以前の記法）
+// Wrong (v2 and earlier)
 import emoji from "markdown-it-emoji";
 ```
 
-### window に公開される API
+### APIs Exposed on `window`
 
-iOS Swift 側から WKWebView の `evaluateJavaScript` を通じて呼び出されます。
+Called from the iOS Swift side via WKWebView's `evaluateJavaScript`.
 
-| API | シグネチャ | 説明 |
-|-----|-----------|------|
-| `window.showMarkdown` | `(percentEncodedMarkdown: string, enableImage?: boolean) => void` | パーセントエンコードされた Markdown を受け取りレンダリングする。`enableImage=false` のとき画像を非表示にする |
-| `window.usePlugin` | `(plugin: MarkdownItPlugin) => void` | markdown-it プラグインを登録する公開 API。Swift 側から動的にプラグインを追加できる |
+| API | Signature | Description |
+|-----|-----------|-------------|
+| `window.showMarkdown` | `(percentEncodedMarkdown: string, enableImage?: boolean) => void` | Receives percent-encoded Markdown and renders it. When `enableImage=false`, images are hidden |
+| `window.usePlugin` | `(plugin: MarkdownItPlugin) => void` | Public API to register a markdown-it plugin. Allows the Swift side to dynamically add plugins |
 
-### WKWebView へのコールバック
+### WKWebView Callback
 
-レンダリング後にドキュメント高さを WKWebView へ通知します。
+After rendering, the document height is sent to WKWebView.
 
 ```js
 window?.webkit?.messageHandlers?.updateHeight?.postMessage(height);
 ```
 
-Swift 側は `WKScriptMessageHandler` の `updateHeight` ハンドラで受信し、
-WebView の高さ制約を更新します。
+The Swift side receives this via the `WKScriptMessageHandler`'s `updateHeight`
+handler and updates the WebView's height constraint.
 
 ---
 
 ## CSS
 
-CSS ファイルはビルドスクリプトで JS と共にバンドルされます。
-**直接編集してください**（CSS 側には別途ビルドツールはありません）。
+CSS files are bundled together with JS by the build script.
+**Edit them directly** (there is no separate build tool for CSS).
 
-| ファイル | 内容・注意点 |
-|---------|-------------|
-| `bootstrap.css` | Bootstrap v3.3.7 から `.table` と `.container` 関連ルールのみ抜粋。バージョンアップ不要 |
-| `gist.css` | highlight.js のコード配色テーマ。テーマを変えたい場合はここを置き換える |
-| `github.css` | GitHub 風の Markdown 装飾スタイル |
-| `index.css` | カスタムスタイル。CSS 変数とダークモード（`prefers-color-scheme`）に対応済み |
-
----
-
-## テスト（tests/render.spec.js）
-
-Playwright + headless Chromium による機能テスト 16 件。
-
-### テスト環境のセットアップ
-
-`beforeEach` は以下の順序で実行されます。
-
-1. `page.setContent(...)` — `<div id="contents">` を持つ最小 HTML を設定
-2. `page.evaluate(...)` — `window.webkit.messageHandlers.updateHeight` モックを注入
-3. `page.addScriptTag(...)` — ビルド済みの `main.js` を読み込む
-
-**重要**: WKWebView モックは `addInitScript` ではなく `page.evaluate`（setContent の後）
-で注入しています。headless shell 環境では `addInitScript` が `window` プロパティを
-確実に保持しないケースがあるためです。
-
-### テストカテゴリ
-
-| カテゴリ | 件数 |
-|---------|------|
-| 基本レンダリング（h1/h2・段落・リスト・太字・インラインコード） | 6 |
-| highlight.js（hljs クラス付与・Swift・Python） | 3 |
-| 絵文字ショートコード変換 | 1 |
-| Bootstrap テーブルクラス注入 | 1 |
-| 画像制御（enableImage true/false） | 2 |
-| webkit 高さ通知 | 1 |
-| エッジケース（空文字列・複数回呼び出し上書き） | 2 |
-
-### テスト実行の前提
-
-- `npm run build` でビルド済みの `main.js` が存在すること
-- Playwright に対応した Chromium が `/root/.cache/ms-playwright/` に存在すること
-  （ネットワーク制限がある環境では `npx playwright install` は失敗する可能性があります）
+| File | Details |
+|------|---------|
+| `bootstrap.css` | Only `.table` and `.container` rules extracted from Bootstrap v3.3.7. No version upgrade needed |
+| `gist.css` | highlight.js code color theme. Replace this file to change themes |
+| `github.css` | GitHub-flavored Markdown decoration styles |
+| `index.css` | Custom styles. Supports CSS variables and dark mode (`prefers-color-scheme`) |
 
 ---
 
-## よくある落とし穴
+## Tests (tests/render.spec.js)
 
-### highlight.js 言語を追加するとき
+16 functional tests using Playwright + headless Chromium.
 
-import 宣言と `hljs.registerLanguage()` の**両方**が必要です。片方だけ追加しても動きません。
+### Test Environment Setup
+
+`beforeEach` runs in the following order:
+
+1. `page.setContent(...)` — Sets up minimal HTML with `<div id="contents">`
+2. `page.evaluate(...)` — Injects a `window.webkit.messageHandlers.updateHeight` mock
+3. `page.addScriptTag(...)` — Loads the built `main.js`
+
+**Important**: The WKWebView mock is injected via `page.evaluate` (after setContent),
+not `addInitScript`. In headless shell environments, `addInitScript` may not
+reliably preserve `window` properties.
+
+### Test Categories
+
+| Category | Count |
+|----------|-------|
+| Basic rendering (h1/h2, paragraphs, lists, bold, inline code) | 6 |
+| highlight.js (hljs class assignment, Swift, Python) | 3 |
+| Emoji shortcode conversion | 1 |
+| Bootstrap table class injection | 1 |
+| Image control (enableImage true/false) | 2 |
+| WebKit height notification | 1 |
+| Edge cases (empty string, multiple-call overwrite) | 2 |
+
+### Test Prerequisites
+
+- A built `main.js` must exist (via `npm run build`)
+- A Playwright-compatible Chromium must be present at `/root/.cache/ms-playwright/`
+  (`npx playwright install` may fail in network-restricted environments)
+
+---
+
+## Common Pitfalls
+
+### Adding a highlight.js Language
+
+**Both** an import statement and an `hljs.registerLanguage()` call are required.
+Adding only one will not work.
 
 ```js
-// 1. import 追加
+// 1. Add import
 import cobol from "highlight.js/lib/languages/cobol";
 
-// 2. 登録追加
+// 2. Add registration
 hljs.registerLanguage('cobol', cobol);
 ```
 
-### `markdown` という変数名
+### The `markdown` Variable Name
 
-`let markdown = new MarkdownIt(...)` が既に `markdown` という変数を宣言しています。
-highlight.js の markdown 言語モジュールをインポートする際は必ず別名を使用してください。
+`let markdown = new MarkdownIt(...)` already declares a variable named `markdown`.
+When importing the highlight.js markdown language module, always use an alias.
 
 ```js
-// 正しい
+// Correct
 import markdownLang from "highlight.js/lib/languages/markdown";
 hljs.registerLanguage('markdown', markdownLang);
 
-// ビルドエラーになる
-import markdown from "highlight.js/lib/languages/markdown"; // 変数名衝突
+// Build error
+import markdown from "highlight.js/lib/languages/markdown"; // Name collision
 ```
 
-### ビルド出力パスの変更
+### Changing the Build Output Path
 
-`build.mjs` の `outdir` を変更した場合、`tests/render.spec.js` の `mainJsPath` も
-合わせて更新してください。
+If you change `outdir` in `build.mjs`, also update `mainJsPath` in
+`tests/render.spec.js` accordingly.
 
 ```js
 // tests/render.spec.js
