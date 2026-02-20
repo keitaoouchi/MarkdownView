@@ -29,9 +29,7 @@ extension MarkdownUI {
   }
   
   public func updateUIView(_ uiView: MarkdownView, context: Context) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-      self.markdownView.show(markdown: self.body)
-    }
+    self.markdownView.show(markdown: self.body)
   }
   
   public func makeCoordinator() -> () {
