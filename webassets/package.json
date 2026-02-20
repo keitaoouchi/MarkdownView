@@ -2,6 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "pretest": "npm run build",
     "test": "playwright test"
   },
   "devDependencies": {

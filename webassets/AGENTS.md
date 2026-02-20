@@ -55,7 +55,7 @@ npm test
 ## Build Configuration (build.mjs)
 
 - **Bundler**: esbuild (replaces webpack + Babel)
-- **Target**: `safari13` (supports WKWebView on iOS 13+)
+- **Target**: `safari13` (supports WKWebView; app deployment target iOS 16+)
 - **Output**: IIFE format, minified
 - **License comments**: `legalComments: 'none'` (no LICENSE.txt generated)
 

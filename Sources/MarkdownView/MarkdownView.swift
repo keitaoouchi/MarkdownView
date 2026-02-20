@@ -53,7 +53,7 @@ open class MarkdownView: UIView {
     super.init(frame : frame)
     
     let updateHeightHandler = UpdateHeightHandler { [weak self] height in
-      guard height > self?.intrinsicContentHeight ?? 0 else { return }
+      guard height != self?.intrinsicContentHeight else { return }
       self?.onRendered?(height)
       self?.intrinsicContentHeight = height
     }
@@ -64,7 +64,7 @@ open class MarkdownView: UIView {
     super.init(coder: aDecoder)
 
     let updateHeightHandler = UpdateHeightHandler { [weak self] height in
-      guard height > self?.intrinsicContentHeight ?? 0 else { return }
+      guard height != self?.intrinsicContentHeight else { return }
       self?.onRendered?(height)
       self?.intrinsicContentHeight = height
     }

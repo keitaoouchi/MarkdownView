@@ -60,7 +60,7 @@ Purpose
 
 ## Platform / Distribution
 
-- Target: iOS 13+
+- Target: iOS 16+
 - Distribution: Swift Package Manager / CocoaPods / Carthage
 - Bundle: HTML/CSS/JS are included as package Resources
 
