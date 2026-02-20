@@ -60,6 +60,13 @@ open class MarkdownView: UIView {
 
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
+
+    let updateHeightHandler = UpdateHeightHandler { [weak self] height in
+      guard height > self?.intrinsicContentHeight ?? 0 else { return }
+      self?.onRendered?(height)
+      self?.intrinsicContentHeight = height
+    }
+    self.updateHeightHandler = updateHeightHandler
   }
 }
 
