@@ -1,6 +1,6 @@
 {
   "name": "MarkdownView",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "summary": "Markdown View for iOS.",
   "homepage": "https://github.com/keitaoouchi/MarkdownView",
   "license": {
@@ -12,7 +12,7 @@
   },
   "source": {
     "git": "https://github.com/keitaoouchi/MarkdownView.git",
-    "tag": "2.0.0"
+    "tag": "2.1.0"
   },
   "source_files": [
     "Sources/MarkdownView/*.swift"
