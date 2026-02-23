@@ -7,11 +7,15 @@ import WebKit
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
 open class MarkdownView: UIView {
+  private struct PendingRenderRequest {
+    let markdown: String
+    let enableImage: Bool
+  }
 
   private var webView: WKWebView?
   private var eventBridge: MarkdownEventBridge?
   private var isWebViewLoaded = false
-  private var pendingMarkdown: String?
+  private var pendingRenderRequest: PendingRenderRequest?
 
   private let scriptBuilder = MarkdownScriptBuilder()
   private let webViewFactory = MarkdownWebViewFactory()
@@ -46,8 +50,7 @@ open class MarkdownView: UIView {
       with: MarkdownRenderingConfiguration(
         css: css,
         plugins: plugins,
-        stylesheets: stylesheets,
-        markdown: nil
+        stylesheets: stylesheets
       ),
       styled: styled
     )
@@ -86,26 +89,37 @@ open class MarkdownView: UIView {
       with: MarkdownRenderingConfiguration(
         css: css,
         plugins: plugins,
-        stylesheets: stylesheets,
-        markdown: markdown,
-        enableImage: enableImage
+        stylesheets: stylesheets
       ),
       styled: styled
     )
+    pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
   }
 
   public func show(markdown: String) {
+    render(markdown: markdown, enableImage: true)
+  }
+
+  private func render(markdown: String, enableImage: Bool) {
     guard let webView else { return }
 
     guard isWebViewLoaded else {
-      pendingMarkdown = markdown
+      pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
       return
     }
 
-    let script = scriptBuilder.scriptToShow(markdown: markdown, enableImage: true)
-    webView.evaluateJavaScript(script) { _, error in
-      guard let error else { return }
-      print("[MarkdownView][Error] \(error)")
+    let payload: [String: Any] = [
+      "markdown": markdown,
+      "enableImage": enableImage
+    ]
+    webView.callAsyncJavaScript(
+      "window.renderMarkdown(payload)",
+      arguments: ["payload": payload],
+      in: nil,
+      in: .page
+    ) { result in
+      guard case let .failure(error) = result else { return }
+      print("[MarkdownView][Error] Failed to call window.renderMarkdown: \(error)")
     }
   }
 }
@@ -117,9 +131,9 @@ extension MarkdownView: WKNavigationDelegate {
   public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     isWebViewLoaded = true
 
-    if let markdown = pendingMarkdown {
-      pendingMarkdown = nil
-      show(markdown: markdown)
+    if let request = pendingRenderRequest {
+      pendingRenderRequest = nil
+      render(markdown: request.markdown, enableImage: request.enableImage)
     }
   }
 
@@ -177,6 +191,7 @@ private extension MarkdownView {
   func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration, styled: Bool) {
     webView?.removeFromSuperview()
     isWebViewLoaded = false
+    pendingRenderRequest = nil
 
     let configuration = WKWebViewConfiguration()
     let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)

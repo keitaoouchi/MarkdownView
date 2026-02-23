@@ -262,12 +262,17 @@ markdown.use(emoji);
 
 window.usePlugin = (plugin) => markdown.use(plugin);
 
-window.showMarkdown = (percentEncodedMarkdown, enableImage = true) => {
-  if (!percentEncodedMarkdown) {
+window.renderMarkdown = (payload = {}) => {
+  if (!payload || typeof payload !== "object") {
     return;
   }
 
-  const markdownText = decodeURIComponent(percentEncodedMarkdown);
+  const markdownText = typeof payload.markdown === "string" ? payload.markdown : null;
+  const enableImage = payload.enableImage !== false;
+
+  if (markdownText == null) {
+    return;
+  }
 
   if (!enableImage) {
     markdown = markdown.disable("image");
@@ -301,4 +306,22 @@ window.showMarkdown = (percentEncodedMarkdown, enableImage = true) => {
   });
 
   postDocumentHeight();
+};
+
+window.showMarkdown = (percentEncodedMarkdown, enableImage = true) => {
+  if (typeof percentEncodedMarkdown !== "string") {
+    return;
+  }
+
+  let markdownText = percentEncodedMarkdown;
+  try {
+    markdownText = decodeURIComponent(percentEncodedMarkdown);
+  } catch (_) {
+    markdownText = percentEncodedMarkdown;
+  }
+
+  window.renderMarkdown({
+    markdown: markdownText,
+    enableImage,
+  });
 };

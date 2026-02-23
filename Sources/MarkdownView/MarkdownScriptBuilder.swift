@@ -23,21 +23,7 @@ struct MarkdownScriptBuilder {
       )
     }
 
-    if let markdown = configuration.markdown {
-      let escapedMarkdown = escape(markdown: markdown) ?? ""
-      let imageOption = configuration.enableImage ? "true" : "false"
-      let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
-      controller.addUserScript(
-        WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-      )
-    }
-
     return controller
-  }
-
-  func scriptToShow(markdown: String, enableImage: Bool) -> String {
-    let escapedMarkdown = escape(markdown: markdown) ?? ""
-    return "window.showMarkdown('\(escapedMarkdown)', \(enableImage));"
   }
 
   private func styleScript(_ css: String) -> String {
@@ -68,23 +54,16 @@ struct MarkdownScriptBuilder {
     """
   }
 
-  private func escape(markdown: String) -> String? {
-    markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
-  }
 }
 
 struct MarkdownRenderingConfiguration {
   let css: String?
   let plugins: [String]?
   let stylesheets: [URL]?
-  let markdown: String?
-  let enableImage: Bool
 
-  init(css: String?, plugins: [String]?, stylesheets: [URL]?, markdown: String?, enableImage: Bool = true) {
+  init(css: String?, plugins: [String]?, stylesheets: [URL]?) {
     self.css = css
     self.plugins = plugins
     self.stylesheets = stylesheets
-    self.markdown = markdown
-    self.enableImage = enableImage
   }
 }

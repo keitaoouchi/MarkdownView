@@ -16,7 +16,7 @@ Purpose
   - HTML: styled.html / non_styled.html
     - Role: Base HTML for rendering (toggles between styled and unstyled)
   - JS: main.js
-    - Role: Markdown-to-HTML conversion using markdown-it and highlight.js, provides the window.showMarkdown API, measures height and notifies native side
+    - Role: Markdown-to-HTML conversion using markdown-it and highlight.js, provides the window.renderMarkdown API, measures height and notifies native side
   - CSS: main.css
     - Role: Default styles (applied via styled.html)
 - SwiftUI Layer
@@ -32,7 +32,7 @@ Purpose
 
 2) Markdown Delivery
 - Native code (Swift/SwiftUI) passes a Markdown string to MarkdownView
-- MarkdownView forwards the string to the JS entry point (window.showMarkdown)
+- MarkdownView forwards the string to the JS entry point (`window.renderMarkdown`) as a payload
 
 3) Web-Side Rendering
 - main.js converts Markdown to HTML using markdown-it and highlight.js

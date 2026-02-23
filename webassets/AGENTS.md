@@ -99,11 +99,11 @@ import emoji from "markdown-it-emoji";
 
 ### APIs Exposed on `window`
 
-Called from the iOS Swift side via WKWebView's `evaluateJavaScript`.
+Called from the iOS Swift side via WKWebView's `callAsyncJavaScript`.
 
 | API | Signature | Description |
 |-----|-----------|-------------|
-| `window.showMarkdown` | `(percentEncodedMarkdown: string, enableImage?: boolean) => void` | Receives percent-encoded Markdown and renders it. When `enableImage=false`, images are hidden |
+| `window.renderMarkdown` | `(payload: { markdown: string, enableImage?: boolean }) => void` | Receives a payload object and renders Markdown. When `enableImage=false`, images are hidden |
 | `window.usePlugin` | `(plugin: MarkdownItPlugin) => void` | Public API to register a markdown-it plugin. Allows the Swift side to dynamically add plugins |
 
 ### WKWebView Callback
