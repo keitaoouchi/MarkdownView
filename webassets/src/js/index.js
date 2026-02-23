@@ -240,6 +240,8 @@ const markdownRendererCache = {
   imageEnabled: null,
   imageDisabled: null,
 };
+let heightPostAnimationFrameId = null;
+let lastPostedDocumentHeight = null;
 
 const createMarkdownRenderer = ({ enableImage = true } = {}) => {
   const markdown = new MarkdownIt({
@@ -273,18 +275,39 @@ const getMarkdownRenderer = (enableImage = true) => {
   return markdownRendererCache[cacheKey];
 };
 
-const postDocumentHeight = () => {
+const measureDocumentHeight = () => {
   var _body = document.body;
   var _html = document.documentElement;
-  var height = Math.max(
+  return Math.max(
     _body.scrollHeight,
     _body.offsetHeight,
     _html.clientHeight,
     _html.scrollHeight,
     _html.offsetHeight
   );
-  console.log(height)
+};
+
+const flushDocumentHeight = () => {
+  const height = measureDocumentHeight();
+
+  if (height === lastPostedDocumentHeight) {
+    return;
+  }
+
+  lastPostedDocumentHeight = height;
   window?.webkit?.messageHandlers?.updateHeight?.postMessage(height);
+};
+
+const postDocumentHeight = () => {
+  if (heightPostAnimationFrameId != null) {
+    return;
+  }
+
+  const schedule = window?.requestAnimationFrame ?? ((callback) => setTimeout(callback, 0));
+  heightPostAnimationFrameId = schedule(() => {
+    heightPostAnimationFrameId = null;
+    flushDocumentHeight();
+  });
 };
 
 window.usePlugin = (plugin) => {

@@ -7,6 +7,8 @@ import WebKit
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
 open class MarkdownView: UIView {
+  private static let minimumHeightDeltaToNotify: CGFloat = 0.1
+
   private struct PendingRenderRequest {
     let markdown: String
     let enableImage: Bool
@@ -182,9 +184,15 @@ private extension MarkdownView {
 
   func setupEventBridge() {
     eventBridge = MarkdownEventBridge { [weak self] height in
-      guard height != self?.intrinsicContentHeight else { return }
-      self?.onRendered?(height)
-      self?.intrinsicContentHeight = height
+      guard let self else { return }
+
+      if let currentHeight = self.intrinsicContentHeight,
+         abs(height - currentHeight) < Self.minimumHeightDeltaToNotify {
+        return
+      }
+
+      self.onRendered?(height)
+      self.intrinsicContentHeight = height
     }
   }
 
