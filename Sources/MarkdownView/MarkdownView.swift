@@ -9,6 +9,31 @@ import WebKit
 open class MarkdownView: UIView {
   private static let minimumHeightDeltaToNotify: CGFloat = 0.1
 
+  public struct RenderOptions {
+    public let enableImage: Bool
+
+    public init(enableImage: Bool = true) {
+      self.enableImage = enableImage
+    }
+  }
+
+  public struct ConfigurationOptions {
+    public let css: String?
+    public let plugins: [String]?
+    public let stylesheets: [URL]?
+    public let styled: Bool
+
+    public init(css: String? = nil,
+                plugins: [String]? = nil,
+                stylesheets: [URL]? = nil,
+                styled: Bool = true) {
+      self.css = css
+      self.plugins = plugins
+      self.stylesheets = stylesheets
+      self.styled = styled
+    }
+  }
+
   private struct PendingRenderRequest {
     let markdown: String
     let enableImage: Bool
@@ -45,16 +70,16 @@ open class MarkdownView: UIView {
   /// Reserve a web view before displaying markdown.
   /// You can use this for performance optimization.
   ///
-  /// - Note: `webView` needs complete loading before invoking `show` method.
+  /// - Note: `webView` needs complete loading before invoking `render` method.
   public convenience init(css: String?, plugins: [String]?, stylesheets: [URL]? = nil, styled: Bool = true) {
     self.init(frame: .zero)
-    configureWebView(
-      with: MarkdownRenderingConfiguration(
+    reconfigure(
+      with: ConfigurationOptions(
         css: css,
         plugins: plugins,
-        stylesheets: stylesheets
-      ),
-      styled: styled
+        stylesheets: stylesheets,
+        styled: styled
+      )
     )
   }
 
@@ -78,7 +103,8 @@ open class MarkdownView: UIView {
 
   /// Load markdown with a newly configured webView.
   ///
-  /// If you want to preserve already applied css or plugins, use `show` instead.
+  /// If you want to preserve already applied css or plugins, use `render` instead.
+  @available(*, deprecated, message: "Use reconfigure(...) then render(markdown:options:) instead.")
   @objc public func load(markdown: String?,
                          enableImage: Bool = true,
                          css: String? = nil,
@@ -87,22 +113,52 @@ open class MarkdownView: UIView {
                          styled: Bool = true) {
     guard let markdown else { return }
 
-    configureWebView(
-      with: MarkdownRenderingConfiguration(
+    reconfigure(
+      with: ConfigurationOptions(
         css: css,
         plugins: plugins,
-        stylesheets: stylesheets
-      ),
-      styled: styled
+        stylesheets: stylesheets,
+        styled: styled
+      )
     )
-    pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
+    render(markdown: markdown, options: RenderOptions(enableImage: enableImage))
   }
 
+  @available(*, deprecated, message: "Use render(markdown:options:) instead.")
   public func show(markdown: String) {
-    render(markdown: markdown, enableImage: true)
+    render(markdown: markdown)
   }
 
-  private func render(markdown: String, enableImage: Bool) {
+  public func render(markdown: String, options: RenderOptions = RenderOptions()) {
+    renderMarkdown(markdown: markdown, enableImage: options.enableImage)
+  }
+
+  @objc public func reconfigure(css: String? = nil,
+                                plugins: [String]? = nil,
+                                stylesheets: [URL]? = nil,
+                                styled: Bool = true) {
+    reconfigure(
+      with: ConfigurationOptions(
+        css: css,
+        plugins: plugins,
+        stylesheets: stylesheets,
+        styled: styled
+      )
+    )
+  }
+
+  public func reconfigure(with options: ConfigurationOptions) {
+    configureWebView(
+      with: MarkdownRenderingConfiguration(
+        css: options.css,
+        plugins: options.plugins,
+        stylesheets: options.stylesheets
+      ),
+      styled: options.styled
+    )
+  }
+
+  private func renderMarkdown(markdown: String, enableImage: Bool) {
     guard let webView else { return }
 
     guard isWebViewLoaded else {
@@ -135,7 +191,7 @@ extension MarkdownView: WKNavigationDelegate {
 
     if let request = pendingRenderRequest {
       pendingRenderRequest = nil
-      render(markdown: request.markdown, enableImage: request.enableImage)
+      renderMarkdown(markdown: request.markdown, enableImage: request.enableImage)
     }
   }
 
