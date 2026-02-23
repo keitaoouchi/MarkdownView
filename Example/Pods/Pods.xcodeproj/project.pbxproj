@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -41,37 +41,37 @@
 
 /* Begin PBXFileReference section */
 		0F78601BD08AE9E8D2E374432E93FCE8 /* MarkdownView-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "MarkdownView-prefix.pch"; sourceTree = "<group>"; };
-		11EF9E5EA0652A8BFF6FF64CA4CD5A90 /* styled.html */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.html; name = styled.html; path = Sources/MarkdownView/Resources/styled.html; sourceTree = "<group>"; };
-		1F667CC0E19EAF34E5A4119E2121F585 /* libPods-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		209039795703F925DC2A9D91BF5B7821 /* MarkdownView.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarkdownView.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		23BAF4415D9293051758111BD344D858 /* main.css */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.css; name = main.css; path = Sources/MarkdownView/Resources/main.css; sourceTree = "<group>"; };
+		11EF9E5EA0652A8BFF6FF64CA4CD5A90 /* styled.html */ = {isa = PBXFileReference; includeInIndex = 1; name = styled.html; path = Sources/MarkdownView/Resources/styled.html; sourceTree = "<group>"; };
+		1F667CC0E19EAF34E5A4119E2121F585 /* Pods-Example */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "Pods-Example"; path = "libPods-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		209039795703F925DC2A9D91BF5B7821 /* MarkdownView-MarkdownView */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "MarkdownView-MarkdownView"; path = MarkdownView.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		23BAF4415D9293051758111BD344D858 /* main.css */ = {isa = PBXFileReference; includeInIndex = 1; name = main.css; path = Sources/MarkdownView/Resources/main.css; sourceTree = "<group>"; };
 		2B650BE181D871CCB211B8E816CEDF44 /* MarkdownWebViewFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarkdownWebViewFactory.swift; path = Sources/MarkdownView/MarkdownWebViewFactory.swift; sourceTree = "<group>"; };
 		30F1D4FDC8CAB01CEB8E325B2DE9995E /* MarkdownView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = MarkdownView.release.xcconfig; sourceTree = "<group>"; };
 		36FFE148248D7E94C8BE6128E97F7F11 /* MarkdownUI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarkdownUI.swift; path = Sources/MarkdownView/MarkdownUI.swift; sourceTree = "<group>"; };
-		4085280B663E2043C9AADDBFA2C285AB /* MarkdownView.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = MarkdownView.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		5971380338373498A0FEBC7AFCBB584D /* main.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = main.js; path = Sources/MarkdownView/Resources/main.js; sourceTree = "<group>"; };
-		702CE5644EF1F26425C05E058547C562 /* libMarkdownView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMarkdownView.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4085280B663E2043C9AADDBFA2C285AB /* MarkdownView.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = MarkdownView.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		5971380338373498A0FEBC7AFCBB584D /* main.js */ = {isa = PBXFileReference; includeInIndex = 1; name = main.js; path = Sources/MarkdownView/Resources/main.js; sourceTree = "<group>"; };
+		702CE5644EF1F26425C05E058547C562 /* MarkdownView */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = MarkdownView; path = libMarkdownView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7295811D8C3549E2DEA0D5E1AB3D568D /* MarkdownEventBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarkdownEventBridge.swift; path = Sources/MarkdownView/MarkdownEventBridge.swift; sourceTree = "<group>"; };
-		7AA922494568BD6F2CDB0EFB63AED87D /* non_styled.html */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.html; name = non_styled.html; path = Sources/MarkdownView/Resources/non_styled.html; sourceTree = "<group>"; };
+		7AA922494568BD6F2CDB0EFB63AED87D /* non_styled.html */ = {isa = PBXFileReference; includeInIndex = 1; name = non_styled.html; path = Sources/MarkdownView/Resources/non_styled.html; sourceTree = "<group>"; };
 		823806DF81E40711B6EAB6844BD1D0C1 /* MarkdownView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = MarkdownView.debug.xcconfig; sourceTree = "<group>"; };
 		8390C1797A666D89BE05AA8852B57C3F /* Pods-Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-Example.modulemap"; sourceTree = "<group>"; };
 		8E3451E6F481D3A92D950285A5AFC6BB /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9F445B97B164129DA4460E5F2F7EDF1E /* MarkdownView-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "MarkdownView-dummy.m"; sourceTree = "<group>"; };
 		A17761FCBF0C42D2747F176250E12C3F /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		A95819E4AF87768A19EAA57C9E4C1407 /* MarkdownView-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "MarkdownView-umbrella.h"; sourceTree = "<group>"; };
 		B295B67A3F356ED311F89F5D19D1CE93 /* MarkdownScriptBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarkdownScriptBuilder.swift; path = Sources/MarkdownView/MarkdownScriptBuilder.swift; sourceTree = "<group>"; };
 		B83EFB18FB622C326451E07D8BEC6283 /* ResourceBundle-MarkdownView-MarkdownView-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-MarkdownView-MarkdownView-Info.plist"; sourceTree = "<group>"; };
-		B9118BEB932B521027247F1CEC1A26B6 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		B9118BEB932B521027247F1CEC1A26B6 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
 		BD7866B2B30C313056837B983F1071EB /* Pods-Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Example-resources.sh"; sourceTree = "<group>"; };
 		D3A3284BF44D45546E4E4CF23D46F031 /* MarkdownView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarkdownView.swift; path = Sources/MarkdownView/MarkdownView.swift; sourceTree = "<group>"; };
 		DAD8FC1C05C3A265F0125B44562436CC /* Pods-Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		E502162F64028620AB3116216016E650 /* Pods-Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-Example-umbrella.h"; sourceTree = "<group>"; };
 		E89EEEB0086FB4D9EE3525138230EEF0 /* MarkdownView.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = MarkdownView.modulemap; sourceTree = "<group>"; };
 		EE8D2190D165A86988AB26F8845EFF98 /* Pods-Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Example-dummy.m"; sourceTree = "<group>"; };
-		F0DDFD49F12A56B23C84E66861A48DCB /* Sources_Analysis_Refactor_Plan.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = Sources_Analysis_Refactor_Plan.md; path = docs/Sources_Analysis_Refactor_Plan.md; sourceTree = "<group>"; };
+		F0DDFD49F12A56B23C84E66861A48DCB /* Sources_Analysis_Refactor_Plan.md */ = {isa = PBXFileReference; includeInIndex = 1; name = Sources_Analysis_Refactor_Plan.md; path = docs/Sources_Analysis_Refactor_Plan.md; sourceTree = "<group>"; };
 		F8B6BE4B9407E8BD8A444C214CF884D3 /* Pods-Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Example-acknowledgements.markdown"; sourceTree = "<group>"; };
-		FE8BDB8B8DA3D467B5B6F7D465044C5C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		FE8BDB8B8DA3D467B5B6F7D465044C5C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,9 +140,9 @@
 		80722847CD04FBC12520D8D2AE255A83 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				702CE5644EF1F26425C05E058547C562 /* libMarkdownView.a */,
-				209039795703F925DC2A9D91BF5B7821 /* MarkdownView.bundle */,
-				1F667CC0E19EAF34E5A4119E2121F585 /* libPods-Example.a */,
+				702CE5644EF1F26425C05E058547C562 /* MarkdownView */,
+				209039795703F925DC2A9D91BF5B7821 /* MarkdownView-MarkdownView */,
+				1F667CC0E19EAF34E5A4119E2121F585 /* Pods-Example */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -241,7 +241,7 @@
 			);
 			name = "Pods-Example";
 			productName = "Pods-Example";
-			productReference = 1F667CC0E19EAF34E5A4119E2121F585 /* libPods-Example.a */;
+			productReference = 1F667CC0E19EAF34E5A4119E2121F585 /* Pods-Example */;
 			productType = "com.apple.product-type.library.static";
 		};
 		9CE7BB59885E11A7F43D648F9B1D6D12 /* MarkdownView */ = {
@@ -260,7 +260,7 @@
 			);
 			name = MarkdownView;
 			productName = MarkdownView;
-			productReference = 702CE5644EF1F26425C05E058547C562 /* libMarkdownView.a */;
+			productReference = 702CE5644EF1F26425C05E058547C562 /* MarkdownView */;
 			productType = "com.apple.product-type.library.static";
 		};
 		A04E94702B62931D2A5061F58579BBC4 /* MarkdownView-MarkdownView */ = {
@@ -277,7 +277,7 @@
 			);
 			name = "MarkdownView-MarkdownView";
 			productName = MarkdownView;
-			productReference = 209039795703F925DC2A9D91BF5B7821 /* MarkdownView.bundle */;
+			productReference = 209039795703F925DC2A9D91BF5B7821 /* MarkdownView-MarkdownView */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -286,9 +286,8 @@
 		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 1600;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -299,6 +298,8 @@
 				en,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 80722847CD04FBC12520D8D2AE255A83 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -402,6 +403,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 30F1D4FDC8CAB01CEB8E325B2DE9995E /* MarkdownView.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -432,6 +434,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 823806DF81E40711B6EAB6844BD1D0C1 /* MarkdownView.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -509,7 +512,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -529,7 +531,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -542,6 +544,7 @@
 			baseConfigurationReference = A17761FCBF0C42D2747F176250E12C3F /* Pods-Example.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -567,6 +570,7 @@
 			baseConfigurationReference = 8E3451E6F481D3A92D950285A5AFC6BB /* Pods-Example.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -638,7 +642,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -662,7 +665,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
