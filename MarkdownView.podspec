@@ -7,8 +7,7 @@ Pod::Spec.new do |s|
   s.author        = { "keitaoouchi" => "keita.oouchi@gmail.com" }
   s.source        = { :git => "https://github.com/keitaoouchi/MarkdownView.git", :tag => "#{s.version}" }
   s.source_files  = [
-    "Sources/MarkdownView/MarkdownView.swift",
-    "Sources/MarkdownView/MarkdownUI.swift",
+    "Sources/MarkdownView/*.swift",
   ]
   s.resource_bundles = {
     'MarkdownView' => [

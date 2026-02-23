@@ -26,7 +26,7 @@ struct MarkdownScriptBuilder {
     if let markdown = configuration.markdown {
       let escapedMarkdown = escape(markdown: markdown) ?? ""
       let imageOption = configuration.enableImage ? "true" : "false"
-      let script = "window.showMarkdown('\\(escapedMarkdown)', \\(imageOption));"
+      let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
       controller.addUserScript(
         WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
       )
@@ -37,13 +37,13 @@ struct MarkdownScriptBuilder {
 
   func scriptToShow(markdown: String, enableImage: Bool) -> String {
     let escapedMarkdown = escape(markdown: markdown) ?? ""
-    return "window.showMarkdown('\\(escapedMarkdown)', \\(enableImage));"
+    return "window.showMarkdown('\(escapedMarkdown)', \(enableImage));"
   }
 
   private func styleScript(_ css: String) -> String {
     [
       "var s = document.createElement('style');",
-      "s.innerHTML = `\\(css)`;",
+      "s.innerHTML = `\(css)`;",
       "document.head.appendChild(s);"
     ].joined()
   }
@@ -51,7 +51,7 @@ struct MarkdownScriptBuilder {
   private func linkScript(_ url: URL) -> String {
     [
       "var link = document.createElement('link');",
-      "link.href = '\\(url.absoluteURL)';",
+      "link.href = '\(url.absoluteURL)';",
       "link.rel = 'stylesheet';",
       "document.head.appendChild(link);"
     ].joined()

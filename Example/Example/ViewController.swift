@@ -52,9 +52,16 @@ final class ViewController: UIViewController {
       btn8
     ].forEach { button in
 
-      button.setTitleColor(UIColor.systemBlue, for: .normal)
-      button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-      button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+      var config = UIButton.Configuration.plain()
+      config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+      // Keep title color blue and font 20pt
+      config.baseForegroundColor = .systemBlue
+      let title = AttributedString(button.title(for: .normal) ?? "")
+      var container = AttributeContainer()
+      container.font = .systemFont(ofSize: 20)
+      config.attributedTitle = title.mergingAttributes(container)
+      button.configuration = config
+
       stackView.addArrangedSubview(button)
 
     }
@@ -107,3 +114,4 @@ final class ViewController: UIViewController {
     navigationController?.pushViewController(example, animated: true)
   }
 }
+
