@@ -3,19 +3,53 @@ import WebKit
 
 /**
  Markdown View for iOS.
- 
+
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
 open class MarkdownView: UIView {
+  private static let minimumHeightDeltaToNotify: CGFloat = 0.1
+
+  public struct RenderOptions {
+    public let enableImage: Bool
+
+    public init(enableImage: Bool = true) {
+      self.enableImage = enableImage
+    }
+  }
+
+  public struct ConfigurationOptions {
+    public let css: String?
+    public let plugins: [String]?
+    public let stylesheets: [URL]?
+    public let styled: Bool
+
+    public init(css: String? = nil,
+                plugins: [String]? = nil,
+                stylesheets: [URL]? = nil,
+                styled: Bool = true) {
+      self.css = css
+      self.plugins = plugins
+      self.stylesheets = stylesheets
+      self.styled = styled
+    }
+  }
+
+  private struct PendingRenderRequest {
+    let markdown: String
+    let enableImage: Bool
+  }
 
   private var webView: WKWebView?
-  private var updateHeightHandler: UpdateHeightHandler?
+  private var eventBridge: MarkdownEventBridge?
   private var isWebViewLoaded = false
-  private var pendingMarkdown: String?
-  
+  private var pendingRenderRequest: PendingRenderRequest?
+
+  private let scriptBuilder = MarkdownScriptBuilder()
+  private let webViewFactory = MarkdownWebViewFactory()
+
   private var intrinsicContentHeight: CGFloat? {
     didSet {
-      self.invalidateIntrinsicContentSize()
+      invalidateIntrinsicContentSize()
     }
   }
 
@@ -36,81 +70,114 @@ open class MarkdownView: UIView {
   /// Reserve a web view before displaying markdown.
   /// You can use this for performance optimization.
   ///
-  /// - Note: `webView` needs complete loading before invoking `show` method.
+  /// - Note: `webView` needs complete loading before invoking `render` method.
   public convenience init(css: String?, plugins: [String]?, stylesheets: [URL]? = nil, styled: Bool = true) {
     self.init(frame: .zero)
-    
-    let configuration = WKWebViewConfiguration()
-    configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: nil, enableImage: nil)
-    if let handler = updateHeightHandler {
-      configuration.userContentController.add(handler, name: "updateHeight")
-    }
-    self.webView = makeWebView(with: configuration)
-    self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
+    reconfigure(
+      with: ConfigurationOptions(
+        css: css,
+        plugins: plugins,
+        stylesheets: stylesheets,
+        styled: styled
+      )
+    )
   }
 
-  override init (frame: CGRect) {
-    super.init(frame : frame)
-    
-    let updateHeightHandler = UpdateHeightHandler { [weak self] height in
-      guard height != self?.intrinsicContentHeight else { return }
-      self?.onRendered?(height)
-      self?.intrinsicContentHeight = height
-    }
-    self.updateHeightHandler = updateHeightHandler
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    setupEventBridge()
   }
 
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-
-    let updateHeightHandler = UpdateHeightHandler { [weak self] height in
-      guard height != self?.intrinsicContentHeight else { return }
-      self?.onRendered?(height)
-      self?.intrinsicContentHeight = height
-    }
-    self.updateHeightHandler = updateHeightHandler
+    setupEventBridge()
   }
-}
 
-extension MarkdownView {
   open override var intrinsicContentSize: CGSize {
-    if let height = self.intrinsicContentHeight {
-      return CGSize(width: UIView.noIntrinsicMetric, height: height)
+    if let height = intrinsicContentHeight {
+      CGSize(width: UIView.noIntrinsicMetric, height: height)
     } else {
-      return CGSize.zero
+      .zero
     }
   }
 
   /// Load markdown with a newly configured webView.
   ///
-  /// If you want to preserve already applied css or plugins, use `show` instead.
-  @objc public func load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil, stylesheets: [URL]? = nil, styled: Bool = true) {
-    guard let markdown = markdown else { return }
+  /// If you want to preserve already applied css or plugins, use `render` instead.
+  @available(*, deprecated, message: "Use reconfigure(...) then render(markdown:options:) instead.")
+  @objc public func load(markdown: String?,
+                         enableImage: Bool = true,
+                         css: String? = nil,
+                         plugins: [String]? = nil,
+                         stylesheets: [URL]? = nil,
+                         styled: Bool = true) {
+    guard let markdown else { return }
 
-    self.webView?.removeFromSuperview()
-    self.isWebViewLoaded = false
-    let configuration = WKWebViewConfiguration()
-    configuration.userContentController = makeContentController(css: css, plugins: plugins, stylesheets: stylesheets, markdown: markdown, enableImage: enableImage)
-    if let handler = updateHeightHandler {
-      configuration.userContentController.add(handler, name: "updateHeight")
-    }
-    self.webView = makeWebView(with: configuration)
-    self.webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
+    reconfigure(
+      with: ConfigurationOptions(
+        css: css,
+        plugins: plugins,
+        stylesheets: stylesheets,
+        styled: styled
+      )
+    )
+    render(markdown: markdown, options: RenderOptions(enableImage: enableImage))
   }
-  
+
+  @available(*, deprecated, message: "Use render(markdown:options:) instead.")
   public func show(markdown: String) {
-    guard let webView = webView else { return }
+    render(markdown: markdown)
+  }
+
+  public func render(markdown: String, options: RenderOptions = RenderOptions()) {
+    renderMarkdown(markdown: markdown, enableImage: options.enableImage)
+  }
+
+  @objc public func reconfigure(css: String? = nil,
+                                plugins: [String]? = nil,
+                                stylesheets: [URL]? = nil,
+                                styled: Bool = true) {
+    reconfigure(
+      with: ConfigurationOptions(
+        css: css,
+        plugins: plugins,
+        stylesheets: stylesheets,
+        styled: styled
+      )
+    )
+  }
+
+  public func reconfigure(with options: ConfigurationOptions) {
+    configureWebView(
+      with: MarkdownRenderingConfiguration(
+        css: options.css,
+        plugins: options.plugins,
+        stylesheets: options.stylesheets
+      ),
+      styled: options.styled
+    )
+  }
+
+  private func renderMarkdown(markdown: String, enableImage: Bool) {
+    guard let webView else { return }
 
     guard isWebViewLoaded else {
-      pendingMarkdown = markdown
+      pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
       return
     }
 
-    let escapedMarkdown = self.escape(markdown: markdown) ?? ""
-    let script = "window.showMarkdown('\(escapedMarkdown)', true);"
-    webView.evaluateJavaScript(script) { _, error in
-      guard let error = error else { return }
-      print("[MarkdownView][Error] \(error)")
+    let payload: [String: Any] = [
+      "markdown": markdown,
+      "enableImage": enableImage
+    ]
+    webView.callAsyncJavaScript(
+      "window.renderMarkdown(payload)",
+      arguments: ["payload": payload],
+      in: nil,
+      in: .page
+    ) { result in
+      guard case let .failure(error) = result else { return }
+      print("[MarkdownView][Error] Failed to call window.renderMarkdown: \(error)")
     }
   }
 }
@@ -121,17 +188,19 @@ extension MarkdownView: WKNavigationDelegate {
 
   public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     isWebViewLoaded = true
-    if let markdown = pendingMarkdown {
-      pendingMarkdown = nil
-      show(markdown: markdown)
+
+    if let request = pendingRenderRequest {
+      pendingRenderRequest = nil
+      renderMarkdown(markdown: request.markdown, enableImage: request.enableImage)
     }
   }
 
-  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
+  public func webView(_ webView: WKWebView,
+                      decidePolicyFor navigationAction: WKNavigationAction,
+                      decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     switch navigationAction.navigationType {
     case .linkActivated:
-      if let onTouchLink = onTouchLink, onTouchLink(navigationAction.request) {
+      if let onTouchLink, onTouchLink(navigationAction.request) {
         decisionHandler(.allow)
       } else {
         decisionHandler(.cancel)
@@ -139,62 +208,8 @@ extension MarkdownView: WKNavigationDelegate {
     default:
       decisionHandler(.allow)
     }
-
   }
 }
-
-// MARK: -
-private class UpdateHeightHandler: NSObject, WKScriptMessageHandler {
-  var onUpdate: ((CGFloat) -> Void)
-  
-  init(onUpdate: @escaping (CGFloat) -> Void) {
-    self.onUpdate = onUpdate
-  }
-  
-  public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-    switch message.name {
-    default:
-      if let height = message.body as? CGFloat {
-        self.onUpdate(height)
-      }
-    }
-  }
-}
-
-// MARK: - Scripts
-
-private extension MarkdownView {
-  
-  func styleScript(_ css: String) -> String {
-    [
-      "var s = document.createElement('style');",
-      "s.innerHTML = `\(css)`;",
-      "document.head.appendChild(s);"
-    ].joined()
-  }
-  
-  func linkScript(_ url: URL) -> String {
-    [
-      "var link = document.createElement('link');",
-      "link.href = '\(url.absoluteURL)';",
-      "link.rel = 'stylesheet';",
-      "document.head.appendChild(link);"
-    ].joined()
-  }
-  
-  func usePluginScript(_ pluginBody: String) -> String {
-    """
-      var _module = {};
-      var _exports = {};
-      (function(module, exports) {
-        \(pluginBody)
-      })(_module, _exports);
-      window.usePlugin(_module.exports || _exports);
-    """
-  }
-}
-
-// MARK: - Misc
 
 private extension MarkdownView {
   static var styledHtmlUrl: URL = {
@@ -205,11 +220,11 @@ private extension MarkdownView {
     #endif
     return bundle.url(forResource: "styled",
                       withExtension: "html") ??
-            bundle.url(forResource: "styled",
-                      withExtension: "html",
-                      subdirectory: "MarkdownView.bundle")!
+      bundle.url(forResource: "styled",
+                 withExtension: "html",
+                 subdirectory: "MarkdownView.bundle")!
   }()
-  
+
   static var nonStyledHtmlUrl: URL = {
     #if SWIFT_PACKAGE
     let bundle = Bundle.module
@@ -218,61 +233,41 @@ private extension MarkdownView {
     #endif
     return bundle.url(forResource: "non_styled",
                       withExtension: "html") ??
-            bundle.url(forResource: "non_styled",
-                      withExtension: "html",
-                      subdirectory: "MarkdownView.bundle")!
+      bundle.url(forResource: "non_styled",
+                 withExtension: "html",
+                 subdirectory: "MarkdownView.bundle")!
   }()
 
-  func escape(markdown: String) -> String? {
-    return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
+  func setupEventBridge() {
+    eventBridge = MarkdownEventBridge { [weak self] height in
+      guard let self else { return }
+
+      if let currentHeight = self.intrinsicContentHeight,
+         abs(height - currentHeight) < Self.minimumHeightDeltaToNotify {
+        return
+      }
+
+      self.onRendered?(height)
+      self.intrinsicContentHeight = height
+    }
   }
 
-  func makeWebView(with configuration: WKWebViewConfiguration) -> WKWebView {
-    let wv = WKWebView(frame: self.bounds, configuration: configuration)
-    wv.scrollView.isScrollEnabled = self.isScrollEnabled
-    wv.translatesAutoresizingMaskIntoConstraints = false
-    wv.navigationDelegate = self
-    addSubview(wv)
-    wv.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-    wv.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-    wv.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-    wv.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-    wv.isOpaque = false
-    wv.backgroundColor = .clear
-    wv.scrollView.backgroundColor = .clear
-    return wv
-  }
-  
-  func makeContentController(css: String?,
-                             plugins: [String]?,
-                             stylesheets: [URL]?,
-                             markdown: String?,
-                             enableImage: Bool?) -> WKUserContentController {
-    let controller = WKUserContentController()
-    
-    if let css = css {
-      let styleInjection = WKUserScript(source: styleScript(css), injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-      controller.addUserScript(styleInjection)
-    }
-    
-    plugins?.forEach({ plugin in
-      let scriptInjection = WKUserScript(source: usePluginScript(plugin), injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-      controller.addUserScript(scriptInjection)
-    })
-    
-    stylesheets?.forEach({ url in
-      let linkInjection = WKUserScript(source: linkScript(url), injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-      controller.addUserScript(linkInjection)
-    })
-    
-    if let markdown = markdown {
-      let escapedMarkdown = self.escape(markdown: markdown) ?? ""
-      let imageOption = (enableImage ?? true) ? "true" : "false"
-      let script = "window.showMarkdown('\(escapedMarkdown)', \(imageOption));"
-      let userScript = WKUserScript(source: script, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-      controller.addUserScript(userScript)
-    }
+  func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration, styled: Bool) {
+    webView?.removeFromSuperview()
+    isWebViewLoaded = false
+    pendingRenderRequest = nil
 
-    return controller
+    let configuration = WKWebViewConfiguration()
+    let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)
+    eventBridge?.attach(to: contentController)
+    configuration.userContentController = contentController
+
+    webView = webViewFactory.makeWebView(
+      with: configuration,
+      in: self,
+      scrollEnabled: isScrollEnabled,
+      navigationDelegate: self
+    )
+    webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
   }
 }

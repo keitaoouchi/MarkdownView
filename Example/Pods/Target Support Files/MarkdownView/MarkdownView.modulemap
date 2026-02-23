@@ -1,0 +1,6 @@
+module MarkdownView {
+  umbrella header "MarkdownView-umbrella.h"
+
+  export *
+  module * { export * }
+}

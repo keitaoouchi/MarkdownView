@@ -41,6 +41,10 @@ final class ViewController: UIViewController {
     btn8.setTitle("SwiftUI", for: .normal)
     btn8.addTarget(self, action: #selector(openSampleUI(sender:)), for: .touchUpInside)
 
+    let btn9 = UIButton()
+    btn9.setTitle("SwiftUI List", for: .normal)
+    btn9.addTarget(self, action: #selector(openSampleListUI(sender:)), for: .touchUpInside)
+
     [
       btn1,
       btn2,
@@ -49,12 +53,20 @@ final class ViewController: UIViewController {
       btn5,
       btn6,
       btn7,
-      btn8
+      btn8,
+      btn9
     ].forEach { button in
 
-      button.setTitleColor(UIColor.systemBlue, for: .normal)
-      button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-      button.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+      var config = UIButton.Configuration.plain()
+      config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+      // Keep title color blue and font 20pt
+      config.baseForegroundColor = .systemBlue
+      let title = AttributedString(button.title(for: .normal) ?? "")
+      var container = AttributeContainer()
+      container.font = .systemFont(ofSize: 20)
+      config.attributedTitle = title.mergingAttributes(container)
+      button.configuration = config
+
       stackView.addArrangedSubview(button)
 
     }
@@ -104,6 +116,11 @@ final class ViewController: UIViewController {
   
   @objc func openSampleUI(sender: Any) {
     let example = UIHostingController(rootView: SampleUI())
+    navigationController?.pushViewController(example, animated: true)
+  }
+
+  @objc func openSampleListUI(sender: Any) {
+    let example = UIHostingController(rootView: SampleListUI())
     navigationController?.pushViewController(example, animated: true)
   }
 }

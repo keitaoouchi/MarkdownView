@@ -41,6 +41,6 @@ public struct MarkdownUI: UIViewRepresentable {
   public func updateUIView(_ uiView: MarkdownView, context: Context) {
     uiView.onTouchLink = onTouchLinkHandler
     uiView.onRendered = onRenderedHandler
-    uiView.show(markdown: body)
+    uiView.render(markdown: body)
   }
 }

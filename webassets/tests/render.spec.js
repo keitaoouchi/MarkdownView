@@ -105,6 +105,24 @@ test('enableImage=false で画像が除去される', async ({ page }) => {
   await expect(page.locator('#contents img')).toHaveCount(0);
 });
 
+test('enableImage=false の後でも enableImage=true で画像がレンダリングされる', async ({ page }) => {
+  const md = '![alt](https://example.com/img.png)';
+  await page.evaluate((md) => window.showMarkdown(md, false), encode(md));
+  await expect(page.locator('#contents img')).toHaveCount(0);
+
+  await page.evaluate((md) => window.showMarkdown(md, true), encode(md));
+  await expect(page.locator('#contents img')).toHaveCount(1);
+});
+
+test('enableImage=true の後に enableImage=false を呼ぶと画像が除去される', async ({ page }) => {
+  const md = '![alt](https://example.com/img.png)';
+  await page.evaluate((md) => window.showMarkdown(md, true), encode(md));
+  await expect(page.locator('#contents img')).toHaveCount(1);
+
+  await page.evaluate((md) => window.showMarkdown(md, false), encode(md));
+  await expect(page.locator('#contents img')).toHaveCount(0);
+});
+
 // --- webkit 高さ通知 ---
 
 test('showMarkdown 呼び出し後に updateHeight が通知される', async ({ page }) => {
