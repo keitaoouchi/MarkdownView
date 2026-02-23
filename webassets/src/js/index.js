@@ -246,9 +246,6 @@ const createMarkdownRenderer = ({ enableImage = true } = {}) => {
     html: true,
     breaks: true,
     linkify: true,
-    highlight: function (code) {
-      return hljs.highlightAuto(code).value;
-    },
   });
 
   markdown.use(emoji);
