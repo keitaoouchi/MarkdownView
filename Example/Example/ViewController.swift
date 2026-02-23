@@ -41,6 +41,10 @@ final class ViewController: UIViewController {
     btn8.setTitle("SwiftUI", for: .normal)
     btn8.addTarget(self, action: #selector(openSampleUI(sender:)), for: .touchUpInside)
 
+    let btn9 = UIButton()
+    btn9.setTitle("SwiftUI List", for: .normal)
+    btn9.addTarget(self, action: #selector(openSampleListUI(sender:)), for: .touchUpInside)
+
     [
       btn1,
       btn2,
@@ -49,7 +53,8 @@ final class ViewController: UIViewController {
       btn5,
       btn6,
       btn7,
-      btn8
+      btn8,
+      btn9
     ].forEach { button in
 
       var config = UIButton.Configuration.plain()
@@ -113,5 +118,9 @@ final class ViewController: UIViewController {
     let example = UIHostingController(rootView: SampleUI())
     navigationController?.pushViewController(example, animated: true)
   }
-}
 
+  @objc func openSampleListUI(sender: Any) {
+    let example = UIHostingController(rootView: SampleListUI())
+    navigationController?.pushViewController(example, animated: true)
+  }
+}
