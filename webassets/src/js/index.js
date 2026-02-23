@@ -235,14 +235,46 @@ hljs.registerLanguage('x86asm', x86asm);
 hljs.registerLanguage('xml', xml);
 hljs.registerLanguage('yaml', yaml);
 
-let markdown = new MarkdownIt({
-  html: true,
-  breaks: true,
-  linkify: true,
-  highlight: function (code) {
-    return hljs.highlightAuto(code).value;
-  },
-});
+const registeredPlugins = [];
+const markdownRendererCache = {
+  imageEnabled: null,
+  imageDisabled: null,
+};
+
+const createMarkdownRenderer = ({ enableImage = true } = {}) => {
+  const markdown = new MarkdownIt({
+    html: true,
+    breaks: true,
+    linkify: true,
+    highlight: function (code) {
+      return hljs.highlightAuto(code).value;
+    },
+  });
+
+  markdown.use(emoji);
+  registeredPlugins.forEach((plugin) => markdown.use(plugin));
+
+  if (!enableImage) {
+    markdown.disable("image");
+  }
+
+  return markdown;
+};
+
+const resetMarkdownRendererCache = () => {
+  markdownRendererCache.imageEnabled = null;
+  markdownRendererCache.imageDisabled = null;
+};
+
+const getMarkdownRenderer = (enableImage = true) => {
+  const cacheKey = enableImage ? "imageEnabled" : "imageDisabled";
+
+  if (markdownRendererCache[cacheKey] == null) {
+    markdownRendererCache[cacheKey] = createMarkdownRenderer({ enableImage });
+  }
+
+  return markdownRendererCache[cacheKey];
+};
 
 const postDocumentHeight = () => {
   var _body = document.body;
@@ -258,9 +290,10 @@ const postDocumentHeight = () => {
   window?.webkit?.messageHandlers?.updateHeight?.postMessage(height);
 };
 
-markdown.use(emoji);
-
-window.usePlugin = (plugin) => markdown.use(plugin);
+window.usePlugin = (plugin) => {
+  registeredPlugins.push(plugin);
+  resetMarkdownRendererCache();
+};
 
 window.renderMarkdown = (payload = {}) => {
   if (!payload || typeof payload !== "object") {
@@ -274,11 +307,8 @@ window.renderMarkdown = (payload = {}) => {
     return;
   }
 
-  if (!enableImage) {
-    markdown = markdown.disable("image");
-  }
-
-  let html = markdown.render(markdownText);
+  const markdownRenderer = getMarkdownRenderer(enableImage);
+  let html = markdownRenderer.render(markdownText);
 
   document.getElementById("contents").innerHTML = html;
 
