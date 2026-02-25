@@ -56,7 +56,8 @@ pod "MarkdownView"
 import MarkdownView
 
 let md = MarkdownView()
-md.load(markdown: "# Hello World!")
+md.reconfigure()
+md.render(markdown: "# Hello World!")
 ```
 
 ### SwiftUI
@@ -89,8 +90,8 @@ struct ContentView: View {
 
 | Signature | Description |
 |-----------|-------------|
-| `init()` | Creates a view with default settings. Call `load(markdown:)` to render content. |
-| `init(css: String?, plugins: [String]?, stylesheets: [URL]? = nil, styled: Bool = true)` | Pre-configures a web view with CSS, plugins, and stylesheets. Use with `show(markdown:)` for efficient updates. |
+| `init()` | Creates a view with default settings. Call `reconfigure()` then `render(markdown:)` to display content. |
+| `init(css: String?, plugins: [String]?, stylesheets: [URL]? = nil, styled: Bool = true)` | Pre-configures a web view with CSS, plugins, and stylesheets. Use with `render(markdown:)` for efficient updates. |
 | `init?(coder: NSCoder)` | Interface Builder support. |
 
 #### Properties
@@ -106,10 +107,13 @@ struct ContentView: View {
 
 | Signature | Description |
 |-----------|-------------|
-| `load(markdown: String?, enableImage: Bool = true, css: String? = nil, plugins: [String]? = nil, stylesheets: [URL]? = nil, styled: Bool = true)` | Loads Markdown by creating a new web view. Use this for one-shot rendering or when you need to change CSS/plugins. |
-| `show(markdown: String)` | Updates the Markdown content on the existing web view. Requires prior initialization with `init(css:plugins:stylesheets:styled:)`. More efficient than `load` for repeated updates. |
+| `reconfigure(css: String? = nil, plugins: [String]? = nil, stylesheets: [URL]? = nil, styled: Bool = true)` | Creates (or recreates) the internal web view with the given CSS, plugins, and stylesheets. |
+| `reconfigure(with: ConfigurationOptions)` | Same as above using a `ConfigurationOptions` struct. |
+| `render(markdown: String, options: RenderOptions = RenderOptions())` | Renders Markdown on the current web view. If the web view is still loading, the request is queued and executed automatically when ready. |
 
-**`load` vs `show`:** `load` recreates the web view on every call and accepts inline configuration. `show` reuses the existing web view, making it the better choice when displaying dynamic content that changes frequently.
+**`reconfigure` vs `render`:** `reconfigure` sets up the web view and styling. `render` sends Markdown to the already-configured web view. For dynamic content that changes frequently, call `reconfigure` once and then `render` for each update.
+
+> **Deprecated:** `load(markdown:...)` and `show(markdown:)` still work but are deprecated. Use `reconfigure` + `render` instead.
 
 ### MarkdownUI (SwiftUI)
 
@@ -152,7 +156,7 @@ Inject a CSS string to override the default styles:
 // UIKit
 let css = "body { background-color: #f0f0f0; } code { font-size: 14px; }"
 let md = MarkdownView(css: css, plugins: nil)
-md.show(markdown: "# Styled content")
+md.render(markdown: "# Styled content")
 
 // SwiftUI
 MarkdownUI(body: "# Styled content", css: "body { background-color: #f0f0f0; }")
@@ -167,7 +171,7 @@ Add [markdown-it](https://markdown-it.github.io/) compatible plugins by passing 
 ```swift
 let katexPlugin = try! String(contentsOfFile: Bundle.main.path(forResource: "katex", ofType: "js")!)
 let md = MarkdownView(css: nil, plugins: [katexPlugin])
-md.show(markdown: "Inline math: $E = mc^2$")
+md.render(markdown: "Inline math: $E = mc^2$")
 ```
 
 See [Example/Example/ViewController/Plugins.swift](https://github.com/keitaoouchi/MarkdownView/blob/master/Example/Example/ViewController/Plugins.swift) for a full example, and the [sample plugin project](https://github.com/keitaoouchi/markdownview-sample-plugin) for building a compatible plugin library.
@@ -179,7 +183,7 @@ Load CSS from remote URLs:
 ```swift
 let url = URL(string: "https://example.com/custom.css")!
 let md = MarkdownView(css: nil, plugins: nil, stylesheets: [url])
-md.show(markdown: "# Remote-styled content")
+md.render(markdown: "# Remote-styled content")
 ```
 
 ### Styled vs Non-Styled Mode

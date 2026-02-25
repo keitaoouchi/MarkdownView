@@ -164,8 +164,7 @@ reliably preserve `window` properties.
 ### Test Prerequisites
 
 - A built `main.js` must exist (via `npm run build`)
-- A Playwright-compatible Chromium must be present at `/root/.cache/ms-playwright/`
-  (`npx playwright install` may fail in network-restricted environments)
+- Playwright browsers must be installed (`npx playwright install`; may fail in network-restricted environments)
 
 ---
 
