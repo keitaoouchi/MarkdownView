@@ -9,14 +9,7 @@ Pod::Spec.new do |s|
   s.source_files  = [
     "Sources/MarkdownView/*.swift",
   ]
-  s.resource_bundles = {
-    'MarkdownView' => [
-      'Sources/MarkdownView/Resources/styled.html',
-      'Sources/MarkdownView/Resources/non_styled.html',
-      'Sources/MarkdownView/Resources/main.css',
-      'Sources/MarkdownView/Resources/main.js'
-    ]
-  }
+  s.resources = "**/styled.html", "**/non_styled.html", "**/main.css", "**/main.js"
   s.frameworks    = "Foundation"
   s.ios.deployment_target = "16.0"
   s.swift_version = '5.0'
