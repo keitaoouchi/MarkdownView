@@ -1,0 +1,22 @@
+included:
+  - Sources
+  - Example
+
+excluded:
+  - webassets
+
+function_body_length:
+  warning: 61
+  error: 100
+
+line_length:
+  warning: 195
+  error: 200
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 2
+  max_length:
+    warning: 40
+    error: 40

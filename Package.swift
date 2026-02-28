@@ -5,13 +5,13 @@ import PackageDescription
 let package = Package(
     name: "MarkdownView",
     platforms: [
-        .iOS(.v16),
+        .iOS(.v16)
     ],
     products: [
         .library(
             name: "MarkdownView",
             targets: ["MarkdownView"]
-        ),
+        )
     ],
     targets: [
         .target(
