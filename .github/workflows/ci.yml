@@ -69,3 +69,31 @@ jobs:
             -scheme MarkdownView \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
+
+  snapshot:
+    name: Example (Snapshot Tests)
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: Run snapshot tests
+        run: |
+          xcodebuild test \
+            -project Example/Example.xcodeproj \
+            -scheme Example \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
+            -only-testing:ExampleSnapshotTests \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload failure diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-failures
+          path: Example/ExampleSnapshotTests/__Snapshots__
