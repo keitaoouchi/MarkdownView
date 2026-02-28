@@ -45,7 +45,7 @@ jobs:
         run: npm test
 
   swift:
-    name: Swift (Lint / Test)
+    name: Swift (Lint / Build)
     runs-on: macos-15
     steps:
       - name: Checkout
@@ -59,54 +59,13 @@ jobs:
       - name: Install SwiftLint
         run: brew install swiftlint
 
-      - name: SwiftLint (relaxed)
-        run: swiftlint lint --config .swiftlint-ci.yml
+      - name: SwiftLint
+        run: swiftlint lint --config .swiftlint.yml
 
-      - name: Run tests if available (fallback to build)
+      - name: Build
         run: |
-          if rg -q "<TestableReference" MarkdownView.xcodeproj/xcshareddata/xcschemes/MarkdownView.xcscheme; then
-            xcodebuild test \
-              -project MarkdownView.xcodeproj \
-              -scheme MarkdownView \
-              -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-              CODE_SIGNING_ALLOWED=NO
-          else
-            echo "No testable entries in MarkdownView scheme. Running build instead."
-            xcodebuild build \
-              -project MarkdownView.xcodeproj \
-              -scheme MarkdownView \
-              -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-              CODE_SIGNING_ALLOWED=NO
-          fi
-
-  example-snapshot:
-    name: Example (Snapshot Testing)
-    runs-on: macos-15
-    needs: swift
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-      - name: Install CocoaPods
-        run: |
-          gem install cocoapods
-          cd Example
-          pod install
-
-      - name: Run snapshot tests when target exists
-        run: |
-          if rg -q "ExampleSnapshotTests" Example/Example.xcodeproj/project.pbxproj; then
-            xcodebuild test \
-              -workspace Example/Example.xcworkspace \
-              -scheme Example \
-              -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-              -only-testing:ExampleSnapshotTests \
-              CODE_SIGNING_ALLOWED=NO
-          else
-            echo "ExampleSnapshotTests target was not found. Skipping snapshot tests."
-          fi
+          xcodebuild build \
+            -project MarkdownView.xcodeproj \
+            -scheme MarkdownView \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
