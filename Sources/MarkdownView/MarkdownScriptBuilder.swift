@@ -61,9 +61,4 @@ struct MarkdownRenderingConfiguration {
   let plugins: [String]?
   let stylesheets: [URL]?
 
-  init(css: String?, plugins: [String]?, stylesheets: [URL]?) {
-    self.css = css
-    self.plugins = plugins
-    self.stylesheets = stylesheets
-  }
 }

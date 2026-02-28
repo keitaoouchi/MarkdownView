@@ -34,6 +34,7 @@ disabled_rules:
   - type_name
   - vertical_whitespace
   - weak_delegate
-  - redundant_optional_initialization
+  - implicit_optional_initialization
   - redundant_string_enum_value
   - switch_case_alignment
+  - unneeded_synthesized_initializer

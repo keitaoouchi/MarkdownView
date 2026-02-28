@@ -59,9 +59,6 @@ jobs:
       - name: Install SwiftLint
         run: brew install swiftlint
 
-      - name: SwiftLint autocorrect
-        run: swiftlint --fix --config .swiftlint-ci.yml
-
       - name: SwiftLint (relaxed)
         run: swiftlint lint --config .swiftlint-ci.yml
 
