@@ -61,7 +61,7 @@ Purpose
 ## Platform / Distribution
 
 - Target: iOS 16+
-- Distribution: Swift Package Manager / CocoaPods
+- Distribution: Swift Package Manager
 - Bundle: HTML/CSS/JS are included as package Resources
 
 This document covers only the roles of components and their connection points. For specific API names and internal implementation, refer to the source files (MarkdownView.swift, MarkdownUI.swift, MarkdownScriptBuilder.swift, MarkdownEventBridge.swift, MarkdownWebViewFactory.swift, Resources).

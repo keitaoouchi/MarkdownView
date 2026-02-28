@@ -1,8 +1,6 @@
 # MarkdownView
 
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg?style=flat)](https://swift.org/)
-[![Version](https://img.shields.io/cocoapods/v/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
-[![License](https://img.shields.io/cocoapods/l/MarkdownView.svg?style=flat)](http://cocoapods.org/pods/MarkdownView)
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 
 A WKWebView-based Markdown renderer for iOS. Converts Markdown to HTML using [markdown-it](https://markdown-it.github.io/) with syntax highlighting by [highlight.js](https://highlightjs.org/).
@@ -30,7 +28,7 @@ A WKWebView-based Markdown renderer for iOS. Converts Markdown to HTML using [ma
 
 ## Installation
 
-MarkdownView is available through [Swift Package Manager](https://swift.org/package-manager/) or [CocoaPods](http://cocoapods.org).
+MarkdownView is available through [Swift Package Manager](https://swift.org/package-manager/).
 
 ### Swift Package Manager
 
@@ -41,12 +39,6 @@ dependencies: [
 ```
 
 Alternatively, you can add the package directly via Xcode (File > Add Package Dependencies).
-
-### CocoaPods
-
-```ruby
-pod "MarkdownView"
-```
 
 ## Quick Start
 
