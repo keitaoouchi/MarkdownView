@@ -232,7 +232,9 @@ extension MarkdownView: WKNavigationDelegate {
     }
 }
 
-private extension MarkdownView {
+// MARK: - Resources
+
+extension MarkdownView {
     static let styledHtmlString: String = loadResource(name: "styled", ext: "html")
     static let nonStyledHtmlString: String = loadResource(name: "non_styled", ext: "html")
     static let extendedLanguagesJs: String = loadResource(name: "main", ext: "js")
@@ -247,6 +249,9 @@ private extension MarkdownView {
             ?? bundle.url(forResource: name, withExtension: ext, subdirectory: "MarkdownView.bundle")!
         return (try? String(contentsOf: url)) ?? ""
     }
+}
+
+private extension MarkdownView {
 
     func setupEventBridge() {
         eventBridge = MarkdownEventBridge { [weak self] height in
@@ -273,6 +278,39 @@ private extension MarkdownView {
         currentRenderingConfiguration = renderingConfiguration
         currentStyledFlag = styled
 
+        // B-2: Try to dequeue a pre-warmed WebView from the pool
+        if let pooledWebView = MarkdownWebViewPool.shared.dequeue(styled: styled) {
+            pooledWebView.translatesAutoresizingMaskIntoConstraints = false
+            pooledWebView.navigationDelegate = self
+            pooledWebView.scrollView.isScrollEnabled = isScrollEnabled
+            addSubview(pooledWebView)
+            NSLayoutConstraint.activate([
+                pooledWebView.topAnchor.constraint(equalTo: topAnchor),
+                pooledWebView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                pooledWebView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                pooledWebView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            ])
+            webView = pooledWebView
+
+            // Inject CSS/plugins via evaluateJavaScript (since pooled WebViews use default config)
+            let scripts = scriptBuilder.makeScriptStrings(configuration: renderingConfiguration)
+            for script in scripts {
+                pooledWebView.evaluateJavaScript(script, completionHandler: nil)
+            }
+
+            // Attach event bridge to pooled WebView's content controller
+            eventBridge?.attach(to: pooledWebView.configuration.userContentController)
+
+            isWebViewLoaded = true
+
+            // If initial markdown is provided, render immediately
+            if let initialMarkdown {
+                renderMarkdown(markdown: initialMarkdown, enableImage: enableImage)
+            }
+            return
+        }
+
+        // Standard path: create a new WebView
         let configuration = WKWebViewConfiguration()
         configuration.processPool = Self.sharedProcessPool
         let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)

@@ -26,6 +26,24 @@ struct MarkdownScriptBuilder {
         return controller
     }
 
+    func makeScriptStrings(configuration: MarkdownRenderingConfiguration) -> [String] {
+        var scripts: [String] = []
+
+        if let css = configuration.css {
+            scripts.append(styleScript(css))
+        }
+
+        configuration.plugins?.forEach { plugin in
+            scripts.append(usePluginScript(plugin))
+        }
+
+        configuration.stylesheets?.forEach { url in
+            scripts.append(linkScript(url))
+        }
+
+        return scripts
+    }
+
     private func styleScript(_ css: String) -> String {
         [
             "var s = document.createElement('style');",
