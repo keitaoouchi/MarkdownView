@@ -9,25 +9,25 @@ final class ExampleSnapshotTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-//        isRecording = true
+        isRecording = true
     }
 
     func testCodeOnlySample() {
         let vc = CodeOnlySampleViewController()
         waitForRendering(of: vc)
-        assertSnapshot(of: vc, as: .image(on: .iPhone16Pro))
+        assertSnapshot(of: vc, as: .image(on: .iPhone17Pro))
     }
 
     func testCustomCssSample() {
         let vc = CustomCssSampleViewController()
         waitForRendering(of: vc)
-        assertSnapshot(of: vc, as: .image(on: .iPhone16Pro))
+        assertSnapshot(of: vc, as: .image(on: .iPhone17Pro))
     }
 
     func testSampleUI() {
         let vc = UIHostingController(rootView: SampleUI())
         waitForRendering(of: vc)
-        assertSnapshot(of: vc, as: .image(on: .iPhone16Pro))
+        assertSnapshot(of: vc, as: .image(on: .iPhone17Pro))
     }
 }
 
@@ -36,7 +36,7 @@ final class ExampleSnapshotTests: XCTestCase {
 private extension ExampleSnapshotTests {
 
     func waitForRendering(of viewController: UIViewController, timeout: TimeInterval = 10) {
-        let size = CGSize(width: 393, height: 852)
+        let size = CGSize(width: 402, height: 874)
         let window = UIWindow(frame: CGRect(origin: .zero, size: size))
         window.rootViewController = viewController
         window.makeKeyAndVisible()
@@ -77,9 +77,9 @@ private extension ExampleSnapshotTests {
 }
 
 private extension ViewImageConfig {
-    static let iPhone16Pro = ViewImageConfig(
+    static let iPhone17Pro = ViewImageConfig(
         safeArea: UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0),
-        size: CGSize(width: 393, height: 852),
+        size: CGSize(width: 402, height: 874),
         traits: UITraitCollection(traitsFrom: [
             .init(forceTouchCapability: .unavailable),
             .init(layoutDirection: .leftToRight),

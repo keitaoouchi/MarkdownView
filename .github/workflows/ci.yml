@@ -72,7 +72,7 @@ jobs:
 
   snapshot:
     name: Example (Snapshot Tests)
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,14 +80,14 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.2'
 
       - name: Run snapshot tests
         run: |
           xcodebuild test \
             -project Example/Example.xcodeproj \
             -scheme Example \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
             -only-testing:ExampleSnapshotTests \
             CODE_SIGNING_ALLOWED=NO
 
