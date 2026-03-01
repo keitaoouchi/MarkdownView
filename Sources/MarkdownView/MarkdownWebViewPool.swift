@@ -89,10 +89,7 @@ public final class MarkdownWebViewPool: @unchecked Sendable {
         }
         lock.unlock()
 
-        let configuration = WKWebViewConfiguration()
-        configuration.processPool = MarkdownView.sharedProcessPool
-
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+        let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear

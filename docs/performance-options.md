@@ -61,22 +61,11 @@
 
 Maintain WKWebView-based architecture while systematically addressing known bottlenecks.
 
-#### B-1. Shared WKProcessPool + Configuration Reuse
+#### ~~B-1. Shared WKProcessPool + Configuration Reuse~~ (Removed)
 
-Share a static `WKProcessPool` across all instances to reduce WebContent process startup cost.
-
-```swift
-// Current: each reconfigure() creates a new WKWebViewConfiguration with its own process
-// Proposed: share a single process pool
-private static let sharedProcessPool = WKProcessPool()
-
-// In configureWebView():
-configuration.processPool = Self.sharedProcessPool
-```
-
-- **Impact:** Without shared pool, each WKWebView can consume 200+ MB. Shared pool significantly reduces memory. Also reduces process creation overhead when multiple MarkdownViews are used simultaneously.
-- **Caveat:** Web views sharing a pool also share cookies, local storage, and session data. For this library's use case (local Markdown rendering only), this is a non-issue.
-- **Implementation cost:** Low (few lines of code)
+> `WKProcessPool` is [deprecated as of iOS 15.0](https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKProcessPool.h):
+> *"Creating and using multiple instances of WKProcessPool no longer has any effect."*
+> Since this library targets iOS 16+, WebKit manages process pooling automatically. No action needed.
 
 #### B-2. WKWebView Pre-warming (Pooling)
 
@@ -355,7 +344,7 @@ Maintain current architecture and stack improvements in order of effort-to-impac
 
 | Priority | Measure | Effect | Cost | Benefit scope |
 |---|---|---|---|---|
-| **1** | B-1: Shared ProcessPool | Reduce WKWebView memory and startup cost | Low | All iOS versions |
+| ~~1~~ | ~~B-1: Shared ProcessPool~~ | ~~Removed — WKProcessPool deprecated since iOS 15~~ | — | — |
 | **2** | B-5: Embed initial markdown in HTML load | Eliminate one async round-trip on first render | Low | All iOS versions |
 | **3** | B-4: Inline HTML/JS/CSS | Eliminate file I/O; single atomic load | Low-Medium | All iOS versions |
 | **4** | B-3: JS bundle optimization (hljs lazy-load) | Reduce initial ~715KB → ~200KB; faster JS parse | Medium | All iOS versions |

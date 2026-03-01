@@ -7,7 +7,6 @@ import WebKit
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
 open class MarkdownView: UIView {
-    static let sharedProcessPool = WKProcessPool()
     private static let minimumHeightDeltaToNotify: CGFloat = 0.1
 
     public struct RenderOptions {
@@ -312,7 +311,6 @@ private extension MarkdownView {
 
         // Standard path: create a new WebView
         let configuration = WKWebViewConfiguration()
-        configuration.processPool = Self.sharedProcessPool
         let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)
         eventBridge?.attach(to: contentController)
         configuration.userContentController = contentController

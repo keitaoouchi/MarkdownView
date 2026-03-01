@@ -43,53 +43,11 @@ MarkdownView.reconfigure()
 
 ---
 
-## B-1: Shared WKProcessPool + Configuration Reuse
+## ~~B-1: Shared WKProcessPool + Configuration Reuse~~ (Removed)
 
-### Problem
-
-Each call to `reconfigure()` creates a new `WKWebViewConfiguration()` with an implicit new `WKProcessPool`. Each WKProcessPool spawns a separate WebContent process (100-200+ MB). Multiple `MarkdownView` instances in a List multiply this cost.
-
-### Design
-
-Add a static shared `WKProcessPool` to `MarkdownView` and apply it to every configuration.
-
-### Changes
-
-**File: `MarkdownView.swift`**
-
-```swift
-// Add at class level (after line 10):
-private static let sharedProcessPool = WKProcessPool()
-```
-
-```swift
-// In configureWebView(with:styled:) (around line 260), after creating configuration:
-func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration, styled: Bool) {
-    webView?.removeFromSuperview()
-    isWebViewLoaded = false
-    pendingRenderRequest = nil
-
-    let configuration = WKWebViewConfiguration()
-    configuration.processPool = Self.sharedProcessPool  // ← ADD THIS LINE
-    let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)
-    eventBridge?.attach(to: contentController)
-    configuration.userContentController = contentController
-    // ... rest unchanged
-}
-```
-
-### Impact
-
-- **Memory:** Multiple `MarkdownView` instances share one WebContent process instead of each spawning its own.
-- **Startup:** Second and subsequent instances skip WebContent process creation (~50-100 ms saved per instance).
-- **Side effect:** Shared cookie/localStorage/session across instances. Non-issue for this library (local Markdown rendering only, no network state).
-
-### Verification
-
-- Create 3+ `MarkdownView` instances in an example project, observe memory in Instruments (Allocations). Compare before/after.
-- Ensure all instances render correctly and independently.
-
-### Estimated diff: ~3 lines changed in `MarkdownView.swift`
+> **Removed:** `WKProcessPool` was [deprecated as of iOS 15.0 / macOS 12.0](https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKProcessPool.h).
+> The deprecation message states: *"Creating and using multiple instances of WKProcessPool no longer has any effect."*
+> Since this library's minimum deployment target is iOS 16, WebKit already manages process pooling automatically. No explicit `WKProcessPool` usage is needed.
 
 ---
 
@@ -160,7 +118,7 @@ func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguratio
     pendingRenderRequest = nil
 
     let configuration = WKWebViewConfiguration()
-    configuration.processPool = Self.sharedProcessPool  // from B-1
+    // WKProcessPool is deprecated (iOS 15+); WebKit manages process pooling automatically
     let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)
     eventBridge?.attach(to: contentController)
     configuration.userContentController = contentController
@@ -728,7 +686,7 @@ public final class MarkdownWebViewPool {
     private var nonStyledPool: [(webView: WKWebView, isLoaded: Bool)] = []
     private let maxPoolSize: Int
     private let lock = NSLock()
-    private let processPool = MarkdownView.sharedProcessPool  // Reuse from B-1
+    // WKProcessPool is deprecated (iOS 15+); WebKit manages process pooling automatically
 
     public init(maxPoolSize: Int = 3) {
         self.maxPoolSize = maxPoolSize
@@ -869,14 +827,7 @@ if let pooledWebView = MarkdownWebViewPool.shared.dequeue(styled: styled) {
 
 ### Exposing internals for the pool
 
-B-1 introduced `private static let sharedProcessPool`. The pool needs access to this. Change to `internal static`:
-
-```swift
-// MarkdownView.swift
-static let sharedProcessPool = WKProcessPool()  // Remove 'private'
-```
-
-Similarly, HTML URL statics need `internal` access:
+HTML string statics need `internal` access for the pool to use:
 
 ```swift
 static var styledHtmlUrl: URL = { ... }()     // internal (remove private extension)
@@ -953,18 +904,17 @@ func makeScriptStrings(configuration: MarkdownRenderingConfiguration) -> [String
 ## Implementation Order and Dependencies
 
 ```
-B-1: Shared ProcessPool          ← standalone, no dependencies
+B-5: Embed Initial Markdown  ← standalone
  │
- ├─ B-5: Embed Initial Markdown  ← depends on B-1 (uses sharedProcessPool)
- │   │
- │   └─ B-4: Inline HTML/JS/CSS  ← depends on B-5 (extends buildInitialHTML)
- │       │
- │       └─ B-3: JS Bundle Split ← depends on B-4 (build.mjs changes)
- │
- └─ B-2: WebView Pooling         ← depends on B-1 (sharedProcessPool)
-                                    depends on B-4 (loadHTMLString path)
-                                    depends on B-1 access modifiers
+ └─ B-4: Inline HTML/JS/CSS  ← depends on B-5 (extends embedMarkdown)
+     │
+     └─ B-3: JS Bundle Split ← depends on B-4 (build.mjs changes)
+
+B-2: WebView Pooling          ← depends on B-4 (loadHTMLString path)
 ```
+
+> **Note:** B-1 (Shared WKProcessPool) was removed — `WKProcessPool` is deprecated since iOS 15.0
+> and WebKit manages process pooling automatically.
 
 ### Commit Plan
 
@@ -972,7 +922,7 @@ Each optimization is a single, independently reviewable commit:
 
 | Order | ID | Commit | Files Changed |
 |-------|-----|--------|--------------|
-| 1 | B-1 | `perf: share WKProcessPool across MarkdownView instances` | `MarkdownView.swift` |
+| ~~1~~ | ~~B-1~~ | ~~Removed — WKProcessPool deprecated since iOS 15~~ | — |
 | 2 | B-5 | `perf: embed initial markdown in HTML to eliminate async round-trip` | `MarkdownView.swift` |
 | 3 | B-4 | `perf: inline JS/CSS into HTML templates at build time` | `build.mjs`, `MarkdownView.swift` |
 | 4 | B-3 | `perf: split highlight.js into core (15 langs) and extended bundles` | `webassets/src/js/*`, `build.mjs`, `MarkdownView.swift`, `Package.swift` |
@@ -983,7 +933,7 @@ Each optimization is a single, independently reviewable commit:
 | After | Initial Parse | First Render | Memory (per additional instance) |
 |-------|--------------|--------------|----------------------------------|
 | Baseline | ~715KB JS | ~250-500ms | 100-200MB |
-| + B-1 | ~715KB JS | ~250-500ms | Shared (100-200MB total) |
+| ~~+ B-1~~ | ~~Removed~~ | ~~WKProcessPool deprecated~~ | ~~N/A~~ |
 | + B-5 | ~715KB JS | ~200-400ms (−1 round-trip) | Shared |
 | + B-4 | ~715KB JS | ~150-350ms (−file I/O) | Shared |
 | + B-3 | ~175KB JS | ~100-250ms (−75% parse) | Shared |
@@ -1002,7 +952,7 @@ Each optimization is a single, independently reviewable commit:
 
 | Change | Test |
 |--------|------|
-| B-1 | Manual: Instruments memory comparison with multiple instances |
+| ~~B-1~~ | ~~Removed — WKProcessPool deprecated~~ |
 | B-5 | Unit test: `buildInitialHTML` correctly escapes backticks, backslashes, `${}`, newlines |
 | B-5 | Integration: render with embedded markdown matches render with callAsyncJavaScript |
 | B-4 | Verify `styled.html` contains `<style>` and `<script>` tags (not `<link>` / `<script src>`) |
