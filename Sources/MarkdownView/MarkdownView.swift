@@ -50,6 +50,7 @@ open class MarkdownView: UIView {
 
     private var currentRenderingConfiguration: MarkdownRenderingConfiguration?
     private var currentStyledFlag: Bool = true
+    private var hasInjectedExtendedLanguages = false
 
     private var intrinsicContentHeight: CGFloat? {
         didSet {
@@ -209,6 +210,10 @@ extension MarkdownView: WKNavigationDelegate {
             pendingRenderRequest = nil
             renderMarkdown(markdown: request.markdown, enableImage: request.enableImage)
         }
+
+        // B-3: After initial page load, inject full highlight.js bundle
+        // to support all 113 languages (core bundle only has 15)
+        injectExtendedLanguagesIfNeeded()
     }
 
     public func webView(_ webView: WKWebView,
@@ -228,17 +233,18 @@ extension MarkdownView: WKNavigationDelegate {
 }
 
 private extension MarkdownView {
-    static let styledHtmlString: String = loadHtmlResource(name: "styled")
-    static let nonStyledHtmlString: String = loadHtmlResource(name: "non_styled")
+    static let styledHtmlString: String = loadResource(name: "styled", ext: "html")
+    static let nonStyledHtmlString: String = loadResource(name: "non_styled", ext: "html")
+    static let extendedLanguagesJs: String = loadResource(name: "main", ext: "js")
 
-    static func loadHtmlResource(name: String) -> String {
+    static func loadResource(name: String, ext: String) -> String {
         #if SWIFT_PACKAGE
         let bundle = Bundle.module
         #else
         let bundle = Bundle(for: MarkdownView.self)
         #endif
-        let url = bundle.url(forResource: name, withExtension: "html")
-            ?? bundle.url(forResource: name, withExtension: "html", subdirectory: "MarkdownView.bundle")!
+        let url = bundle.url(forResource: name, withExtension: ext)
+            ?? bundle.url(forResource: name, withExtension: ext, subdirectory: "MarkdownView.bundle")!
         return (try? String(contentsOf: url)) ?? ""
     }
 
@@ -263,6 +269,7 @@ private extension MarkdownView {
         webView?.removeFromSuperview()
         isWebViewLoaded = false
         pendingRenderRequest = nil
+        hasInjectedExtendedLanguages = false
         currentRenderingConfiguration = renderingConfiguration
         currentStyledFlag = styled
 
@@ -286,6 +293,29 @@ private extension MarkdownView {
             webView?.loadHTMLString(htmlString, baseURL: nil)
         } else {
             webView?.loadHTMLString(baseHtml, baseURL: nil)
+        }
+    }
+
+    func injectExtendedLanguagesIfNeeded() {
+        guard !hasInjectedExtendedLanguages, let webView else { return }
+        hasInjectedExtendedLanguages = true
+
+        let fullJs = Self.extendedLanguagesJs
+        guard !fullJs.isEmpty else { return }
+
+        // Inject the full bundle (re-registers all 113 languages on the shared hljs instance)
+        // then re-highlight any code blocks that may have been rendered with core-only languages
+        let script = fullJs + """
+        ; document.querySelectorAll('pre code').forEach(function(block) {
+            block.removeAttribute('data-highlighted');
+            hljs.highlightElement(block);
+        });
+        """
+
+        webView.evaluateJavaScript(script) { _, error in
+            if let error {
+                print("[MarkdownView] Extended languages injection failed: \(error)")
+            }
         }
     }
 

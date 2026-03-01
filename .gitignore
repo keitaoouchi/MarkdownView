@@ -22,3 +22,4 @@ DerivedData
 # Swift Package Manager
 .build/
 .swiftpm/
+Sources/MarkdownView/Resources/main-core.css

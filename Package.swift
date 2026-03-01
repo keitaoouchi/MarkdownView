@@ -21,6 +21,7 @@ let package = Package(
                 .copy("Resources/styled.html"),
                 .copy("Resources/non_styled.html"),
                 .copy("Resources/main.js"),
+                .copy("Resources/main-core.js"),
                 .copy("Resources/main.css")
             ],
             swiftSettings: [
