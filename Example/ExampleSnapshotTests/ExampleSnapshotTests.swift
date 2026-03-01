@@ -9,7 +9,7 @@ final class ExampleSnapshotTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        isRecording = true
+//        isRecording = true
     }
 
     func testCodeOnlySample() {
