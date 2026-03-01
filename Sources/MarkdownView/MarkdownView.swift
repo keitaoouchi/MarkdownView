@@ -7,6 +7,7 @@ import WebKit
  - Note: [How to get height of entire document with javascript](https://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript)
  */
 open class MarkdownView: UIView {
+    static let sharedProcessPool = WKProcessPool()
     private static let minimumHeightDeltaToNotify: CGFloat = 0.1
 
     public struct RenderOptions {
@@ -46,6 +47,9 @@ open class MarkdownView: UIView {
 
     private let scriptBuilder = MarkdownScriptBuilder()
     private let webViewFactory = MarkdownWebViewFactory()
+
+    private var currentRenderingConfiguration: MarkdownRenderingConfiguration?
+    private var currentStyledFlag: Bool = true
 
     private var intrinsicContentHeight: CGFloat? {
         didSet {
@@ -159,10 +163,22 @@ open class MarkdownView: UIView {
     }
 
     private func renderMarkdown(markdown: String, enableImage: Bool) {
-        guard let webView else { return }
+        guard webView != nil else { return }
 
         guard isWebViewLoaded else {
-            pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
+            // B-5: Instead of queuing a pendingRenderRequest, restart the load
+            // with markdown embedded in the HTML template. This eliminates the
+            // didFinish → callAsyncJavaScript round-trip for the first render.
+            if let config = currentRenderingConfiguration {
+                configureWebView(
+                    with: config,
+                    styled: currentStyledFlag,
+                    initialMarkdown: markdown,
+                    enableImage: enableImage
+                )
+            } else {
+                pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
+            }
             return
         }
 
@@ -170,7 +186,7 @@ open class MarkdownView: UIView {
             "markdown": markdown,
             "enableImage": enableImage
         ]
-        webView.callAsyncJavaScript(
+        webView?.callAsyncJavaScript(
             "window.renderMarkdown(payload)",
             arguments: ["payload": payload],
             in: nil,
@@ -252,12 +268,18 @@ private extension MarkdownView {
         }
     }
 
-    func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration, styled: Bool) {
+    func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration,
+                          styled: Bool,
+                          initialMarkdown: String? = nil,
+                          enableImage: Bool = true) {
         webView?.removeFromSuperview()
         isWebViewLoaded = false
         pendingRenderRequest = nil
+        currentRenderingConfiguration = renderingConfiguration
+        currentStyledFlag = styled
 
         let configuration = WKWebViewConfiguration()
+        configuration.processPool = Self.sharedProcessPool
         let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)
         eventBridge?.attach(to: contentController)
         configuration.userContentController = contentController
@@ -268,6 +290,36 @@ private extension MarkdownView {
             scrollEnabled: isScrollEnabled,
             navigationDelegate: self
         )
-        webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
+
+        let htmlUrl = styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl
+
+        if let initialMarkdown {
+            let htmlString = Self.buildHTML(from: htmlUrl, markdown: initialMarkdown, enableImage: enableImage)
+            webView?.loadHTMLString(htmlString, baseURL: htmlUrl.deletingLastPathComponent())
+        } else {
+            webView?.load(URLRequest(url: htmlUrl))
+        }
+    }
+
+    static func buildHTML(from htmlUrl: URL, markdown: String, enableImage: Bool) -> String {
+        guard var html = try? String(contentsOf: htmlUrl) else {
+            return ""
+        }
+
+        let escaped = markdown
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "$", with: "\\$")
+
+        let initScript = """
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.renderMarkdown({ markdown: `\(escaped)`, enableImage: \(enableImage) });
+        });
+        </script>
+        """
+
+        html = html.replacingOccurrences(of: "</body>", with: "\(initScript)\n</body>")
+        return html
     }
 }
