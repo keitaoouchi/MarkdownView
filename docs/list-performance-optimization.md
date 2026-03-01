@@ -251,33 +251,6 @@ open override func didMoveToWindow() {
 
 ---
 
-## Recommended Implementation Order
-
-```
-Phase 1: Quick wins (low risk, high impact)
-  C-2  Height Cache                    ← Eliminates layout flicker immediately
-  C-4  Deferred Off-Screen Rendering   ← Reduces resource contention
-
-Phase 2: Core optimization (medium risk, highest impact)
-  C-1  WebView Recycling              ← Eliminates per-cell creation cost
-
-Phase 3: Polish (medium risk, incremental gain)
-  C-3  Rendered HTML Cache            ← Eliminates redundant JS parsing
-```
-
-### Expected Cumulative Impact
-
-| Metric | Current (80 cells) | After C-1+C-2+C-3+C-4 |
-|---|---|---|
-| WKWebView instances alive | Up to 80 | Pool max (3-5) |
-| Cold cell render | 160-350 ms | 160-350 ms (first time only) |
-| Scroll-back cell render | 160-350 ms (full redo) | ~5-20 ms (recycled + cached HTML) |
-| Layout flicker on scroll-back | Yes (height 1 → real) | No (cached height) |
-| Memory (WebContent processes) | Unbounded | Bounded to pool size |
-| Fast scroll jank | Significant | Minimal |
-
----
-
 ## Measurement Plan
 
 Before implementing, establish baselines with the `SampleListUI` (80 rows):
@@ -303,9 +276,158 @@ os_signpost(.end, log: signpostLog, name: "configureWebView", signpostID: id)
 
 ---
 
+## C-5: Native-Side Markdown Parsing (cmark-gfm)
+
+**Problem:** The current pipeline requires a fully loaded WKWebView before markdown can be parsed. Even with WebView recycling (C-1), the JS parsing step (`markdown-it.render()`) adds 10-50 ms per cell and requires an IPC round-trip.
+
+**Idea:** Move markdown→HTML conversion to the native side using cmark-gfm (C library), then inject pre-rendered HTML directly into the WebView. The WebView becomes a display-only component.
+
+### Why cmark-gfm, not Wasm
+
+| Approach | Binary Size | Speed | Complexity |
+|---|---|---|---|
+| **cmark-gfm (C) via SPM** | ~100KB | 10-100x faster than markdown-it | Low (existing SPM packages) |
+| cmark-gfm.wasm + WasmKit | ~200-300KB + runtime | Same, with runtime overhead | Medium |
+| pulldown-cmark (Rust→Wasm) | ~150KB | Similar to cmark | Medium |
+| tree-sitter.wasm (highlighting) | ~500KB-1MB | Faster than highlight.js | High |
+
+cmark-gfm is a C library that links directly via SPM — no Wasm runtime needed. Wasm would only be justified for Rust-based parsers that can't be natively compiled, which doesn't apply here.
+
+### Design
+
+```
+Current flow:
+  Swift → WKWebView → JS(markdown-it.render) → HTML → DOM → height → Swift
+                       ~~~~~~~~~~~~~~~~~~~~~~~~
+                       10-50 ms + IPC round-trip
+
+Proposed flow:
+  Swift → cmark-gfm(markdown→HTML)  →  WKWebView(setRenderedHTML) → DOM → height → Swift
+          ~~~~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          0.1-0.5 ms (synchronous)      5 ms (innerHTML injection)
+```
+
+**Key changes:**
+
+1. **Add cmark-gfm SPM dependency** — Wrap in a `MarkdownParser` protocol for testability and to allow swapping implementations.
+
+```swift
+protocol MarkdownParser {
+    func renderHTML(from markdown: String) -> String
+}
+
+struct CMarkParser: MarkdownParser {
+    func renderHTML(from markdown: String) -> String {
+        // cmark_markdown_to_html(markdown, markdown.utf8.count, CMARK_OPT_DEFAULT | CMARK_OPT_UNSAFE)
+    }
+}
+
+struct JSMarkdownParser: MarkdownParser {
+    // Fallback: current JS-based rendering via callAsyncJavaScript
+}
+```
+
+2. **JS-side: Add `setRenderedHTML` entry point** — Bypasses markdown-it, injects pre-rendered HTML directly:
+
+```javascript
+window.setRenderedHTML = function(html, enableImage) {
+    const contents = document.getElementById('contents');
+    contents.innerHTML = html;
+    if (!enableImage) {
+        contents.querySelectorAll('img').forEach(el => el.remove());
+    }
+    hljs.highlightAll();
+    postDocumentHeight();
+};
+```
+
+3. **Swift-side: Pre-render and inject**:
+
+```swift
+func renderMarkdown(markdown: String, enableImage: Bool) {
+    guard let webView, isWebViewLoaded else {
+        pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
+        return
+    }
+
+    let html = nativeParser.renderHTML(from: markdown)
+    let payload: [String: Any] = ["html": html, "enableImage": enableImage]
+    webView.callAsyncJavaScript(
+        "window.setRenderedHTML(payload.html, payload.enableImage)",
+        arguments: ["payload": payload],
+        in: nil, in: .page
+    ) { _ in }
+}
+```
+
+### Combined impact with C-1 (WebView Recycling)
+
+```
+Scroll-back cell render (current):
+  WebView creation (150ms) → HTML load (200ms) → JS parse (30ms) → display
+  Total: ~380 ms
+
+Scroll-back with C-1 + C-5:
+  Recycled WebView (0ms) → native parse (0.5ms) → innerHTML inject (5ms) → display
+  Total: ~5 ms
+```
+
+### Feature parity considerations
+
+| Feature | markdown-it | cmark-gfm | Gap |
+|---|---|---|---|
+| GFM (tables, strikethrough, autolinks) | Yes (built-in) | Yes (extension) | None |
+| Emoji shortcodes (`:smile:`) | Yes (plugin) | No | Need post-processing or JS fallback |
+| Custom plugins (footnotes, math, etc.) | Yes (plugin system) | No | JS fallback for plugin-dependent content |
+| HTML passthrough | Yes (`html: true`) | Yes (`CMARK_OPT_UNSAFE`) | None |
+| Syntax highlighting | highlight.js (JS) | N/A (handled by WebView) | None (still uses hljs in WebView) |
+
+**Plugin gap mitigation:** Offer `CMarkParser` as default for List scenarios (fast, covers 90% of use cases). Fall back to `JSMarkdownParser` (current behavior) when plugins are configured. This is a per-MarkdownView decision, not global.
+
+### Risks
+
+- **Rendering fidelity**: cmark-gfm and markdown-it may produce slightly different HTML for edge cases. Need visual comparison testing.
+- **Dependency**: Adding cmark-gfm as a SPM dependency increases the package footprint. Consider making it optional (separate target or feature flag).
+- **Emoji**: markdown-it-emoji plugin support requires either a JS fallback or a native emoji shortcode→unicode mapping.
+
+### Complexity: Medium-High
+
+Touches parser layer, JS API, rendering pipeline, and adds a new dependency. Best implemented as a separate `MarkdownParser` module that can be adopted incrementally.
+
+---
+
+## Recommended Implementation Order (Updated)
+
+```
+Phase 1: Quick wins (low risk, high impact)
+  C-2  Height Cache                    ← Eliminates layout flicker immediately
+  C-4  Deferred Off-Screen Rendering   ← Reduces resource contention
+
+Phase 2: Core optimization (medium risk, highest impact)
+  C-1  WebView Recycling              ← Eliminates per-cell creation cost
+
+Phase 3: Rendering fast path (medium-high risk, order-of-magnitude gain)
+  C-5  Native-Side Parsing (cmark-gfm) ← Eliminates JS parsing + IPC round-trip
+  C-3  Rendered HTML Cache             ← Further reduces redundant work (complementary to C-5)
+```
+
+### Expected Cumulative Impact (Updated)
+
+| Metric | Current (80 cells) | C-1+C-2+C-4 | C-1+C-2+C-4+C-5 |
+|---|---|---|---|
+| WKWebView instances alive | Up to 80 | Pool max (3-5) | Pool max (3-5) |
+| Cold cell render | 160-350 ms | 160-350 ms | 160-350 ms |
+| Scroll-back cell render | 160-350 ms | ~20-50 ms | **~5 ms** |
+| Layout flicker on scroll-back | Yes | No | No |
+| Memory (WebContent processes) | Unbounded | Bounded | Bounded |
+| Fast scroll jank | Significant | Mild | **Minimal** |
+
+---
+
 ## Open Questions
 
 1. **`willMove(toWindow:)` reliability** — Does SwiftUI `List` reliably call this when recycling cells via `UIViewRepresentable`? Need empirical validation on iOS 16-18.
 2. **WKWebView reset cost** — How expensive is `loadHTMLString(baseHtml)` on a recycled WebView vs creating a new one? If reset cost approaches creation cost, recycling has diminished value.
 3. **`UIViewRepresentable` lifecycle** — Does SwiftUI call `dismantleUIView` when cells scroll off-screen, or only when the List itself is removed? This determines where to trigger enqueue.
 4. **iOS 26 `WebView` (SwiftUI native)** — Does it handle List reuse natively? If so, C-1 through C-4 could be superseded for iOS 26+ targets. See `performance-options.md` Option E.
+5. **cmark-gfm rendering fidelity** — How closely does cmark-gfm HTML output match markdown-it for the same input? Visual diff testing needed before adopting C-5 as default.
