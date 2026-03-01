@@ -155,7 +155,12 @@ Embed the initial markdown content directly in the HTML template to avoid the tw
 
 #### iOS 26 SwiftUI WebView Overview
 
-WWDC 2025 introduced `WebView` and `WebPage` as first-class SwiftUI citizens:
+WWDC 2025 (session [WWDC25-231 "Meet WebKit for SwiftUI"](https://developer.apple.com/videos/play/wwdc2025/231/)) introduced `WebView` and `WebPage` as first-class SwiftUI citizens:
+
+- **`WebView`** — Declarative SwiftUI view for displaying web content
+- **`WebPage`** — `@Observable` class managing page state (URL, title, progress, navigation events)
+- **`WebPage.Configuration`** — Own configuration type (not `WKWebViewConfiguration`, but carries forward similar concepts including `userContentController`)
+- **Platform availability:** iOS 26, iPadOS 26, macOS 26, visionOS 26
 
 ```swift
 import WebKit
@@ -165,8 +170,8 @@ let page = WebPage()
 
 // WebView: Declarative SwiftUI view
 WebView(page)
-    .onNavigationDeciding { action in
-        // Replaces WKNavigationDelegate.decidePolicyFor
+    .onChange(of: page.currentNavigationEvent) { event in
+        // Navigation event handling
     }
 ```
 
@@ -175,13 +180,19 @@ WebView(page)
 | Current (UIViewRepresentable) | iOS 26 (SwiftUI WebView) |
 |---|---|
 | `WKWebView(frame:configuration:)` | `WebPage(configuration:)` + `WebView(page)` |
-| `webView.load(URLRequest(url:))` | `page.load(URLRequest(url:))` |
-| `webView.callAsyncJavaScript(...)` | `page.callAsyncJavaScript(...)` |
-| `WKNavigationDelegate.decidePolicyFor` | `.onNavigationDeciding { }` modifier |
-| `WKScriptMessageHandler` (`updateHeight`) | Same — via `WKWebViewConfiguration.userContentController` |
-| `WKUserScript` (CSS/plugin injection) | Same — via `WebPage.Configuration` wrapping `WKWebViewConfiguration` |
-| Manual Auto Layout constraints | Automatic SwiftUI sizing |
-| `invalidateIntrinsicContentSize()` | `@Observable` state propagation |
+| `webView.load(URLRequest(url:))` | `page.load(URLRequest(url:))` / `page.loadHTML(_:baseURL:)` |
+| `webView.callAsyncJavaScript(...)` | `page.callJavaScript(_:arguments:)` (async/await, no completion handler) |
+| `WKNavigationDelegate.decidePolicyFor` | `NavigationDeciding` protocol / `.onChange(of: page.currentNavigationEvent)` |
+| `WKScriptMessageHandler` (`updateHeight`) | Same — via `WebPage.Configuration.userContentController` |
+| `WKUserScript` (CSS/plugin injection) | Same — via `userContentController.addUserScript()` |
+| Manual Auto Layout constraints | Automatic SwiftUI layout |
+| `invalidateIntrinsicContentSize()` | `@Observable` state + `.webViewOnScrollGeometryChange` |
+
+**Important API differences from WKWebView:**
+- JS evaluation is `callJavaScript` (not `callAsyncJavaScript` / `evaluateJavaScript`). Uses native `async/await`. Arguments become local JS variables (not wrapped in a payload).
+- `WebPage.Configuration` is a separate type from `WKWebViewConfiguration`. It has `userContentController` but not all WKWebViewConfiguration properties.
+- No direct access to the underlying `WKWebView` instance.
+- `callJavaScript` cannot be called immediately after `load()` — must wait for page load to complete (the `window` object must exist).
 
 #### Proposed Architecture
 
@@ -229,33 +240,46 @@ struct MarkdownWebView: View {
     @State private var page: WebPage
 
     init(/* ... */) {
-        let configuration = WKWebViewConfiguration()
+        var config = WebPage.Configuration()
         // Reuse MarkdownScriptBuilder for CSS/plugin injection
         let contentController = scriptBuilder.makeContentController(configuration: renderConfig)
         // Attach MarkdownEventBridge for height updates
         eventBridge.attach(to: contentController)
-        configuration.userContentController = contentController
+        config.userContentController = contentController
 
-        _page = State(initialValue: WebPage(configuration: configuration))
+        _page = State(initialValue: WebPage(configuration: config))
     }
 
     var body: some View {
         WebView(page)
-            .onNavigationDeciding { action in
-                // Link tap handling — replaces WKNavigationDelegate
+            .onChange(of: page.currentNavigationEvent) { event in
+                // Navigation event handling (replaces WKNavigationDelegate)
+            }
+            // Height tracking alternative: native scroll geometry observation
+            .webViewOnScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentSize.height
+            } action: { _, newHeight in
+                onRendered?(newHeight)
             }
             .task {
-                page.load(URLRequest(url: htmlUrl))
+                // Load bundled HTML — loadHTML avoids file URL loading issues
+                let htmlString = try? String(contentsOf: htmlUrl)
+                page.loadHTML(htmlString ?? "", baseURL: htmlUrl.deletingLastPathComponent())
             }
             .onChange(of: markdown) { _, newValue in
-                page.callAsyncJavaScript(
-                    "window.renderMarkdown(payload)",
-                    arguments: ["payload": ["markdown": newValue, "enableImage": true]]
-                )
+                // callJavaScript: arguments become local JS variables
+                Task {
+                    try? await page.callJavaScript(
+                        "window.renderMarkdown({ markdown: md, enableImage: img })",
+                        arguments: ["md": newValue, "img": true]
+                    )
+                }
             }
     }
 }
 ```
+
+**Note on `callJavaScript` argument passing:** Unlike `callAsyncJavaScript` where a single `payload` dict was passed, `callJavaScript` arguments become individual local JS variables. The call `page.callJavaScript("greet(name)", arguments: ["name": "World"])` makes `name` available as a local variable in the JS expression.
 
 #### Impact Analysis
 
@@ -266,8 +290,9 @@ struct MarkdownWebView: View {
 | SwiftUI integration | UIViewRepresentable (bridging overhead) | Native SwiftUI view | Cleaner lifecycle, no Coordinator needed |
 | Auto Layout | Manual 4-constraint setup in `MarkdownWebViewFactory` | Automatic SwiftUI layout | Eliminates constraint code |
 | State sync | Closure-based (`onRendered`, `onTouchLink`) | `@Observable` WebPage + SwiftUI modifiers | More idiomatic reactive updates |
-| Navigation handling | WKNavigationDelegate protocol conformance | `.onNavigationDeciding` modifier | Declarative, composable |
-| Height propagation | `invalidateIntrinsicContentSize()` → UIKit layout pass | Direct SwiftUI state update | Fewer layout recalculations |
+| Navigation handling | WKNavigationDelegate protocol conformance | `NavigationDeciding` protocol / `.onChange(of: currentNavigationEvent)` | Declarative, composable |
+| Height propagation | `invalidateIntrinsicContentSize()` → UIKit layout pass | `.webViewOnScrollGeometryChange` modifier | May eliminate JS height measurement entirely |
+| Page state observation | KVO on `isLoading`, `title`, etc. | Direct `@Observable` properties (`page.title`, `page.isLoading`, `page.estimatedProgress`) | Eliminates KVO boilerplate |
 
 **What does NOT improve:**
 
@@ -276,9 +301,9 @@ struct MarkdownWebView: View {
 | WKWebView cold start (50-100+ ms) | SwiftUI `WebView` still uses WKWebView internally |
 | First page load (200-400 ms) | Same WebContent process startup |
 | JS bundle parse time (715KB) | Same JavaScript engine |
-| IPC latency (~0.4 ms) | Same `callAsyncJavaScript` / `postMessage` mechanism |
+| IPC latency (~0.4 ms) | Same `callJavaScript` / `postMessage` mechanism underneath |
 | Memory per instance (100-200+ MB) | Same WebContent process |
-| `updateHeight` message handler pattern | `WKScriptMessageHandler` still required — no SwiftUI equivalent |
+| `updateHeight` message handler | `WKScriptMessageHandler` still works, but `.webViewOnScrollGeometryChange` may provide a native alternative (needs validation) |
 
 **Key insight:** The performance bottleneck in MarkdownView is **WKWebView cold start + JS execution**, not the UIViewRepresentable bridging layer. The current `MarkdownUI.swift` is only 46 lines with minimal overhead. iOS 26 WebView improves **code quality and maintainability** but does not meaningfully improve **rendering performance**.
 
@@ -289,7 +314,7 @@ Both paths can share the same internal components:
 | Component | Shared? | Notes |
 |---|---|---|
 | `MarkdownScriptBuilder` | Yes | Builds `WKUserContentController` identically for both paths |
-| `MarkdownEventBridge` | Yes | Attaches to `userContentController` in both paths |
+| `MarkdownEventBridge` | Conditionally | iOS < 26: attaches to `userContentController`. iOS 26+: may be replaced by `.webViewOnScrollGeometryChange` (needs validation) |
 | `MarkdownRenderingConfiguration` | Yes | Same data model |
 | `MarkdownWebViewFactory` | iOS < 26 only | iOS 26+ uses `WebView` directly, no manual constraints |
 | HTML/JS/CSS Resources | Yes | Same bundle resources |
@@ -298,10 +323,16 @@ Both paths can share the same internal components:
 #### Risks and Concerns
 
 1. **Dual code path maintenance** — Two SwiftUI rendering paths to test and maintain. Bug fixes may need to be applied in both places. Mitigated by shared internal components.
-2. **WebPage lifecycle differences** — `WebPage`'s `@Observable` lifecycle may differ subtly from UIViewRepresentable's `makeUIView`/`updateUIView` cycle. Thorough testing needed for edge cases (rapid markdown updates, view appearance/disappearance).
-3. **Height measurement on iOS 26+** — The `WKScriptMessageHandler` → `updateHeight` pattern is the same in both paths. SwiftUI WebView does not provide a built-in content height observation mechanism. Need to verify that attaching a message handler to `WebPage`'s configuration works identically.
-4. **Beta API stability** — iOS 26 is in beta as of this writing. API surface may change before release.
-5. **Minimum deployment target remains iOS 16** — The iOS 26 code path benefits only users running iOS 26+. Given iOS adoption curves, this path will serve a minority of users for at least 1-2 years after iOS 26 release.
+2. **WebPage lifecycle differences** — `WebPage`'s `@Observable` lifecycle may differ subtly from UIViewRepresentable's `makeUIView`/`updateUIView` cycle. Thorough testing needed for edge cases (rapid markdown updates, view appearance/disappearance). Known issue: passing `WebPage` as `Binding` creates new `WebView` per view while reusing the same `WebPage`, causing crashes. Must create separate `WebPage` instances per view.
+3. **`callJavaScript` timing** — Cannot be called immediately after `load()` / `loadHTML()`. The `window` object must be ready first. Current `pendingRenderRequest` pattern must be preserved — wait for navigation event signaling load completion before calling `window.renderMarkdown`.
+4. **Height measurement on iOS 26+** — Two possible approaches: (a) existing `WKScriptMessageHandler` pattern via `userContentController`, (b) new `.webViewOnScrollGeometryChange` modifier for native content size tracking. Option (b) is preferable (eliminates JS height measurement code) but needs validation that `contentSize.height` accurately reflects the Markdown content height.
+5. **No direct WKWebView access** — Cannot call `WKWebView`-only APIs (e.g., `takeSnapshot`). Not currently needed by this project, but limits future extensibility.
+6. **Beta known issues (as of iOS 26.2 beta):**
+   - `WKScriptMessage.body` crash reported — `name` attribute accessible but `body` causes crash. **Critical for this project** since the `updateHeight` handler reads `message.body as? CGFloat`. Must be resolved before shipping.
+   - Navigation event tracking code shown in WWDC session did not compile as demonstrated; workarounds needed.
+   - On macOS 26 beta, external navigation prints console crash logs (app doesn't actually crash).
+7. **`WebPage.Configuration` is not `WKWebViewConfiguration`** — While it has `userContentController`, not all WKWebViewConfiguration properties are available. Verify that `addUserScript(_:injectionTime:forMainFrameOnly:)` works identically for CSS/plugin injection at `.atDocumentEnd`.
+8. **Minimum deployment target remains iOS 16** — The iOS 26 code path benefits only users running iOS 26+. Given iOS adoption curves, this path will serve a minority of users for at least 1-2 years after iOS 26 release.
 
 #### Assessment
 
