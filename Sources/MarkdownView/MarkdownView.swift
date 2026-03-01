@@ -228,31 +228,19 @@ extension MarkdownView: WKNavigationDelegate {
 }
 
 private extension MarkdownView {
-    static var styledHtmlUrl: URL = {
-        #if SWIFT_PACKAGE
-        let bundle = Bundle.module
-        #else
-        let bundle = Bundle(for: MarkdownView.self)
-        #endif
-        return bundle.url(forResource: "styled",
-                          withExtension: "html") ??
-            bundle.url(forResource: "styled",
-                       withExtension: "html",
-                       subdirectory: "MarkdownView.bundle")!
-    }()
+    static let styledHtmlString: String = loadHtmlResource(name: "styled")
+    static let nonStyledHtmlString: String = loadHtmlResource(name: "non_styled")
 
-    static var nonStyledHtmlUrl: URL = {
+    static func loadHtmlResource(name: String) -> String {
         #if SWIFT_PACKAGE
         let bundle = Bundle.module
         #else
         let bundle = Bundle(for: MarkdownView.self)
         #endif
-        return bundle.url(forResource: "non_styled",
-                          withExtension: "html") ??
-            bundle.url(forResource: "non_styled",
-                       withExtension: "html",
-                       subdirectory: "MarkdownView.bundle")!
-    }()
+        let url = bundle.url(forResource: name, withExtension: "html")
+            ?? bundle.url(forResource: name, withExtension: "html", subdirectory: "MarkdownView.bundle")!
+        return (try? String(contentsOf: url)) ?? ""
+    }
 
     func setupEventBridge() {
         eventBridge = MarkdownEventBridge { [weak self] height in
@@ -291,21 +279,17 @@ private extension MarkdownView {
             navigationDelegate: self
         )
 
-        let htmlUrl = styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl
+        let baseHtml = styled ? Self.styledHtmlString : Self.nonStyledHtmlString
 
         if let initialMarkdown {
-            let htmlString = Self.buildHTML(from: htmlUrl, markdown: initialMarkdown, enableImage: enableImage)
-            webView?.loadHTMLString(htmlString, baseURL: htmlUrl.deletingLastPathComponent())
+            let htmlString = Self.embedMarkdown(in: baseHtml, markdown: initialMarkdown, enableImage: enableImage)
+            webView?.loadHTMLString(htmlString, baseURL: nil)
         } else {
-            webView?.load(URLRequest(url: htmlUrl))
+            webView?.loadHTMLString(baseHtml, baseURL: nil)
         }
     }
 
-    static func buildHTML(from htmlUrl: URL, markdown: String, enableImage: Bool) -> String {
-        guard var html = try? String(contentsOf: htmlUrl) else {
-            return ""
-        }
-
+    static func embedMarkdown(in html: String, markdown: String, enableImage: Bool) -> String {
         let escaped = markdown
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "`", with: "\\`")
@@ -319,7 +303,6 @@ private extension MarkdownView {
         </script>
         """
 
-        html = html.replacingOccurrences(of: "</body>", with: "\(initScript)\n</body>")
-        return html
+        return html.replacingOccurrences(of: "</body>", with: "\(initScript)\n</body>")
     }
 }
