@@ -149,9 +149,172 @@ Embed the initial markdown content directly in the HTML template to avoid the tw
 
 ---
 
-### E. iOS 26 Native WebView for SwiftUI (Future)
+### E. iOS 26+ SwiftUI WebView Conditional Architecture
 
-iOS 26 introduces a native `WebView` for SwiftUI, eliminating the need for `UIViewRepresentable` wrappers. This could simplify the SwiftUI integration layer (`MarkdownUI.swift`) and improve state synchronization, but the core architecture (WKWebView + JS rendering) remains the same. Worth monitoring but not actionable today for iOS 16+ targets.
+**Approach:** Use `#available(iOS 26, *)` to provide a native SwiftUI `WebView` path on iOS 26+, while falling back to the current `UIViewRepresentable` wrapper on older versions.
+
+#### iOS 26 SwiftUI WebView Overview
+
+WWDC 2025 introduced `WebView` and `WebPage` as first-class SwiftUI citizens:
+
+```swift
+import WebKit
+
+// WebPage: Observable state object managing the web view's lifecycle
+let page = WebPage()
+
+// WebView: Declarative SwiftUI view
+WebView(page)
+    .onNavigationDeciding { action in
+        // Replaces WKNavigationDelegate.decidePolicyFor
+    }
+```
+
+**Key APIs relevant to MarkdownView:**
+
+| Current (UIViewRepresentable) | iOS 26 (SwiftUI WebView) |
+|---|---|
+| `WKWebView(frame:configuration:)` | `WebPage(configuration:)` + `WebView(page)` |
+| `webView.load(URLRequest(url:))` | `page.load(URLRequest(url:))` |
+| `webView.callAsyncJavaScript(...)` | `page.callAsyncJavaScript(...)` |
+| `WKNavigationDelegate.decidePolicyFor` | `.onNavigationDeciding { }` modifier |
+| `WKScriptMessageHandler` (`updateHeight`) | Same — via `WKWebViewConfiguration.userContentController` |
+| `WKUserScript` (CSS/plugin injection) | Same — via `WebPage.Configuration` wrapping `WKWebViewConfiguration` |
+| Manual Auto Layout constraints | Automatic SwiftUI sizing |
+| `invalidateIntrinsicContentSize()` | `@Observable` state propagation |
+
+#### Proposed Architecture
+
+```
+MarkdownUI (public SwiftUI API — unchanged)
+├── iOS 26+: MarkdownWebView (SwiftUI native WebView)
+│   └── WebPage + WebView
+│       └── Same JS/CSS/HTML resources
+└── iOS < 26: MarkdownUILegacy (UIViewRepresentable)
+    └── MarkdownView (UIView + WKWebView)
+        └── Same JS/CSS/HTML resources
+```
+
+```swift
+// Public API — no breaking changes
+public struct MarkdownUI: View {
+    @Binding public var body: String
+    // ... existing properties ...
+
+    public var body: some View {
+        if #available(iOS 26, *) {
+            MarkdownWebView(
+                markdown: $body,
+                css: css, plugins: plugins,
+                stylesheets: stylesheets, styled: styled,
+                onTouchLink: onTouchLinkHandler,
+                onRendered: onRenderedHandler
+            )
+        } else {
+            MarkdownUILegacy(
+                body: $body,
+                css: css, plugins: plugins,
+                stylesheets: stylesheets, styled: styled,
+                onTouchLink: onTouchLinkHandler,
+                onRendered: onRenderedHandler
+            )
+        }
+    }
+}
+
+// iOS 26+ implementation
+@available(iOS 26, *)
+struct MarkdownWebView: View {
+    @Binding var markdown: String
+    @State private var page: WebPage
+
+    init(/* ... */) {
+        let configuration = WKWebViewConfiguration()
+        // Reuse MarkdownScriptBuilder for CSS/plugin injection
+        let contentController = scriptBuilder.makeContentController(configuration: renderConfig)
+        // Attach MarkdownEventBridge for height updates
+        eventBridge.attach(to: contentController)
+        configuration.userContentController = contentController
+
+        _page = State(initialValue: WebPage(configuration: configuration))
+    }
+
+    var body: some View {
+        WebView(page)
+            .onNavigationDeciding { action in
+                // Link tap handling — replaces WKNavigationDelegate
+            }
+            .task {
+                page.load(URLRequest(url: htmlUrl))
+            }
+            .onChange(of: markdown) { _, newValue in
+                page.callAsyncJavaScript(
+                    "window.renderMarkdown(payload)",
+                    arguments: ["payload": ["markdown": newValue, "enableImage": true]]
+                )
+            }
+    }
+}
+```
+
+#### Impact Analysis
+
+**What improves on iOS 26+:**
+
+| Aspect | Current | iOS 26+ | Improvement |
+|---|---|---|---|
+| SwiftUI integration | UIViewRepresentable (bridging overhead) | Native SwiftUI view | Cleaner lifecycle, no Coordinator needed |
+| Auto Layout | Manual 4-constraint setup in `MarkdownWebViewFactory` | Automatic SwiftUI layout | Eliminates constraint code |
+| State sync | Closure-based (`onRendered`, `onTouchLink`) | `@Observable` WebPage + SwiftUI modifiers | More idiomatic reactive updates |
+| Navigation handling | WKNavigationDelegate protocol conformance | `.onNavigationDeciding` modifier | Declarative, composable |
+| Height propagation | `invalidateIntrinsicContentSize()` → UIKit layout pass | Direct SwiftUI state update | Fewer layout recalculations |
+
+**What does NOT improve:**
+
+| Aspect | Reason |
+|---|---|
+| WKWebView cold start (50-100+ ms) | SwiftUI `WebView` still uses WKWebView internally |
+| First page load (200-400 ms) | Same WebContent process startup |
+| JS bundle parse time (715KB) | Same JavaScript engine |
+| IPC latency (~0.4 ms) | Same `callAsyncJavaScript` / `postMessage` mechanism |
+| Memory per instance (100-200+ MB) | Same WebContent process |
+| `updateHeight` message handler pattern | `WKScriptMessageHandler` still required — no SwiftUI equivalent |
+
+**Key insight:** The performance bottleneck in MarkdownView is **WKWebView cold start + JS execution**, not the UIViewRepresentable bridging layer. The current `MarkdownUI.swift` is only 46 lines with minimal overhead. iOS 26 WebView improves **code quality and maintainability** but does not meaningfully improve **rendering performance**.
+
+#### Shared Component Reuse
+
+Both paths can share the same internal components:
+
+| Component | Shared? | Notes |
+|---|---|---|
+| `MarkdownScriptBuilder` | Yes | Builds `WKUserContentController` identically for both paths |
+| `MarkdownEventBridge` | Yes | Attaches to `userContentController` in both paths |
+| `MarkdownRenderingConfiguration` | Yes | Same data model |
+| `MarkdownWebViewFactory` | iOS < 26 only | iOS 26+ uses `WebView` directly, no manual constraints |
+| HTML/JS/CSS Resources | Yes | Same bundle resources |
+| `MarkdownView` (UIKit class) | iOS < 26 only | UIKit users still use this directly |
+
+#### Risks and Concerns
+
+1. **Dual code path maintenance** — Two SwiftUI rendering paths to test and maintain. Bug fixes may need to be applied in both places. Mitigated by shared internal components.
+2. **WebPage lifecycle differences** — `WebPage`'s `@Observable` lifecycle may differ subtly from UIViewRepresentable's `makeUIView`/`updateUIView` cycle. Thorough testing needed for edge cases (rapid markdown updates, view appearance/disappearance).
+3. **Height measurement on iOS 26+** — The `WKScriptMessageHandler` → `updateHeight` pattern is the same in both paths. SwiftUI WebView does not provide a built-in content height observation mechanism. Need to verify that attaching a message handler to `WebPage`'s configuration works identically.
+4. **Beta API stability** — iOS 26 is in beta as of this writing. API surface may change before release.
+5. **Minimum deployment target remains iOS 16** — The iOS 26 code path benefits only users running iOS 26+. Given iOS adoption curves, this path will serve a minority of users for at least 1-2 years after iOS 26 release.
+
+#### Assessment
+
+| Dimension | Rating | Notes |
+|---|---|---|
+| Performance impact | **Low** | Bottleneck is WKWebView/JS, not UIViewRepresentable |
+| Code quality improvement | **Medium** | Cleaner SwiftUI integration, declarative navigation |
+| Implementation cost | **Medium** | New SwiftUI component + testing both paths |
+| Maintenance cost increase | **Medium** | Two SwiftUI paths (shared internals mitigate) |
+| User-visible benefit | **Low** | No measurable performance difference for end users |
+| Future-proofing value | **High** | Aligns with Apple's direction; UIViewRepresentable may eventually be deprecated |
+
+**Verdict:** Worth implementing **after** B-series optimizations are done (Priority 6 in the roadmap below). The B-series changes improve performance for **all** iOS versions. This option improves code quality for iOS 26+ but doesn't address the core performance bottleneck.
 
 ---
 
@@ -159,13 +322,20 @@ iOS 26 introduces a native `WebView` for SwiftUI, eliminating the need for `UIVi
 
 Maintain current architecture and stack improvements in order of effort-to-impact ratio:
 
-| Priority | Measure | Effect | Cost |
-|---|---|---|---|
-| **1** | B-1: Shared ProcessPool | Reduce WKWebView memory and startup cost | Low |
-| **2** | B-5: Embed initial markdown in HTML load | Eliminate one async round-trip on first render | Low |
-| **3** | B-4: Inline HTML/JS/CSS | Eliminate file I/O; single atomic load | Low-Medium |
-| **4** | B-3: JS bundle optimization (hljs lazy-load) | Reduce initial ~715KB → ~200KB; faster JS parse | Medium |
-| **5** | B-2: WebView pooling | Eliminate 50-100+ ms cold start per instance in List | Medium |
+| Priority | Measure | Effect | Cost | Benefit scope |
+|---|---|---|---|---|
+| **1** | B-1: Shared ProcessPool | Reduce WKWebView memory and startup cost | Low | All iOS versions |
+| **2** | B-5: Embed initial markdown in HTML load | Eliminate one async round-trip on first render | Low | All iOS versions |
+| **3** | B-4: Inline HTML/JS/CSS | Eliminate file I/O; single atomic load | Low-Medium | All iOS versions |
+| **4** | B-3: JS bundle optimization (hljs lazy-load) | Reduce initial ~715KB → ~200KB; faster JS parse | Medium | All iOS versions |
+| **5** | B-2: WebView pooling | Eliminate 50-100+ ms cold start per instance in List | Medium | All iOS versions |
+| **6** | E: iOS 26 conditional WebView | Cleaner SwiftUI integration; future-proof | Medium | iOS 26+ only |
+
+**Rationale for Priority 6 placement of iOS 26 WebView:**
+- Priorities 1-5 (B-series) directly reduce rendering latency and memory for **all** users on iOS 16+
+- iOS 26 WebView improves code quality but does not improve rendering performance (same WKWebView underneath)
+- iOS 26 adoption will be limited in the first 1-2 years; B-series optimizations benefit the entire user base immediately
+- Implementing B-series first ensures the shared internals (`MarkdownScriptBuilder`, `MarkdownEventBridge`, resource loading) are already optimized before building the iOS 26 path on top
 
 Pure Swift (A) is viable only as a **separate package** (`MarkdownViewLite`), not a replacement.
 
