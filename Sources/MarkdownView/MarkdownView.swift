@@ -47,8 +47,6 @@ open class MarkdownView: UIView {
     private let scriptBuilder = MarkdownScriptBuilder()
     private let webViewFactory = MarkdownWebViewFactory()
 
-    private var currentRenderingConfiguration: MarkdownRenderingConfiguration?
-    private var currentStyledFlag: Bool = true
     private var hasInjectedExtendedLanguages = false
 
     private var intrinsicContentHeight: CGFloat? {
@@ -166,19 +164,7 @@ open class MarkdownView: UIView {
         guard webView != nil else { return }
 
         guard isWebViewLoaded else {
-            // B-5: Instead of queuing a pendingRenderRequest, restart the load
-            // with markdown embedded in the HTML template. This eliminates the
-            // didFinish → callAsyncJavaScript round-trip for the first render.
-            if let config = currentRenderingConfiguration {
-                configureWebView(
-                    with: config,
-                    styled: currentStyledFlag,
-                    initialMarkdown: markdown,
-                    enableImage: enableImage
-                )
-            } else {
-                pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
-            }
+            pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
             return
         }
 
@@ -203,6 +189,7 @@ open class MarkdownView: UIView {
 extension MarkdownView: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard webView === self.webView else { return }
         isWebViewLoaded = true
 
         if let request = pendingRenderRequest {
@@ -274,8 +261,6 @@ private extension MarkdownView {
         isWebViewLoaded = false
         pendingRenderRequest = nil
         hasInjectedExtendedLanguages = false
-        currentRenderingConfiguration = renderingConfiguration
-        currentStyledFlag = styled
 
         // B-2: Try to dequeue a pre-warmed WebView from the pool
         if let pooledWebView = MarkdownWebViewPool.shared.dequeue(styled: styled) {
