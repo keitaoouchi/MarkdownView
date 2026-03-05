@@ -23,3 +23,5 @@ DerivedData
 .build/
 .swiftpm/
 Sources/MarkdownView/Resources/main-core.css
+Sources/MarkdownView/Resources/main.js
+Sources/MarkdownView/Resources/main.css
