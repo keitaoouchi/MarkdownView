@@ -77,6 +77,10 @@ export function initRenderer(hljs) {
     });
   };
 
+  // Expose hljs globally so the extended-languages bundle can register
+  // additional languages on the same instance without re-running initRenderer.
+  window._hljs = hljs;
+
   window.usePlugin = (plugin) => {
     registeredPlugins.push(plugin);
     resetMarkdownRendererCache();

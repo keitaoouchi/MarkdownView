@@ -16,9 +16,11 @@ await esbuild.build({
   legalComments: 'none',
 });
 
-// Step 2: Build full bundle (~715KB) — all 113 languages (for lazy injection)
+// Step 2: Build extended-languages bundle (~540KB) — 97 additional languages only
+// This bundle registers languages on the shared window._hljs instance
+// without calling initRenderer, preserving plugin state.
 await esbuild.build({
-  entryPoints: { main: './src/js/index.js' },
+  entryPoints: { 'main-extended': './src/js/index-extended.js' },
   bundle: true,
   minify: true,
   outdir,
@@ -28,7 +30,7 @@ await esbuild.build({
 
 // Step 3: Read built artifacts (use core bundle for HTML inlining)
 const coreJs = readFileSync(resolve(outdir, 'main-core.js'), 'utf-8');
-const mainCss = readFileSync(resolve(outdir, 'main.css'), 'utf-8');
+const mainCss = readFileSync(resolve(outdir, 'main-core.css'), 'utf-8');
 
 // Step 4: Generate self-contained HTML templates with inlined core JS/CSS
 const styledHtml = `<!doctype html>

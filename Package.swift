@@ -20,9 +20,8 @@ let package = Package(
             resources: [
                 .copy("Resources/styled.html"),
                 .copy("Resources/non_styled.html"),
-                .copy("Resources/main.js"),
-                .copy("Resources/main-core.js"),
-                .copy("Resources/main.css")
+                .copy("Resources/main-extended.js"),
+                .copy("Resources/main-core.js")
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v5)

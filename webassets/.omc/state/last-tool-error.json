@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd /Users/keeeita/workplace/MarkdownView && swift build 2>&1\",\"timeout\":120000,\"description\":\"Swift package build\"}",
+  "error": "Exit code 1\nwarning: 'markdownview': found 2 file(s) which are unhandled; explicitly declare them as resources or exclude from the target\n    /Users/keeeita/workplace/MarkdownView/Sources/MarkdownView/Resources/main.js\n    /Users/keeeita/workplace/MarkdownView/Sources/MarkdownView/Resources/main.css\n[0/1] Planning build\nBuilding for debugging...\n[0/7] Copying main-core.css\n[1/7] Copying main-extended.js\n[1/7] Copying main-core.js\n[1/7] Copying non_styled.html\n[4/7] Copying styled.html\n[5/7] Writ...",
+  "timestamp": "2026-03-03T15:21:31.806Z",
+  "retry_count": 1
+}
