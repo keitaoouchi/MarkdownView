@@ -362,7 +362,7 @@ private extension MarkdownView {
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "`", with: "\\`")
             .replacingOccurrences(of: "$", with: "\\$")
-            .replacingOccurrences(of: "</script", with: "<\\/script")
+            .replacingOccurrences(of: "</script", with: "<\\/script", options: .caseInsensitive)
 
         let initScript = """
         <script>
