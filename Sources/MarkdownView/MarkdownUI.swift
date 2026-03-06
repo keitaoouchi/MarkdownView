@@ -32,6 +32,7 @@ public struct MarkdownUI: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> MarkdownView {
         let view = MarkdownView(css: css, plugins: plugins, stylesheets: stylesheets, styled: styled)
+        view.clipsToBounds = true
         view.isScrollEnabled = false
         view.onTouchLink = onTouchLinkHandler
         view.onRendered = onRenderedHandler

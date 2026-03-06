@@ -11,9 +11,9 @@
 		3E4A3B02278D1111009DD55A /* MarkdownEventBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E4A3B01278D1111009DD55A /* MarkdownEventBridge.swift */; };
 		3E4A3B04278D1111009DD55A /* MarkdownScriptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E4A3B03278D1111009DD55A /* MarkdownScriptBuilder.swift */; };
 		3E4A3B06278D1111009DD55A /* MarkdownWebViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E4A3B05278D1111009DD55A /* MarkdownWebViewFactory.swift */; };
+		3E4A3B08278D1111009DD55A /* MarkdownWebViewPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E4A3B07278D1111009DD55A /* MarkdownWebViewPool.swift */; };
 		FC9CC4C51EC43FA90013238C /* styled.html in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BD1EC43FA90013238C /* styled.html */; };
-		FC9CC4C61EC43FA90013238C /* main.css in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BE1EC43FA90013238C /* main.css */; };
-		FC9CC4C71EC43FA90013238C /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BF1EC43FA90013238C /* main.js */; };
+		FC9CC4C71EC43FA90013238C /* main-extended.js in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4BF1EC43FA90013238C /* main-extended.js */; };
 		FC9CC4C81EC43FA90013238C /* non_styled.html in Resources */ = {isa = PBXBuildFile; fileRef = FC9CC4C01EC43FA90013238C /* non_styled.html */; };
 		FCA0501A1EC41211001DAD5F /* MarkdownView.h in Headers */ = {isa = PBXBuildFile; fileRef = FCA050181EC41211001DAD5F /* MarkdownView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FCFB6FD51EC4381600297562 /* MarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFB6FD21EC4381600297562 /* MarkdownView.swift */; };
@@ -24,9 +24,9 @@
 		3E4A3B01278D1111009DD55A /* MarkdownEventBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownEventBridge.swift; sourceTree = "<group>"; };
 		3E4A3B03278D1111009DD55A /* MarkdownScriptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownScriptBuilder.swift; sourceTree = "<group>"; };
 		3E4A3B05278D1111009DD55A /* MarkdownWebViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownWebViewFactory.swift; sourceTree = "<group>"; };
+		3E4A3B07278D1111009DD55A /* MarkdownWebViewPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownWebViewPool.swift; sourceTree = "<group>"; };
 		FC9CC4BD1EC43FA90013238C /* styled.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = styled.html; path = Sources/MarkdownView/Resources/styled.html; sourceTree = SOURCE_ROOT; };
-		FC9CC4BE1EC43FA90013238C /* main.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = main.css; path = Sources/MarkdownView/Resources/main.css; sourceTree = SOURCE_ROOT; };
-		FC9CC4BF1EC43FA90013238C /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main.js; path = Sources/MarkdownView/Resources/main.js; sourceTree = SOURCE_ROOT; };
+		FC9CC4BF1EC43FA90013238C /* main-extended.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = main-extended.js; path = Sources/MarkdownView/Resources/main-extended.js; sourceTree = SOURCE_ROOT; };
 		FC9CC4C01EC43FA90013238C /* non_styled.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = non_styled.html; path = Sources/MarkdownView/Resources/non_styled.html; sourceTree = SOURCE_ROOT; };
 		FCA050151EC41211001DAD5F /* MarkdownView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MarkdownView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCA050181EC41211001DAD5F /* MarkdownView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MarkdownView.h; path = ../MarkdownView.h; sourceTree = "<group>"; };
@@ -68,6 +68,7 @@
 				3E4A3B01278D1111009DD55A /* MarkdownEventBridge.swift */,
 				3E4A3B03278D1111009DD55A /* MarkdownScriptBuilder.swift */,
 				3E4A3B05278D1111009DD55A /* MarkdownWebViewFactory.swift */,
+				3E4A3B07278D1111009DD55A /* MarkdownWebViewPool.swift */,
 				3E3DF020278C4880009DD55A /* MarkdownUI.swift */,
 				FCA050181EC41211001DAD5F /* MarkdownView.h */,
 				FCA050191EC41211001DAD5F /* Info.plist */,
@@ -82,8 +83,7 @@
 			children = (
 				FC9CC4BD1EC43FA90013238C /* styled.html */,
 				FC9CC4C01EC43FA90013238C /* non_styled.html */,
-				FC9CC4BE1EC43FA90013238C /* main.css */,
-				FC9CC4BF1EC43FA90013238C /* main.js */,
+				FC9CC4BF1EC43FA90013238C /* main-extended.js */,
 			);
 			name = Assets;
 			sourceTree = "<group>";
@@ -159,10 +159,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC9CC4C61EC43FA90013238C /* main.css in Resources */,
 				FC9CC4C51EC43FA90013238C /* styled.html in Resources */,
 				FC9CC4C81EC43FA90013238C /* non_styled.html in Resources */,
-				FC9CC4C71EC43FA90013238C /* main.js in Resources */,
+				FC9CC4C71EC43FA90013238C /* main-extended.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,6 +175,7 @@
 				3E4A3B02278D1111009DD55A /* MarkdownEventBridge.swift in Sources */,
 				3E4A3B04278D1111009DD55A /* MarkdownScriptBuilder.swift in Sources */,
 				3E4A3B06278D1111009DD55A /* MarkdownWebViewFactory.swift in Sources */,
+				3E4A3B08278D1111009DD55A /* MarkdownWebViewPool.swift in Sources */,
 				3E3DF021278C4880009DD55A /* MarkdownUI.swift in Sources */,
 				FCFB6FD51EC4381600297562 /* MarkdownView.swift in Sources */,
 			);

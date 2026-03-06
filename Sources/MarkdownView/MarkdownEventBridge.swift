@@ -9,7 +9,12 @@ final class MarkdownEventBridge: NSObject, WKScriptMessageHandler {
     }
 
     func attach(to userContentController: WKUserContentController) {
+        userContentController.removeScriptMessageHandler(forName: "updateHeight")
         userContentController.add(self, name: "updateHeight")
+    }
+
+    func detach(from userContentController: WKUserContentController) {
+        userContentController.removeScriptMessageHandler(forName: "updateHeight")
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {

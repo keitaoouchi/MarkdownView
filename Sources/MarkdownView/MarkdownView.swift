@@ -47,6 +47,8 @@ open class MarkdownView: UIView {
     private let scriptBuilder = MarkdownScriptBuilder()
     private let webViewFactory = MarkdownWebViewFactory()
 
+    private var hasInjectedExtendedLanguages = false
+
     private var intrinsicContentHeight: CGFloat? {
         didSet {
             invalidateIntrinsicContentSize()
@@ -91,6 +93,10 @@ open class MarkdownView: UIView {
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setupEventBridge()
+    }
+
+    deinit {
+        cleanupWebView()
     }
 
     open override var intrinsicContentSize: CGSize {
@@ -159,7 +165,7 @@ open class MarkdownView: UIView {
     }
 
     private func renderMarkdown(markdown: String, enableImage: Bool) {
-        guard let webView else { return }
+        guard webView != nil else { return }
 
         guard isWebViewLoaded else {
             pendingRenderRequest = PendingRenderRequest(markdown: markdown, enableImage: enableImage)
@@ -170,7 +176,7 @@ open class MarkdownView: UIView {
             "markdown": markdown,
             "enableImage": enableImage
         ]
-        webView.callAsyncJavaScript(
+        webView?.callAsyncJavaScript(
             "window.renderMarkdown(payload)",
             arguments: ["payload": payload],
             in: nil,
@@ -187,12 +193,17 @@ open class MarkdownView: UIView {
 extension MarkdownView: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard webView === self.webView else { return }
         isWebViewLoaded = true
 
         if let request = pendingRenderRequest {
             pendingRenderRequest = nil
             renderMarkdown(markdown: request.markdown, enableImage: request.enableImage)
         }
+
+        // B-3: After initial page load, inject full highlight.js bundle
+        // to support all 113 languages (core bundle only has 15)
+        injectExtendedLanguagesIfNeeded()
     }
 
     public func webView(_ webView: WKWebView,
@@ -211,34 +222,39 @@ extension MarkdownView: WKNavigationDelegate {
     }
 }
 
-private extension MarkdownView {
-    static var styledHtmlUrl: URL = {
-        #if SWIFT_PACKAGE
-        let bundle = Bundle.module
-        #else
-        let bundle = Bundle(for: MarkdownView.self)
-        #endif
-        return bundle.url(forResource: "styled",
-                          withExtension: "html") ??
-            bundle.url(forResource: "styled",
-                       withExtension: "html",
-                       subdirectory: "MarkdownView.bundle")!
-    }()
+// MARK: - Resources
 
-    static var nonStyledHtmlUrl: URL = {
+extension MarkdownView {
+    static let styledHtmlString: String = loadResource(name: "styled", ext: "html")
+    static let nonStyledHtmlString: String = loadResource(name: "non_styled", ext: "html")
+    static let extendedLanguagesJs: String = loadResource(name: "main-extended", ext: "js")
+
+    static func loadResource(name: String, ext: String) -> String {
         #if SWIFT_PACKAGE
         let bundle = Bundle.module
         #else
         let bundle = Bundle(for: MarkdownView.self)
         #endif
-        return bundle.url(forResource: "non_styled",
-                          withExtension: "html") ??
-            bundle.url(forResource: "non_styled",
-                       withExtension: "html",
-                       subdirectory: "MarkdownView.bundle")!
-    }()
+        let url = bundle.url(forResource: name, withExtension: ext)
+            ?? bundle.url(forResource: name, withExtension: ext, subdirectory: "MarkdownView.bundle")!
+        return (try? String(contentsOf: url)) ?? ""
+    }
+}
+
+private extension MarkdownView {
+
+    func cleanupWebView() {
+        guard let webView else { return }
+
+        webView.navigationDelegate = nil
+        let contentController = webView.configuration.userContentController
+        eventBridge?.detach(from: contentController)
+        webView.removeFromSuperview()
+        self.webView = nil
+    }
 
     func setupEventBridge() {
+        clipsToBounds = true
         eventBridge = MarkdownEventBridge { [weak self] height in
             guard let self else { return }
 
@@ -252,11 +268,54 @@ private extension MarkdownView {
         }
     }
 
-    func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration, styled: Bool) {
-        webView?.removeFromSuperview()
+    func configureWebView(with renderingConfiguration: MarkdownRenderingConfiguration,
+                          styled: Bool,
+                          initialMarkdown: String? = nil,
+                          enableImage: Bool = true) {
+        cleanupWebView()
         isWebViewLoaded = false
         pendingRenderRequest = nil
+        hasInjectedExtendedLanguages = false
 
+        // B-2: Try to dequeue a pre-warmed WebView from the pool
+        if let pooledWebView = MarkdownWebViewPool.shared.dequeue(styled: styled) {
+            pooledWebView.translatesAutoresizingMaskIntoConstraints = false
+            pooledWebView.navigationDelegate = self
+            pooledWebView.scrollView.isScrollEnabled = isScrollEnabled
+            pooledWebView.clipsToBounds = true
+            pooledWebView.scrollView.clipsToBounds = true
+            addSubview(pooledWebView)
+            NSLayoutConstraint.activate([
+                pooledWebView.topAnchor.constraint(equalTo: topAnchor),
+                pooledWebView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                pooledWebView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                pooledWebView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            ])
+            webView = pooledWebView
+
+            // Inject CSS/plugins via evaluateJavaScript (since pooled WebViews use default config)
+            let scripts = scriptBuilder.makeScriptStrings(configuration: renderingConfiguration)
+            for script in scripts {
+                pooledWebView.evaluateJavaScript(script, completionHandler: nil)
+            }
+
+            // Attach event bridge to pooled WebView's content controller
+            eventBridge?.attach(to: pooledWebView.configuration.userContentController)
+
+            isWebViewLoaded = true
+
+            // B-3: Inject extended languages for pooled WebViews
+            // (didFinish won't fire since the page is already loaded)
+            injectExtendedLanguagesIfNeeded()
+
+            // If initial markdown is provided, render immediately
+            if let initialMarkdown {
+                renderMarkdown(markdown: initialMarkdown, enableImage: enableImage)
+            }
+            return
+        }
+
+        // Standard path: create a new WebView
         let configuration = WKWebViewConfiguration()
         let contentController = scriptBuilder.makeContentController(configuration: renderingConfiguration)
         eventBridge?.attach(to: contentController)
@@ -268,6 +327,51 @@ private extension MarkdownView {
             scrollEnabled: isScrollEnabled,
             navigationDelegate: self
         )
-        webView?.load(URLRequest(url: styled ? Self.styledHtmlUrl : Self.nonStyledHtmlUrl))
+        webView?.clipsToBounds = true
+        webView?.scrollView.clipsToBounds = true
+
+        let baseHtml = styled ? Self.styledHtmlString : Self.nonStyledHtmlString
+
+        if let initialMarkdown {
+            let htmlString = Self.embedMarkdown(in: baseHtml, markdown: initialMarkdown, enableImage: enableImage)
+            webView?.loadHTMLString(htmlString, baseURL: nil)
+        } else {
+            webView?.loadHTMLString(baseHtml, baseURL: nil)
+        }
+    }
+
+    func injectExtendedLanguagesIfNeeded() {
+        guard !hasInjectedExtendedLanguages, let webView else { return }
+        hasInjectedExtendedLanguages = true
+
+        let extendedJs = Self.extendedLanguagesJs
+        guard !extendedJs.isEmpty else { return }
+
+        // Inject the extended-languages bundle which registers 97 additional languages
+        // on the shared window._hljs instance and re-highlights existing code blocks.
+        // This bundle does NOT call initRenderer, preserving plugin state.
+        webView.evaluateJavaScript(extendedJs) { _, error in
+            if let error {
+                print("[MarkdownView] Extended languages injection failed: \(error)")
+            }
+        }
+    }
+
+    static func embedMarkdown(in html: String, markdown: String, enableImage: Bool) -> String {
+        let escaped = markdown
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "$", with: "\\$")
+            .replacingOccurrences(of: "</script", with: "<\\/script", options: .caseInsensitive)
+
+        let initScript = """
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.renderMarkdown({ markdown: `\(escaped)`, enableImage: \(enableImage) });
+        });
+        </script>
+        """
+
+        return html.replacingOccurrences(of: "</body>", with: "\(initScript)\n</body>")
     }
 }

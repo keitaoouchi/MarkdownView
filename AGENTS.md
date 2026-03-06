@@ -15,9 +15,9 @@ Purpose
 - Web Layer (Bundled Assets)
   - HTML: styled.html / non_styled.html
     - Role: Base HTML for rendering (toggles between styled and unstyled)
-  - JS: main.js
+  - JS: main-core.js (core bundle, 15 languages, inlined into HTML), main-extended.js (97 additional languages, lazy-loaded), main.js (full bundle for tests)
     - Role: Markdown-to-HTML conversion using markdown-it and highlight.js, provides the window.renderMarkdown API, measures height and notifies native side
-  - CSS: main.css
+  - CSS: main-core.css (inlined into HTML at build time)
     - Role: Default styles (applied via styled.html)
 - SwiftUI Layer
   - MarkdownUI (UIViewRepresentable)

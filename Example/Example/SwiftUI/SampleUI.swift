@@ -1,6 +1,40 @@
 import SwiftUI
 import MarkdownView
 
+private final class MarkdownListHeightCache {
+    static let shared = MarkdownListHeightCache()
+
+    private struct Key: Hashable {
+        let markdown: String
+        let widthBucket: Int
+    }
+
+    private var storage: [Key: CGFloat] = [:]
+    private let lock = NSLock()
+
+    private init() {}
+
+    func height(for markdown: String, width: CGFloat) -> CGFloat? {
+        guard width > 0 else { return nil }
+        let key = Key(markdown: markdown, widthBucket: widthBucket(for: width))
+        lock.lock()
+        defer { lock.unlock() }
+        return storage[key]
+    }
+
+    func store(height: CGFloat, for markdown: String, width: CGFloat) {
+        guard width > 0, height > 0 else { return }
+        let key = Key(markdown: markdown, widthBucket: widthBucket(for: width))
+        lock.lock()
+        storage[key] = height
+        lock.unlock()
+    }
+
+    private func widthBucket(for width: CGFloat) -> Int {
+        Int((width * 2).rounded())
+    }
+}
+
 struct SampleUI: View {
     var body: some View {
         ScrollView {
@@ -26,17 +60,22 @@ struct SampleListUI: View {
     private let items = MarkdownListItem.makeLargeDataset(count: 80)
 
     var body: some View {
-        List(items) { item in
-            MarkdownListRow(item: item)
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(items) { item in
+                    MarkdownListRow(item: item)
+                    Divider()
+                }
+            }
         }
-        .listStyle(.plain)
-        .navigationTitle("SwiftUI List (80)")
+        .navigationTitle("SwiftUI LazyVStack (80)")
     }
 }
 
 private struct MarkdownListRow: View {
     let item: MarkdownListItem
     @State private var contentHeight: CGFloat = 1
+    @State private var markdownWidth: CGFloat = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -47,14 +86,52 @@ private struct MarkdownListRow: View {
                 .onRendered { height in
                     guard abs(contentHeight - height) > 0.5 else { return }
                     contentHeight = height
+                    MarkdownListHeightCache.shared.store(
+                        height: height,
+                        for: item.markdown,
+                        width: markdownWidth
+                    )
                 }
                 .onTouchLink { link in
                     print(link)
                     return false
                 }
                 .frame(height: contentHeight)
+                .clipped()
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear
+                            .onAppear {
+                                updateMarkdownWidth(proxy.size.width)
+                            }
+                            .onChange(of: proxy.size.width) { newWidth in
+                                updateMarkdownWidth(newWidth)
+                            }
+                    }
+                )
         }
+        .onChange(of: item.id) { _ in
+            applyCachedHeightOrReset()
+        }
+        .padding(.horizontal, 16)
         .padding(.vertical, 4)
+    }
+
+    private func updateMarkdownWidth(_ width: CGFloat) {
+        guard abs(markdownWidth - width) > 0.5 else { return }
+        markdownWidth = width
+        applyCachedHeightOrReset()
+    }
+
+    private func applyCachedHeightOrReset() {
+        if let cachedHeight = MarkdownListHeightCache.shared.height(
+            for: item.markdown,
+            width: markdownWidth
+        ) {
+            contentHeight = cachedHeight
+        } else {
+            contentHeight = 1
+        }
     }
 }
 

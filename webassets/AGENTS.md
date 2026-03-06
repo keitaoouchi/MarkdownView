@@ -14,22 +14,29 @@ webassets/
 ├── playwright.config.js       # Playwright test configuration
 ├── src/
 │   ├── js/
-│   │   └── index.js           # JS entry point (sole source file)
+│   │   ├── index.js           # Full JS entry point (113 languages + renderer)
+│   │   ├── index-core.js      # Core JS entry point (15 common languages + renderer)
+│   │   ├── index-extended.js  # Extended-languages-only bundle (97 additional languages)
+│   │   └── render.js          # Shared renderer logic (markdown-it, height notification)
 │   └── css/
 │       ├── bootstrap.css      # Bootstrap v3.3.7 (only .table / .container rules)
 │       ├── gist.css           # highlight.js theme (gist)
 │       ├── github.css         # GitHub Markdown styles
 │       └── index.css          # Custom CSS (CSS variables & dark mode support)
 └── tests/
-    └── render.spec.js         # Playwright functional tests (16 cases)
+    └── render.spec.js         # Playwright functional tests (18 cases)
 ```
 
 Build artifacts are output **outside of `webassets/`**.
 
 ```
 ../Sources/MarkdownView/Resources/
-├── main.js      # Bundled & minified (~715 KB)
-└── main.css     # Same
+├── main.js           # Full bundle (~715 KB) — all 113 languages + renderer (for tests)
+├── main-core.js      # Core bundle (~175 KB) — 15 common languages + renderer (inlined into HTML)
+├── main-core.css     # CSS bundle (inlined into HTML)
+├── main-extended.js  # Extended-languages bundle (~540 KB) — 97 additional languages only
+├── styled.html       # Self-contained HTML template with inlined core JS/CSS (styled)
+└── non_styled.html   # Self-contained HTML template with inlined core JS (non-styled)
 ```
 
 ---
@@ -63,7 +70,7 @@ Build time is typically under 100 ms.
 
 ---
 
-## JS Entry Point (src/js/index.js)
+## JS Entry Points
 
 ### Dependencies
 
@@ -73,13 +80,27 @@ Build time is typically under 100 ms.
 | `markdown-it` | ^14.1.0 | Markdown parsing & rendering |
 | `markdown-it-emoji` | ^3.0.0 | Emoji shortcode conversion |
 
+### Bundle Architecture
+
+The JS is split into three bundles for performance optimization:
+
+| Entry Point | Output | Languages | Includes Renderer |
+|-------------|--------|-----------|-------------------|
+| `index-core.js` | `main-core.js` | 15 common | Yes (via `render.js`) |
+| `index.js` | `main.js` | 113 all | Yes (via `render.js`) |
+| `index-extended.js` | `main-extended.js` | 97 additional | No (registers on `window._hljs`) |
+
+- **`main-core.js`** is inlined into HTML templates at build time for fast initial load
+- **`main-extended.js`** is injected via `evaluateJavaScript` after first render to add remaining languages
+- **`main.js`** is the full bundle used by Playwright tests
+
 ### highlight.js Language Set
 
 **113 languages are individually imported** into `highlight.js/lib/core`
 (changed from bundling all 192 languages to reduce bundle size).
 
 To add or remove languages, edit both the import statement and the
-`hljs.registerLanguage()` call in `index.js` as a pair.
+`hljs.registerLanguage()` call in the relevant `index*.js` file as a pair.
 
 **Note**: `import markdownLang from "highlight.js/lib/languages/markdown"` uses
 the alias `markdownLang` to avoid a variable name collision with
@@ -97,6 +118,12 @@ import { full as emoji } from "markdown-it-emoji";
 import emoji from "markdown-it-emoji";
 ```
 
+### Shared Renderer (render.js)
+
+The renderer logic is shared between `index-core.js` and `index.js` via
+`render.js`. It exposes `window._hljs` so the extended-languages bundle can
+register additional languages without re-running `initRenderer`.
+
 ### APIs Exposed on `window`
 
 Called from the iOS Swift side via WKWebView's `callAsyncJavaScript`.
@@ -105,6 +132,7 @@ Called from the iOS Swift side via WKWebView's `callAsyncJavaScript`.
 |-----|-----------|-------------|
 | `window.renderMarkdown` | `(payload: { markdown: string, enableImage?: boolean }) => void` | Receives a payload object and renders Markdown. When `enableImage=false`, images are hidden |
 | `window.usePlugin` | `(plugin: MarkdownItPlugin) => void` | Public API to register a markdown-it plugin. Allows the Swift side to dynamically add plugins |
+| `window._hljs` | `hljs instance` | Exposed by `render.js` for the extended-languages bundle to register additional languages |
 
 ### WKWebView Callback
 
@@ -135,7 +163,7 @@ CSS files are bundled together with JS by the build script.
 
 ## Tests (tests/render.spec.js)
 
-16 functional tests using Playwright + headless Chromium.
+18 functional tests using Playwright + headless Chromium.
 
 ### Test Environment Setup
 
@@ -143,7 +171,7 @@ CSS files are bundled together with JS by the build script.
 
 1. `page.setContent(...)` — Sets up minimal HTML with `<div id="contents">`
 2. `page.evaluate(...)` — Injects a `window.webkit.messageHandlers.updateHeight` mock
-3. `page.addScriptTag(...)` — Loads the built `main.js`
+3. `page.addScriptTag(...)` — Loads the built `main.js` (full bundle with all 113 languages)
 
 **Important**: The WKWebView mock is injected via `page.evaluate` (after setContent),
 not `addInitScript`. In headless shell environments, `addInitScript` may not
@@ -157,7 +185,7 @@ reliably preserve `window` properties.
 | highlight.js (hljs class assignment, Swift, Python) | 3 |
 | Emoji shortcode conversion | 1 |
 | Bootstrap table class injection | 1 |
-| Image control (enableImage true/false) | 2 |
+| Image control (enableImage true/false) | 4 |
 | WebKit height notification | 1 |
 | Edge cases (empty string, multiple-call overwrite) | 2 |
 
@@ -200,7 +228,7 @@ import markdown from "highlight.js/lib/languages/markdown"; // Name collision
 ### Changing the Build Output Path
 
 If you change `outdir` in `build.mjs`, also update `mainJsPath` in
-`tests/render.spec.js` accordingly.
+`tests/render.spec.js` accordingly. The tests load the full `main.js` bundle.
 
 ```js
 // tests/render.spec.js
