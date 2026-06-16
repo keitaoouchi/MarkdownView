@@ -12,7 +12,7 @@ await esbuild.build({
   bundle: true,
   minify: true,
   outdir,
-  target: ['safari13'],
+  target: ['safari16'],
   legalComments: 'none',
 });
 
@@ -22,7 +22,7 @@ await esbuild.build({
   bundle: true,
   minify: true,
   outdir,
-  target: ['safari13'],
+  target: ['safari16'],
   legalComments: 'none',
 });
 
@@ -34,7 +34,7 @@ await esbuild.build({
   bundle: true,
   minify: true,
   outdir,
-  target: ['safari13'],
+  target: ['safari16'],
   legalComments: 'none',
 });
 
