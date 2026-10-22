@@ -62,7 +62,7 @@ npm test
 ## Build Configuration (build.mjs)
 
 - **Bundler**: esbuild (replaces webpack + Babel)
-- **Target**: `safari13` (supports WKWebView; app deployment target iOS 16+)
+- **Target**: `safari16` (matches the iOS 16+ deployment target for WKWebView)
 - **Output**: IIFE format, minified
 - **License comments**: `legalComments: 'none'` (no LICENSE.txt generated)
 
@@ -77,7 +77,7 @@ Build time is typically under 100 ms.
 | Library | Version | Purpose |
 |---------|---------|---------|
 | `highlight.js` | ^11.11.1 | Syntax highlighting |
-| `markdown-it` | ^14.1.0 | Markdown parsing & rendering |
+| `markdown-it` | ^14.3.3 | Markdown parsing & rendering |
 | `markdown-it-emoji` | ^3.0.0 | Emoji shortcode conversion |
 
 ### Bundle Architecture
