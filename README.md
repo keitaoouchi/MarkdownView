@@ -34,7 +34,7 @@ MarkdownView is available through [Swift Package Manager](https://swift.org/pack
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/keitaoouchi/MarkdownView.git", from: "2.1.0")
+    .package(url: "https://github.com/keitaoouchi/MarkdownView.git", from: "2.1.1")
 ]
 ```
 
